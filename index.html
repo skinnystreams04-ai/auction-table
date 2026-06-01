@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Аукцион - Оверлей OBS (Некромантия)</title>
+    <style>
+        /* Глубокий мрак на фоне (в OBS будет прозрачным) */
+        body { margin: 0; padding: 20px; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; overflow: hidden; background-color: #050605; color: #c2c9bc; }
+        
+        .layout { display: flex; gap: 30px; align-items: flex-start; height: 100vh; }
+        .players-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; align-items: start; align-content: start; }
+        
+        .cauldron-sidebar { width: 400px; background: linear-gradient(180deg, #140d0d 0%, #070a07 100%); border: 2px solid #4a1515; border-radius: 6px; padding: 20px; box-shadow: -10px 0 30px rgba(0,0,0,0.9), inset 0 0 40px rgba(74, 21, 21, 0.4); display: flex; flex-direction: column; gap: 15px; }
+        .cauldron-header { font-size: 22px; font-weight: 900; color: #8c9c84; text-align: center; text-transform: uppercase; border-bottom: 2px solid #4a1515; padding-bottom: 15px; letter-spacing: 2px; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); }
+        
+        .cauldron-item { background: rgba(8, 12, 8, 0.8); border: 1px solid #1c261c; border-radius: 4px; padding: 12px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
+        .c-top-row { display: flex; justify-content: space-between; align-items: center; }
+        .c-game-name { font-size: 17px; font-weight: bold; color: #b0bcab; text-transform: uppercase; width: 65%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .c-tickets { font-size: 24px; font-weight: 900; color: #7fa86b; text-shadow: 0 0 8px rgba(127, 168, 107, 0.3); }
+        .c-gold { display: flex; align-items: center; gap: 5px; font-size: 14px; color: #b59a5c; font-weight: bold; background: rgba(181, 154, 92, 0.1); padding: 4px 8px; border-radius: 4px; width: fit-content; border: 1px solid rgba(181, 154, 92, 0.3); }
+
+        .status-badge { font-size: 12px; font-weight: 900; padding: 4px 8px; border-radius: 4px; text-align: center; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.9); }
+        .cauldron-item.immortal, .game-item.immortal-slot { border-color: #4a6b82; background: linear-gradient(90deg, rgba(74, 107, 130, 0.2) 0%, rgba(5, 7, 5, 0.8) 100%); }
+        .cauldron-item.immortal .c-game-name, .game-item.immortal-slot .game-name { color: #8cb4d1; text-shadow: 0 0 8px rgba(140, 180, 209, 0.4); }
+        .status-badge.immortal, .badge.immortal { background: #14202b; color: #8cb4d1; border: 1px solid #4a6b82; box-shadow: 0 0 10px rgba(74, 107, 130, 0.4); }
+
+        .cauldron-item.absolute, .game-item.absolute-slot { border-color: #b59a5c; background: linear-gradient(90deg, rgba(181, 154, 92, 0.15) 0%, rgba(5, 7, 5, 0.8) 100%); box-shadow: 0 0 15px rgba(181, 154, 92, 0.1); }
+        .cauldron-item.absolute .c-game-name, .game-item.absolute-slot .game-name { color: #d4c194; text-shadow: 0 0 10px rgba(212, 193, 148, 0.4); }
+        .status-badge.absolute, .badge.absolute { background: #3d3119; color: #d4c194; border: 1px solid #b59a5c; text-shadow: 0 0 5px rgba(212, 193, 148, 0.8); box-shadow: 0 0 10px rgba(181, 154, 92, 0.4); }
+
+        .user-card { background: linear-gradient(145deg, #101410 0%, #080606 100%); border: 2px solid #3b1717; border-radius: 4px; padding: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 10px 20px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 12px; color: #b0bcab; }
+        .user-header { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #2e1414; padding-bottom: 10px; }
+        .role-badge { font-size: 11px; font-weight: 900; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.8); color: #e0e0e0; }
+        .role-badge.sub { background: #4a2b54; border: 1px solid #6c417a; } 
+        .role-badge.vip { background: #5e1c34; border: 1px solid #8a2a4d; } 
+        .role-badge.f   { background: #263327; border: 1px solid #3a4d3b; } 
+        .username { font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #d1d6cd; text-shadow: 2px 2px 4px rgba(0,0,0,0.9); }
+        
+        .game-item { background: rgba(5, 7, 5, 0.8); border: 1px solid #1a211a; border-radius: 2px; padding: 10px; display: flex; flex-direction: column; gap: 8px; border-left: 4px solid #5e1a1a; }
+        .game-top-row { display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Изменен стиль названия игры, чтобы вместить номер */
+        .game-name-container { display: flex; align-items: center; gap: 6px; max-width: 70%; }
+        .game-number { color: #89b4fa; font-weight: 900; font-size: 16px; text-shadow: 0 0 5px rgba(137, 180, 250, 0.4); }
+        .game-name { font-size: 15px; font-weight: bold; color: #94a38f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
+        
+        .tickets { font-size: 26px; font-weight: 900; color: #7fa86b; line-height: 1; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); }
+        
+        .badges-container { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+        .badge { padding: 2px 6px; font-size: 11px; font-weight: bold; text-transform: uppercase; background: rgba(5,5,5,0.9); border: 1px solid; border-radius: 2px; box-shadow: inset 0 0 5px rgba(0,0,0,0.9); }
+        .badge.freeze { color: #5a7b8c; border-color: #314652; } 
+        .badge.shield { color: #8c8163; border-color: #524b38; } 
+        .badge.fire   { color: #d97736; border-color: #8c4217; } /* Добавил цвет для огня */
+        .badge.passive { color: #a6e3a1; border-color: #436340; background: rgba(166, 227, 161, 0.1); } /* Стиль пассивки */
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+        <div class="players-grid" id="players-grid"></div>
+        
+        <div class="cauldron-sidebar">
+            <div class="cauldron-header">🪦 Алтарь Жертв</div>
+            <div id="cauldron-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const playersGrid = document.getElementById("players-grid");
+        const cauldronList = document.getElementById("cauldron-list");
+        
+        const firebaseUrl = "https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/auction_data.json";
+        const configUrl = "https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/auction_config.json";
+
+        // 🔥 Хранилище нашего Словаря для умных бейджей 🔥
+        let dictionaryMap = {};
+
+        async function fetchFromCloud() {
+            try {
+                // Скачиваем данные лотов и конфиг (словарь) одновременно
+                const [dataRes, confRes] = await Promise.all([
+                    fetch(firebaseUrl + "?nocache=" + new Date().getTime()),
+                    fetch(configUrl + "?nocache=" + new Date().getTime())
+                ]);
+                
+                const data = await dataRes.json();
+                const conf = await confRes.json();
+                
+                // Заполняем словарь эффектов
+                if (conf && conf.dictionary) {
+                    dictionaryMap = {};
+                    if (conf.dictionary.buffs) conf.dictionary.buffs.forEach(e => dictionaryMap[e.id] = e);
+                    if (conf.dictionary.debuffs) conf.dictionary.debuffs.forEach(e => dictionaryMap[e.id] = e);
+                }
+
+                if (data && data.players) {
+                    drawSlots(data.players);
+                } else {
+                    playersGrid.innerHTML = "<h2 style='color: #4a1515;'>Алтарь пуст... Ждем жертв.</h2>";
+                    cauldronList.innerHTML = "";
+                }
+            } catch (error) {
+                console.error("Ошибка связи с Некрополем:", error);
+            }
+        }
+
+        setInterval(fetchFromCloud, 1000);
+        fetchFromCloud();
+
+        function drawSlots(playersData) {
+            
+            // 1. ПЕРВЫЙ ПРОХОД: Собираем глобальное золото в Котел
+            const globalCauldron = {};
+            playersData.forEach(player => {
+                if (!player.games) return; 
+                
+                player.games.forEach(game => {
+                    let upperName = game.name.toUpperCase();
+                    if (!globalCauldron[upperName]) {
+                        globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: game.name };
+                    }
+                    globalCauldron[upperName].tickets += parseInt(game.tickets) || 0;
+                    globalCauldron[upperName].gold += parseInt(game.gold) || 0; 
+                });
+            });
+
+            // 2. ВТОРОЙ ПРОХОД: Рисуем карточки игроков
+            playersGrid.innerHTML = "";
+
+            playersData.forEach(player => {
+                let gamesHtml = "";
+                let localGameCounter = 1; // 🔥 СЧЕТЧИК СБРАСЫВАЕТСЯ ТУТ
+                
+                if (player.games) {
+                    player.games.forEach(game => {
+                        let upperName = game.name.toUpperCase();
+                        let globalGold = globalCauldron[upperName].gold;
+                        
+                        let itemClass = "";
+                        let globalBadge = "";
+
+                        // Проверяем статус игры в Котле
+                        if (globalGold >= 20) {
+                            itemClass = "absolute-slot";
+                            globalBadge = `<div class="badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`;
+                        } else if (globalGold >= 10) {
+                            itemClass = "immortal-slot";
+                            globalBadge = `<div class="badge immortal">💀 БЕССМЕРТИЕ</div>`;
+                        }
+
+                        // БЕЙДЖ ПАССИВКИ
+                        let passiveBadge = "";
+                        if (game.passive && game.passive > 0) {
+                            passiveBadge = `<div class="badge passive">📈 +${game.passive}</div>`;
+                        }
+
+                        // 🔥 УМНЫЕ БЕЙДЖИ V2.0 🔥
+                        let localBadges = (game.badges || []).map(b => {
+                            let iconText = "";
+                            
+                            // Ищем статус в нашем скачанном словаре
+                            if (dictionaryMap[b.type]) {
+                                iconText = `${dictionaryMap[b.type].icon} ${dictionaryMap[b.type].name}`;
+                            } else {
+                                // Фоллбэк (если вдруг словаря нет)
+                                if(b.type === 'shield') iconText = "🛡️ Щит";
+                                else if(b.type === 'fire') iconText = "🔥 Огонь";
+                                else if(b.type === 'freeze') iconText = "❄️ Заморозка";
+                                else if(b.type === 'kill') iconText = "💀 УБИТ";
+                                else iconText = `✨ ${b.type}`; // Если статус совсем неизвестный
+                            }
+
+                            return `<div class="badge ${b.type}">${iconText}</div>`;
+                        }).join("");
+                        
+                        let badgesHtml = globalBadge + passiveBadge + localBadges;
+                        
+                        gamesHtml += `
+                            <div class="game-item ${itemClass}">
+                                <div class="game-top-row">
+                                    <div class="game-name-container">
+                                        <span class="game-number">#${localGameCounter}</span>
+                                        <span class="game-name">${game.name}</span>
+                                    </div>
+                                    <div class="tickets">🎟️ ${game.tickets || 0}</div>
+                                </div>
+                                ${badgesHtml ? `<div class="badges-container">${badgesHtml}</div>` : ''}
+                            </div>
+                        `;
+                        localGameCounter++; 
+                    });
+                }
+
+                playersGrid.innerHTML += `
+                    <div class="user-card">
+                        <div class="user-header">
+                            <span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span>
+                            <span class="username">${player.user}</span>
+                        </div>
+                        ${gamesHtml}
+                    </div>
+                `;
+            });
+
+            // 3. РИСУЕМ КОТЕЛ (Сортировка по билетам)
+            const sortedGames = Object.values(globalCauldron).sort((a, b) => b.tickets - a.tickets);
+
+            cauldronList.innerHTML = "";
+            sortedGames.forEach(game => {
+                let statusBadge = "";
+                let itemClass = "";
+
+                if (game.gold >= 20) {
+                    itemClass = "absolute";
+                    statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`;
+                } else if (game.gold >= 10) {
+                    itemClass = "immortal";
+                    statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`;
+                }
+
+                cauldronList.innerHTML += `
+                    <div class="cauldron-item ${itemClass}">
+                        <div class="c-top-row">
+                            <div class="c-game-name">${game.rawName}</div>
+                            <div class="c-tickets">🎟️ ${game.tickets}</div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                            ${game.gold > 0 ? `<div class="c-gold">⚜️ Золото: ${game.gold}</div>` : '<div></div>'}
+                            ${statusBadge}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

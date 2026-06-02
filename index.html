@@ -2,17 +2,19 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Аукцион - Оверлей OBS V3.2 (Финальное Колесо)</title>
+    <title>Аукцион - Оверлей V4.8 (Шрифт Neucha)</title>
+    
+    <!-- Подключение шрифта Neucha -->
+    <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
+
     <style>
-        /* Глубокий мрак на фоне (в OBS будет прозрачным) */
         body { margin: 0; padding: 20px; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; overflow: hidden; background-color: #050605; color: #c2c9bc; }
-        
         .layout { display: flex; gap: 20px; align-items: flex-start; height: 95vh; width: 100%; justify-content: space-between; }
         
         .left-panel { flex: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; align-content: start; overflow-y: auto; padding-right: 10px; max-height: 100%; }
         .center-panel { flex: 0 0 450px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; height: 100%; }
-        
         .right-panel { flex: 0 0 350px; background: linear-gradient(180deg, #140d0d 0%, #070a07 100%); border: 2px solid #4a1515; border-radius: 6px; padding: 15px; box-shadow: -10px 0 30px rgba(0,0,0,0.9), inset 0 0 40px rgba(74, 21, 21, 0.4); display: flex; flex-direction: column; gap: 10px; max-height: 100%; box-sizing: border-box; }
+        
         .cauldron-header { font-size: 20px; font-weight: 900; color: #8c9c84; text-align: center; text-transform: uppercase; border-bottom: 2px solid #4a1515; padding-bottom: 10px; letter-spacing: 2px; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); flex-shrink: 0; }
         #cauldron-list { overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
 
@@ -48,7 +50,6 @@
         
         .game-item { background: rgba(5, 7, 5, 0.8); border: 1px solid #1a211a; border-radius: 2px; padding: 8px; display: flex; flex-direction: column; gap: 6px; border-left: 4px solid #5e1a1a; }
         .game-top-row { display: flex; justify-content: space-between; align-items: center; }
-        
         .game-name-container { display: flex; align-items: center; gap: 6px; max-width: 70%; }
         .game-number { color: #89b4fa; font-weight: 900; font-size: 14px; text-shadow: 0 0 5px rgba(137, 180, 250, 0.4); }
         .game-name { font-size: 13px; font-weight: bold; color: #94a38f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: uppercase; }
@@ -61,30 +62,51 @@
         .badge.fire   { color: #d97736; border-color: #8c4217; } 
         .badge.passive { color: #a6e3a1; border-color: #436340; background: rgba(166, 227, 161, 0.1); } 
 
-        /* 🔥 СТИЛИ ЖИВОГО КОЛЕСА (PNG + НЕОН) 🔥 */
-        #wheel-wrapper { position: relative; width: 420px; height: 420px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; transform: scale(0.8); pointer-events: none; }
+        /* 🔥 ИДЕАЛЬНАЯ АРХИТЕКТУРА "СЭНДВИЧ" 🔥 */
+        #wheel-wrapper { 
+            position: relative; width: 420px; height: 420px; 
+            display: flex; align-items: center; justify-content: center; 
+            opacity: 0; transform: scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease; 
+            pointer-events: none; 
+        }
         #wheel-wrapper.active { opacity: 1; transform: scale(1); }
         
-        .wheel-pointer { display: none; }
-        
-        canvas { 
-            width: 400px; 
-            height: 400px; 
-            border: none; 
-            background-position: center;
-            background-size: contain; 
+        #wheel-canvas { 
+            position: absolute; 
+            width: 400px; height: 400px; 
+            top: 10px; left: 10px; 
+            border-radius: 50%; 
+            background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png');
+            background-size: cover; 
+            background-position: center; 
             background-repeat: no-repeat;
-            background-color: transparent;
+            z-index: 1;
         }
         
-        .wheel-result { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(5, 6, 5, 0.95); border: 2px solid #8c9c84; padding: 15px 25px; border-radius: 8px; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.9); opacity: 0; transition: opacity 0.3s; width: 80%; }
-        .wheel-result.show { opacity: 1; }
-        .res-user { color: #d4c194; font-size: 18px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;}
-        .res-text { color: #fff; font-size: 22px; font-weight: 900; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+        #wheel-frame {
+            position: absolute; 
+            width: 420px; height: 420px; 
+            top: 0; left: 0;
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            z-index: 5; 
+            filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.95));
+        }
+        
+        #wheel-wrapper.buff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Buff.png'); }
+        #wheel-wrapper.debuff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Debuff.png'); }
+        #wheel-wrapper.free #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png'); }
 
-        #wheel-wrapper.buff canvas { background-image: url('Buff.png'); box-shadow: 0 0 70px rgba(0, 255, 0, 0.3); }
-        #wheel-wrapper.debuff canvas { background-image: url('Debuff.png'); box-shadow: 0 0 70px rgba(255, 0, 0, 0.4); }
-        #wheel-wrapper.free canvas { background-image: url('Free.png'); box-shadow: 0 0 70px rgba(100, 150, 255, 0.3); }
+        /* Фоновое свечение (накладывается на общий враппер) */
+        #wheel-wrapper.buff { filter: drop-shadow(0 0 50px rgba(0, 255, 0, 0.4)); }
+        #wheel-wrapper.debuff { filter: drop-shadow(0 0 60px rgba(255, 0, 0, 0.8)); }
+        #wheel-wrapper.free { filter: drop-shadow(0 0 50px rgba(200, 200, 200, 0.4)); } 
+
+        .wheel-result { position: absolute; top: 110%; left: 50%; transform: translate(-50%, 0); text-align: center; opacity: 0; transition: opacity 0.3s; width: 100%; z-index: 10; font-family: 'Neucha', cursive, sans-serif;}
+        .wheel-result.show { opacity: 1; }
+        .res-user { color: #d4c194; font-size: 20px; margin-bottom: 10px; text-shadow: 2px 2px 0px #000; line-height: 1.5;}
+        .res-text { font-size: 28px; text-shadow: 3px 3px 0px #000; line-height: 1.5; font-weight: bold;}
     </style>
 </head>
 <body>
@@ -94,11 +116,11 @@
         
         <div class="center-panel">
             <div id="wheel-wrapper">
-                <div class="wheel-pointer"></div>
                 <canvas id="wheel-canvas" width="800" height="800"></canvas>
+                <div id="wheel-frame"></div>
                 <div class="wheel-result" id="wheel-result">
-                    <div class="res-user" id="res-user">Зритель</div>
-                    <div class="res-text" id="res-text">✨ Награда!</div>
+                    <div class="res-user" id="res-user">КРУТИТ: ЗРИТЕЛЬ</div>
+                    <div class="res-text" id="res-text">Награда!</div>
                 </div>
             </div>
         </div>
@@ -138,12 +160,8 @@
                 }
 
                 if (data && data.players) {
-                    try {
-                        drawSlots(data.players);
-                    } catch (e) {
-                        console.error("КРИТИЧЕСКАЯ ОШИБКА ОТРИСОВКИ:", e);
-                        playersGrid.innerHTML = `<h3 style='color: #f38ba8;'>🔴 Ошибка в данных БД: ${e.message}</h3>`;
-                    }
+                    try { drawSlots(data.players); } 
+                    catch (e) { playersGrid.innerHTML = `<h3 style='color: #f38ba8;'>🔴 Ошибка: ${e.message}</h3>`; }
                 } else {
                     playersGrid.innerHTML = "<h2 style='color: #4a1515;'>Алтарь пуст... Ждем жертв.</h2>";
                     cauldronList.innerHTML = "";
@@ -156,8 +174,7 @@
                         startWheelAnimation(spinData);
                     }
                 }
-
-            } catch (error) { console.error("Ошибка связи с Некрополем:", error); }
+            } catch (error) { console.error("Ошибка связи:", error); }
         }
 
         setInterval(fetchFromCloud, 1000);
@@ -165,7 +182,6 @@
 
         function drawSlots(playersData) {
             const globalCauldron = {};
-            
             playersData.forEach(player => {
                 let playerTotalTickets = 0; 
                 if (player.games) {
@@ -174,13 +190,9 @@
                         let safeName = game.name != null ? String(game.name) : "Без названия";
                         let upperName = safeName.toUpperCase();
                         let t = parseInt(game.tickets) || 0;
-                        
-                        if (!globalCauldron[upperName]) {
-                            globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: safeName };
-                        }
+                        if (!globalCauldron[upperName]) globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: safeName };
                         globalCauldron[upperName].tickets += t;
                         globalCauldron[upperName].gold += parseInt(game.gold) || 0; 
-                        
                         playerTotalTickets += t;
                     });
                 }
@@ -193,22 +205,17 @@
             playersData.forEach(player => {
                 let gamesHtml = "";
                 let localGameCounter = 1; 
-                
                 if (player.games) {
                     let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     gamesArr.forEach(game => {
                         let safeName = game.name != null ? String(game.name) : "Без названия";
                         let upperName = safeName.toUpperCase();
                         let globalGold = globalCauldron[upperName].gold;
-                        
                         let itemClass = "";
                         let globalBadge = "";
 
-                        if (globalGold >= 20) {
-                            itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`;
-                        } else if (globalGold >= 10) {
-                            itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal">💀 БЕССМЕРТИЕ</div>`;
-                        }
+                        if (globalGold >= 20) { itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
+                        else if (globalGold >= 10) { itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal">💀 БЕССМЕРТИЕ</div>`; }
 
                         let passiveBadge = "";
                         if (game.passive && game.passive > 0) passiveBadge = `<div class="badge passive">📈 +${game.passive}</div>`;
@@ -217,9 +224,8 @@
                         let localBadges = badgesArr.map(b => {
                             if (!b || !b.type) return "";
                             let iconText = "";
-                            if (dictionaryMap[b.type]) {
-                                iconText = `${dictionaryMap[b.type].icon} ${dictionaryMap[b.type].name}`;
-                            } else {
+                            if (dictionaryMap[b.type]) iconText = `${dictionaryMap[b.type].icon} ${dictionaryMap[b.type].name}`;
+                            else {
                                 if(b.type === 'shield') iconText = "🛡️ Щит";
                                 else if(b.type === 'fire') iconText = "🔥 Огонь";
                                 else if(b.type === 'freeze') iconText = "❄️ Заморозка";
@@ -230,14 +236,10 @@
                         }).join("");
                         
                         let badgesHtml = globalBadge + passiveBadge + localBadges;
-                        
                         gamesHtml += `
                             <div class="game-item ${itemClass}">
                                 <div class="game-top-row">
-                                    <div class="game-name-container">
-                                        <span class="game-number">#${localGameCounter}</span>
-                                        <span class="game-name">${safeName}</span>
-                                    </div>
+                                    <div class="game-name-container"><span class="game-number">#${localGameCounter}</span><span class="game-name">${safeName}</span></div>
                                     <div class="tickets">🎟️ ${game.tickets || 0}</div>
                                 </div>
                                 ${badgesHtml ? `<div class="badges-container">${badgesHtml}</div>` : ''}
@@ -250,10 +252,7 @@
                 playersGrid.innerHTML += `
                     <div class="user-card">
                         <div class="user-header">
-                            <div class="user-header-left">
-                                <span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span>
-                                <span class="username">${player.user || "Зритель"}</span>
-                            </div>
+                            <div class="user-header-left"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="username">${player.user || "Зритель"}</span></div>
                             <div class="user-total-tickets">Σ ${player.totalTickets}</div>
                         </div>
                         ${gamesHtml}
@@ -270,10 +269,7 @@
 
                 cauldronList.innerHTML += `
                     <div class="cauldron-item ${itemClass}">
-                        <div class="c-top-row">
-                            <div class="c-game-name">${game.rawName}</div>
-                            <div class="c-tickets">🎟️ ${game.tickets}</div>
-                        </div>
+                        <div class="c-top-row"><div class="c-game-name">${game.rawName}</div><div class="c-tickets">🎟️ ${game.tickets}</div></div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
                             ${game.gold > 0 ? `<div class="c-gold">⚜️ Золото: ${game.gold}</div>` : '<div></div>'}
                             ${statusBadge}
@@ -283,33 +279,36 @@
             });
         }
 
-        // 🔥 ВОССТАНОВЛЕННАЯ ФУНКЦИЯ КОЛЕСА 🔥
         function startWheelAnimation(spinData) {
             isSpinning = true;
             const wrapper = document.getElementById('wheel-wrapper');
             const canvas = document.getElementById('wheel-canvas');
             const ctx = canvas.getContext('2d');
             const resultBox = document.getElementById('wheel-result');
+            const resText = document.getElementById('res-text');
             
             resultBox.classList.remove('show');
             wrapper.className = 'active'; 
+            canvas.style.transform = `rotate(0rad)`;
 
             let itemsRaw = [];
-            let textColor = "#4a8522"; // Темно-зеленый по умолчанию
+            let neonColor = "#00ff00"; 
             
             if (spinData.action === "SPIN_BUFF_SUB") {
                 itemsRaw = currentConfig.wheels.premium.buffs;
                 wrapper.classList.add('buff');
-                textColor = "#4a8522"; 
+                neonColor = "#00ff00"; 
             } else if (spinData.action === "SPIN_DEBUFF_SUB") {
                 itemsRaw = currentConfig.wheels.premium.debuffs;
                 wrapper.classList.add('debuff');
-                textColor = "#8c1c1c"; 
+                neonColor = "#ff0000"; 
             } else if (spinData.action === "SPIN_FREE_WHEEL") {
                 itemsRaw = currentConfig.wheels.free.buffs;
                 wrapper.classList.add('free');
-                textColor = "#2a547a"; 
+                neonColor = "#b3b3b3"; 
             }
+            
+            resText.style.color = neonColor;
 
             const activeItems = itemsRaw.filter(i => i.active);
             if (activeItems.length === 0) { isSpinning = false; wrapper.className = ''; return; }
@@ -317,77 +316,82 @@
             const targetIndex = spinData.index; 
             const targetItem = activeItems[targetIndex];
             
-            const cx = 400, cy = 400, r = 380;
+            const cx = 400, cy = 400;
             const sliceAngle = (Math.PI * 2) / activeItems.length;
 
-            let currentAngle = 0;
+            ctx.clearRect(0, 0, 800, 800);
+            const lineRadius = 400; 
+            const textRadius = 265; 
+
+            for (let i = 0; i < activeItems.length; i++) {
+                const startA = i * sliceAngle;
+                const endA = startA + sliceAngle;
+                
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, lineRadius, startA, endA);
+                ctx.closePath();
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; 
+                ctx.lineWidth = 4;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(startA + sliceAngle / 2);
+                ctx.textAlign = "right";
+                ctx.textBaseline = "middle";
+                
+                let text = activeItems[i].name;
+                if(text.length > 18) text = text.substring(0, 16) + "...";
+                
+                // 🔥 ШРИФТ NEUCHA 🔥
+                ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; 
+                
+                ctx.lineWidth = 6; 
+                ctx.strokeStyle = "black";
+                ctx.strokeText(text, textRadius, 0);
+
+                ctx.fillStyle = neonColor; 
+                ctx.shadowBlur = 0; 
+                ctx.fillText(text, textRadius, 0); 
+                
+                ctx.restore();
+            }
+
             const spins = 5;
             const targetCenterAngle = targetIndex * sliceAngle + (sliceAngle / 2);
-            const finalAngle = (spins * Math.PI * 2) + (Math.PI * 1.5) - targetCenterAngle;
+            const finalAngle = (spins * Math.PI * 2) - (Math.PI / 2) - targetCenterAngle;
             const randomOffset = (Math.random() - 0.5) * (sliceAngle * 0.7); 
             const absoluteFinalAngle = finalAngle + randomOffset;
 
             let startTime = null;
-            const duration = 5000; 
+            const duration = (currentConfig.wheels.spin_duration || 5) * 1000; 
 
             function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
 
-            function drawFrame(timestamp) {
+            function animateWheel(timestamp) {
                 if (!startTime) startTime = timestamp;
                 const progress = Math.min((timestamp - startTime) / duration, 1);
                 
-                currentAngle = absoluteFinalAngle * easeOut(progress);
-
-                ctx.clearRect(0, 0, 800, 800);
-                
-                const innerRadius = 300; 
-
-                for (let i = 0; i < activeItems.length; i++) {
-                    const startA = currentAngle + i * sliceAngle;
-                    const endA = startA + sliceAngle;
-                    
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.arc(cx, cy, innerRadius, startA, endA);
-                    ctx.closePath();
-                    ctx.strokeStyle = "rgba(0, 0, 0, 0.35)"; 
-                    ctx.lineWidth = 3;
-                    ctx.stroke();
-
-                    ctx.save();
-                    ctx.translate(cx, cy);
-                    ctx.rotate(startA + sliceAngle / 2);
-                    ctx.textAlign = "right";
-                    ctx.textBaseline = "middle";
-                    
-                    ctx.fillStyle = textColor; 
-                    ctx.shadowColor = "rgba(0, 0, 0, 0.7)"; 
-                    ctx.shadowBlur = 4;
-                    ctx.font = "bold 24px 'Trebuchet MS', sans-serif"; 
-                    
-                    let text = activeItems[i].name;
-                    if(text.length > 18) text = text.substring(0, 16) + "...";
-                    
-                    ctx.fillText(text, innerRadius - 15, 0); 
-                    ctx.restore();
-                }
+                const currentAngle = absoluteFinalAngle * easeOut(progress);
+                canvas.style.transform = `rotate(${currentAngle}rad)`;
 
                 if (progress < 1) {
-                    requestAnimationFrame(drawFrame);
+                    requestAnimationFrame(animateWheel);
                 } else {
-                    document.getElementById('res-user').innerText = spinData.user;
-                    document.getElementById('res-text').innerText = targetItem.name;
+                    document.getElementById('res-user').innerText = `КРУТИТ: ${spinData.user}`;
+                    document.getElementById('res-text').innerText = `Награда: ${targetItem.name}`;
                     resultBox.classList.add('show');
                     
                     clearTimeout(wheelTimeout);
                     wheelTimeout = setTimeout(() => {
                         wrapper.classList.remove('active');
                         setTimeout(() => { isSpinning = false; }, 500); 
-                    }, 5000);
+                    }, duration); // <--- Вот здесь
                 }
             }
-
-            requestAnimationFrame(drawFrame);
+            
+            requestAnimationFrame(animateWheel);
         }
     </script>
 </body>

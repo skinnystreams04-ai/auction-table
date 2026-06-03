@@ -2,12 +2,12 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Аукцион - Оверлей V7.0 (Модульный Дашборд)</title>
+    <title>Аукцион - Оверлей V9.4 (Идеальный Круг)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
     <style>
-        /* ГЛОБАЛЬНЫЙ МРАЧНЫЙ СТИЛЬ И ШРИФТ */
+        /* ГЛОБАЛЬНЫЙ СТИЛЬ */
         body { margin: 0; padding: 20px; font-family: 'Neucha', cursive, sans-serif; overflow: hidden; background-color: #0b0d0a; color: #a4b09c; letter-spacing: 0.5px; }
         .layout { display: flex; gap: 20px; align-items: flex-start; height: 95vh; width: 100%; justify-content: space-between; }
         
@@ -16,7 +16,7 @@
         ::-webkit-scrollbar-thumb { background: #2f382a; border-radius: 4px; }
 
         /* =========================================
-           ЛЕВАЯ ПАНЕЛЬ (ФИКСИРОВАННАЯ ТАБЛИЦА)
+           ЛЕВАЯ ПАНЕЛЬ (ТАБЛИЦА)
            ========================================= */
         .left-panel { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 10px; max-height: 100%; position: relative; }
         
@@ -68,76 +68,110 @@
         .badge.absolute { background: #2b2518; color: #b8a87b; border: 1px solid #8c7b52; }
 
         /* =========================================
-           ИНТЕРАКТИВНАЯ ЗОНА (МОДУЛИ DRAG & DROP)
+           ИНТЕРАКТИВНАЯ ЗОНА (МОДУЛИ)
            ========================================= */
-        .right-interactive { display: flex; gap: 20px; flex: 0 0 790px; height: 100%; }
-        .col-main { display: flex; flex-direction: column; gap: 20px; width: 450px; height: 100%; }
-        .col-side { display: flex; flex-direction: column; gap: 20px; width: 320px; height: 100%; }
+        .right-interactive { display: flex; gap: 20px; flex: 0 0 auto; height: 100%; min-width: 400px; }
+        
+        .col-main { display: flex; flex-direction: column; gap: 20px; width: 450px; height: 100%; padding-bottom: 15px; }
+        .col-side { display: flex; flex-direction: column; gap: 20px; width: 350px; height: 100%; padding-bottom: 15px; }
 
         .drop-zone { flex: 1; display: flex; flex-direction: column; min-height: 50px; border-radius: 6px; transition: all 0.3s; }
         .drop-zone.drag-over { border: 2px dashed #8abf86; background: rgba(138, 191, 134, 0.05); }
 
-        /* Сам виджет */
         .draggable-widget {
             background: linear-gradient(180deg, #101411 0%, #080a08 100%);
-            border: 2px solid #283325;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
+            border: 2px solid #283325; border-radius: 6px;
+            display: flex; flex-direction: column;
             height: 100%;
             box-shadow: -10px 0 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(40, 51, 37, 0.2);
             transition: opacity 0.2s;
-            overflow: hidden;
+            overflow: hidden; 
         }
         .draggable-widget.dragging { opacity: 0.4; }
 
-        /* Шапка виджета */
         .widget-header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 8px 12px; background: #0b0d0a; border-bottom: 2px solid #283325;
             cursor: grab;
         }
         .widget-header:active { cursor: grabbing; }
-        .widget-title { color: #829c73; font-weight: bold; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .widget-title { color: #829c73; font-weight: bold; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; pointer-events: none; }
         .drag-handle { color: #4a5c41; font-size: 18px; }
-        .collapse-btn { background: none; border: none; color: #829c73; cursor: pointer; font-size: 18px; font-weight: bold; transition: color 0.2s; }
-        .collapse-btn:hover { color: #c4d1b8; }
-
-        /* Содержимое виджета */
-        .widget-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; position: relative; }
         
-        /* Свернутое состояние */
+        .widget-controls { display: flex; gap: 6px; align-items: center; }
+        .ctrl-btn { 
+            background: rgba(40, 51, 37, 0.5); border: 1px solid #4a5c41; color: #829c73; 
+            border-radius: 4px; cursor: pointer; padding: 2px 8px; transition: 0.2s; 
+            font-size: 14px; font-weight: bold;
+        }
+        .ctrl-btn:hover { background: #4a5c41; color: #c4d1b8; }
+
+        .widget-content { flex: 1; overflow: hidden; position: relative; }
+        .zoom-target {
+            transform-origin: top left;
+            width: 100%; height: 100%;
+            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+            display: flex; flex-direction: column;
+        }
+        
         .draggable-widget.collapsed { height: auto !important; flex: 0 0 auto; }
         .draggable-widget.collapsed .widget-content { display: none; }
-
-        /* Отключаем клики по айфреймам при перетаскивании (чтобы не заедало) */
         body.is-dragging iframe { pointer-events: none !important; }
 
-        /* СТИЛИ КОЛЕСА */
-        .wheel-scaler { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 350px; }
+        /* =========================================
+           🔥 ФИКС КОЛЕСА (УБИЙЦА КАБАЧКОВ) 🔥
+           ========================================= */
+        .wheel-container-wrapper { 
+            display: block; /* Убиваем флексбокс */
+            width: 100%; text-align: center; /* Выравниваем по центру */
+            padding-top: 20px; overflow: visible;
+        }
         
-        /* Авто-масштаб колеса, если оно в узкой колонке */
-        .col-side .wheel-scaler { zoom: 0.65; }
-
-        #wheel-wrapper { position: relative; width: 420px; height: 420px; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; }
+        #wheel-wrapper {
+            display: inline-block; /* Чтобы слушалось text-align: center */
+            position: relative; 
+            /* ЖЕЛЕЗОБЕТОННЫЕ ПИКСЕЛИ */
+            width: 420px !important; height: 420px !important; 
+            min-width: 420px !important; min-height: 420px !important; 
+            max-width: 420px !important; max-height: 420px !important; 
+            aspect-ratio: 1 / 1 !important; /* Навсегда квадрат */
+            margin: 0; 
+            opacity: 0; transform: scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease;
+            pointer-events: none; 
+        }
         #wheel-wrapper.active { opacity: 1; transform: scale(1); }
-        #wheel-canvas { position: absolute; width: 400px; height: 400px; top: 10px; left: 10px; border-radius: 50%; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1; }
-        #wheel-frame { position: absolute; width: 420px; height: 420px; top: 0; left: 0; background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 5; filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.95)); }
         
+        #wheel-canvas {
+            position: absolute; 
+            width: 400px !important; height: 400px !important; 
+            top: 10px !important; left: 10px !important; 
+            border-radius: 50%; 
+            background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png');
+            background-size: cover !important; 
+            background-position: center; background-repeat: no-repeat; z-index: 1;
+        }
+        #wheel-frame {
+            position: absolute; 
+            width: 420px !important; height: 420px !important; 
+            top: 0 !important; left: 0 !important;
+            background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png');
+            background-size: cover !important; 
+            background-position: center; background-repeat: no-repeat; z-index: 5;
+            filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.95));
+            pointer-events: none;
+        }
+
         #wheel-wrapper.buff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Buff.png'); }
         #wheel-wrapper.debuff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Debuff.png'); }
         #wheel-wrapper.free #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png'); }
-        #wheel-wrapper.buff { filter: drop-shadow(0 0 50px rgba(94, 153, 64, 0.6)); } 
-        #wheel-wrapper.debuff { filter: drop-shadow(0 0 60px rgba(163, 44, 44, 0.8)); } 
-        #wheel-wrapper.free { filter: drop-shadow(0 0 50px rgba(150, 163, 140, 0.4)); } 
 
-        .wheel-result { position: absolute; top: 110%; left: 50%; transform: translate(-50%, 0); text-align: center; opacity: 0; transition: opacity 0.3s; width: 100%; z-index: 10; font-family: 'Neucha', cursive, sans-serif;}
+        .wheel-result { text-align: center; opacity: 0; transition: opacity 0.3s; margin-top: 15px; width: 100%; padding-bottom: 10px; }
         .wheel-result.show { opacity: 1; }
-        .res-user { color: #b8a87b; font-size: 24px; margin-bottom: 5px; text-shadow: 2px 2px 0px #000; line-height: 1;}
-        .res-text { font-size: 32px; text-shadow: 3px 3px 0px #000; line-height: 1; font-weight: bold;}
+        .res-user { color: #b8a87b; font-size: 20px; margin-bottom: 5px; text-shadow: 2px 2px 0px #000; word-wrap: break-word; line-height: 1.1; }
+        .res-text { font-size: 26px; text-shadow: 3px 3px 0px #000; font-weight: bold; word-wrap: break-word; line-height: 1.1; padding: 0 10px; }
 
         /* СТИЛИ АЛТАРЯ */
-        #cauldron-list { overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+        #cauldron-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; overflow-y: auto;}
         .cauldron-item { background: rgba(14, 17, 13, 0.8); border: 1px solid #21291f; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; flex-shrink: 0; }
         .c-top-row { display: flex; justify-content: space-between; align-items: center; }
         .c-game-name { font-size: 18px; font-weight: bold; color: #b5c4ab; text-transform: uppercase; width: 65%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 2px #000;}
@@ -152,7 +186,7 @@
         .status-badge.absolute { background: #2b2518; color: #b8a87b; border: 1px solid #8c7b52; box-shadow: 0 0 10px rgba(140, 123, 82, 0.3); }
 
         /* IFRAMES */
-        .iframe-container { width: 100%; height: 100%; min-height: 250px; background: #000; border: none; }
+        .iframe-container { width: 100%; height: 100%; border: none; flex-grow: 1; }
     </style>
 </head>
 <body>
@@ -164,20 +198,26 @@
         <!-- МОДУЛЬНАЯ ЗОНА -->
         <div class="right-interactive">
             
-            <!-- ЦЕНТРАЛЬНАЯ КОЛОНКА (ШИРОКАЯ) -->
             <div class="col-main">
                 <!-- ЗОНА 1: КОЛЕСО -->
                 <div class="drop-zone" id="zone-1" style="flex: 1;">
-                    <div class="draggable-widget" id="widget-wheel" draggable="true">
+                    <div class="draggable-widget" id="widget-wheel" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title"><span class="drag-handle">☰</span> 🎲 Колесо Скинволкера</div>
-                            <button class="collapse-btn">➖</button>
+                            <div class="widget-controls">
+                                <button class="ctrl-btn" onclick="changeZoom(this, -0.1)" title="Отдалить">➖</button>
+                                <button class="ctrl-btn" onclick="changeZoom(this, 0.1)" title="Приблизить">➕</button>
+                                <button class="ctrl-btn collapse-btn" title="Свернуть">🔽</button>
+                            </div>
                         </div>
                         <div class="widget-content">
-                            <div class="wheel-scaler">
-                                <div id="wheel-wrapper">
-                                    <canvas id="wheel-canvas" width="800" height="800"></canvas>
-                                    <div id="wheel-frame"></div>
+                            <!-- Зум-контейнер -->
+                            <div class="zoom-target">
+                                <div class="wheel-container-wrapper">
+                                    <div id="wheel-wrapper">
+                                        <canvas id="wheel-canvas" width="800" height="800"></canvas>
+                                        <div id="wheel-frame"></div>
+                                    </div>
                                     <div class="wheel-result" id="wheel-result">
                                         <div class="res-user" id="res-user">КРУТИТ: ЗРИТЕЛЬ</div>
                                         <div class="res-text" id="res-text">Награда!</div>
@@ -188,44 +228,61 @@
                     </div>
                 </div>
 
-                <!-- ЗОНА 2: ЧАТ -->
+                <!-- ЗОНА 2: ЧАТ ТВИЧА -->
                 <div class="drop-zone" id="zone-2" style="flex: 1;">
-                    <div class="draggable-widget" id="widget-chat" draggable="true">
+                    <div class="draggable-widget" id="widget-chat" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title"><span class="drag-handle">☰</span> 💬 Чат Твича</div>
-                            <button class="collapse-btn">➖</button>
+                            <div class="widget-controls">
+                                <button class="ctrl-btn" onclick="changeZoom(this, -0.1)" title="Отдалить">➖</button>
+                                <button class="ctrl-btn" onclick="changeZoom(this, 0.1)" title="Приблизить">➕</button>
+                                <button class="ctrl-btn collapse-btn" title="Свернуть">🔽</button>
+                            </div>
                         </div>
                         <div class="widget-content">
-                            <iframe class="iframe-container" src="https://www.twitch.tv/embed/skinwalker_nozxc/chat?parent=localhost&parent=127.0.0.1&parent=skinnystreams04-ai.github.io&darkpopout" frameborder="0" scrolling="no"></iframe>
+                            <div class="zoom-target">
+                                <iframe class="iframe-container" src="https://www.twitch.tv/embed/skinwalker_nozxc/chat?parent=localhost&parent=127.0.0.1&parent=skinnystreams04-ai.github.io&darkpopout" frameborder="0" scrolling="no"></iframe>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ПРАВАЯ КОЛОНКА (УЗКАЯ) -->
             <div class="col-side">
                 <!-- ЗОНА 3: АЛТАРЬ -->
                 <div class="drop-zone" id="zone-3" style="flex: 1;">
-                    <div class="draggable-widget" id="widget-altar" draggable="true">
+                    <div class="draggable-widget" id="widget-altar" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title"><span class="drag-handle">☰</span> 🩸 Жертвенный Алтарь</div>
-                            <button class="collapse-btn">➖</button>
+                            <div class="widget-controls">
+                                <button class="ctrl-btn" onclick="changeZoom(this, -0.1)" title="Отдалить">➖</button>
+                                <button class="ctrl-btn" onclick="changeZoom(this, 0.1)" title="Приблизить">➕</button>
+                                <button class="ctrl-btn collapse-btn" title="Свернуть">🔽</button>
+                            </div>
                         </div>
-                        <div class="widget-content" id="cauldron-list">
-                            <!-- Сюда генерятся игры -->
+                        <div class="widget-content">
+                            <div class="zoom-target" id="cauldron-list">
+                                <!-- Сюда генерятся игры -->
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- ЗОНА 4: СТРИМ -->
                 <div class="drop-zone" id="zone-4" style="flex: 1;">
-                    <div class="draggable-widget" id="widget-stream" draggable="true">
+                    <div class="draggable-widget" id="widget-stream" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title"><span class="drag-handle">☰</span> 📺 Стрим</div>
-                            <button class="collapse-btn">➖</button>
+                            <div class="widget-controls">
+                                <button class="ctrl-btn" onclick="changeZoom(this, -0.1)" title="Отдалить">➖</button>
+                                <button class="ctrl-btn" onclick="changeZoom(this, 0.1)" title="Приблизить">➕</button>
+                                <button class="ctrl-btn collapse-btn" title="Свернуть">🔽</button>
+                            </div>
                         </div>
                         <div class="widget-content">
-                            <iframe class="iframe-container" src="https://player.twitch.tv/?channel=skinwalker_nozxc&parent=localhost&parent=127.0.0.1&parent=skinnystreams04-ai.github.io&muted=true" frameborder="0" allowfullscreen="true" scrolling="no"></iframe>
+                            <div class="zoom-target">
+                                <iframe class="iframe-container" src="https://player.twitch.tv/?channel=skinwalker_nozxc&parent=localhost&parent=127.0.0.1&parent=skinnystreams04-ai.github.io&muted=true" frameborder="0" allowfullscreen="true" scrolling="no"></iframe>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -236,39 +293,53 @@
 
     <script>
         // =========================================
-        // ЛОГИКА DRAG & DROP И СВОРАЧИВАНИЯ
+        // ЛОГИКА МАСШТАБИРОВАНИЯ (ZOOM)
         // =========================================
-        const widgets = document.querySelectorAll('.draggable-widget');
+        function changeZoom(btn, delta) {
+            const widget = btn.closest('.draggable-widget');
+            const target = widget.querySelector('.zoom-target');
+            let currentZoom = parseFloat(widget.getAttribute('data-zoom')) || 1.0;
+            
+            currentZoom += delta;
+            
+            if (currentZoom < 0.4) currentZoom = 0.4;
+            if (currentZoom > 1.5) currentZoom = 1.5;
+            
+            widget.setAttribute('data-zoom', currentZoom.toFixed(1));
+            
+            target.style.transform = `scale(${currentZoom})`;
+            target.style.width = `${100 / currentZoom}%`;
+            target.style.height = `${100 / currentZoom}%`;
+        }
+
+        // =========================================
+        // УМНЫЙ DRAG & DROP
+        // =========================================
+        const headers = document.querySelectorAll('.widget-header');
         const zones = document.querySelectorAll('.drop-zone');
         
-        widgets.forEach(widget => {
-            // Drag Start
+        headers.forEach(header => {
+            header.addEventListener('mouseenter', () => { header.closest('.draggable-widget').setAttribute('draggable', 'true'); });
+            header.addEventListener('mouseleave', () => { header.closest('.draggable-widget').removeAttribute('draggable'); });
+            
+            const widget = header.closest('.draggable-widget');
+            
             widget.addEventListener('dragstart', (e) => {
                 widget.classList.add('dragging');
                 e.dataTransfer.setData('text/plain', widget.id);
-                document.body.classList.add('is-dragging'); // Отключаем клики по iframe
+                document.body.classList.add('is-dragging'); 
             });
             
-            // Drag End
             widget.addEventListener('dragend', () => {
                 widget.classList.remove('dragging');
                 document.body.classList.remove('is-dragging');
-                
-                // Убираем подсветку со всех зон
                 zones.forEach(z => z.classList.remove('drag-over'));
             });
         });
 
         zones.forEach(zone => {
-            zone.addEventListener('dragover', e => {
-                e.preventDefault(); // Разрешаем drop
-                zone.classList.add('drag-over');
-            });
-            
-            zone.addEventListener('dragleave', () => {
-                zone.classList.remove('drag-over');
-            });
-            
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+            zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); });
             zone.addEventListener('drop', e => {
                 e.preventDefault();
                 zone.classList.remove('drag-over');
@@ -277,19 +348,15 @@
                 const draggedWidget = document.getElementById(draggedId);
                 
                 if (draggedWidget && draggedWidget.parentNode !== zone) {
-                    // Магия обмена местами (Swap)
                     const existingWidget = zone.querySelector('.draggable-widget');
                     const originZone = draggedWidget.parentNode;
                     
-                    if (existingWidget) {
-                        originZone.appendChild(existingWidget);
-                    }
+                    if (existingWidget) { originZone.appendChild(existingWidget); }
                     zone.appendChild(draggedWidget);
                 }
             });
         });
 
-        // Сворачивание блоков
         document.querySelectorAll('.collapse-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const widget = e.target.closest('.draggable-widget');
@@ -298,11 +365,11 @@
                 widget.classList.toggle('collapsed');
                 
                 if (widget.classList.contains('collapsed')) {
-                    e.target.innerText = '➕';
-                    zone.style.flex = '0 0 auto'; // Зона сжимается
+                    e.target.innerText = '▶️';
+                    zone.style.flex = '0 0 auto'; 
                 } else {
-                    e.target.innerText = '➖';
-                    zone.style.flex = '1'; // Зона растягивается обратно
+                    e.target.innerText = '🔽';
+                    zone.style.flex = '1'; 
                 }
             });
         });
@@ -475,13 +542,16 @@
             });
 
             const sortedGames = Object.values(globalCauldron).sort((a, b) => b.tickets - a.tickets);
-            cauldronList.innerHTML = "";
+            
+            const cauldronListEl = document.getElementById("cauldron-list");
+            
+            let html = "";
             sortedGames.forEach(game => {
                 let statusBadge = ""; let itemClass = "";
                 if (game.gold >= 20) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
                 else if (game.gold >= 10) { itemClass = "immortal"; statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`; }
 
-                cauldronList.innerHTML += `
+                html += `
                     <div class="cauldron-item ${itemClass}">
                         <div class="c-top-row"><div class="c-game-name" title="${game.rawName}">${game.rawName}</div><div class="c-tickets">🎟️ ${game.tickets}</div></div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
@@ -491,6 +561,8 @@
                     </div>
                 `;
             });
+            
+            cauldronListEl.innerHTML = html;
         }
 
         function startWheelAnimation(spinData) {
@@ -503,7 +575,7 @@
             
             resultBox.classList.remove('show');
             wrapper.className = 'active'; 
-            canvas.style.transform = `rotate(0rad)`;
+            canvas.style.transform = `scale(1) rotate(0rad)`;
 
             let itemsRaw = [];
             let neonColor = "#8abf86"; 
@@ -587,7 +659,7 @@
                 const progress = Math.min((timestamp - startTime) / duration, 1);
                 
                 const currentAngle = absoluteFinalAngle * easeOut(progress);
-                canvas.style.transform = `rotate(${currentAngle}rad)`;
+                canvas.style.transform = `scale(1) rotate(${currentAngle}rad)`;
 
                 if (progress < 1) {
                     requestAnimationFrame(animateWheel);

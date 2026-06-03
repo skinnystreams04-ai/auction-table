@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Аукцион - Оверлей V5.5 (Умный Чат)</title>
+    <title>Аукцион - Оверлей V5.6 (Стрим и Чат)</title>
     
     <!-- Подключение шрифта Neucha -->
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
@@ -88,51 +88,32 @@
         .pr-total { font-size: 14px; color: #7c966a; font-weight: bold; background: rgba(124, 150, 106, 0.1); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(124, 150, 106, 0.2); margin-top: 4px; }
         
         /* КОНТЕЙНЕР ДЛЯ ИГР (СЕТКА) */
-        .pr-games { 
-            display: grid; 
-            gap: 10px; 
-            padding: 10px; 
-            flex: 1; 
-            align-content: start;
-        }
+        .pr-games { display: grid; gap: 10px; padding: 10px; flex: 1; align-content: start; }
         
         /* ДВУХЭТАЖНАЯ КАРТОЧКА ИГРЫ */
-        .pr-game-pill { 
-            display: flex; 
-            flex-direction: column;
-            background: #161a15; 
-            border: 1px solid #2b3628; 
-            border-radius: 4px; 
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.5); 
-            overflow: hidden; 
-        }
+        .pr-game-pill { display: flex; flex-direction: column; background: #161a15; border: 1px solid #2b3628; border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); overflow: hidden; }
         
-        /* ВЕРХНИЙ ЭТАЖ: Название и Билеты */
         .pr-g-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid #283325; background: rgba(0,0,0,0.2); gap: 8px; }
         .pr-g-name-wrap { display: flex; align-items: center; gap: 6px; overflow: hidden; }
         .pr-g-num { display: none; } 
         .pr-g-name { color: #a4b09c; font-size: 16px; font-weight: bold; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; }
         .pr-g-tix { color: #8bb377; font-weight: bold; font-size: 16px; text-shadow: 1px 1px 2px #000; line-height: 1; flex-shrink: 0; background: rgba(139, 179, 119, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(139, 179, 119, 0.2); }
 
-        /* НИЖНИЙ ЭТАЖ: Баффы и Пассивный доход */
         .pr-g-bottom { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; min-height: 20px; }
         .badges-mini-container { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
         .passive-container { flex-shrink: 0; margin-left: auto; }
 
-        /* Сами бейджи */
         .badge { padding: 2px 5px; font-size: 12px; font-weight: bold; font-family: sans-serif; text-transform: uppercase; background: rgba(5,5,5,0.9); border: 1px solid; border-radius: 3px; box-shadow: inset 0 0 3px rgba(0,0,0,0.9); line-height: 1; }
         .badge.freeze { color: #6e98ad; border-color: #3f5966; } 
         .badge.shield { color: #9c9273; border-color: #5c5541; } 
         .badge.fire   { color: #c97134; border-color: #7a421b; } 
         .badge.passive { color: #8abf86; border-color: #4b6b48; background: rgba(138, 191, 134, 0.1); } 
 
-        /* Роли */
         .role-badge { font-size: 11px; font-family: sans-serif; font-weight: 900; padding: 2px 4px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.8); color: #d0d0d0; line-height: 1; flex-shrink: 0; }
         .role-badge.sub { background: #3c2e42; border: 1px solid #574161; } 
         .role-badge.vip { background: #4a242c; border: 1px solid #6b333e; } 
         .role-badge.f   { background: #222b20; border: 1px solid #32422f; } 
 
-        /* Статусы слотов */
         .pr-game-pill.immortal-slot { border-color: #3b5a59; }
         .pr-game-pill.immortal-slot .pr-g-top { background: linear-gradient(90deg, rgba(59, 90, 89, 0.3) 0%, rgba(0, 0, 0, 0.2) 100%); }
         .pr-game-pill.immortal-slot .pr-g-name { color: #7fa6a3; text-shadow: 0 0 5px rgba(127, 166, 163, 0.4); }
@@ -144,39 +125,15 @@
         .badge.absolute { background: #2b2518; color: #b8a87b; border: 1px solid #8c7b52; }
 
         /* =========================================
-           ЦЕНТР (КОЛЕСО + ЧАТ)
+           ЦЕНТР (КОЛЕСО + ПЛЕЕР)
            ========================================= */
-        .center-panel { 
-            flex: 0 0 450px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: flex-start; /* Прижимаем наверх */
-            gap: 10px; 
-            position: relative; 
-            height: 100%; 
-        }
+        .center-panel { flex: 0 0 450px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 20px; position: relative; height: 100%; }
         
-        #wheel-wrapper { 
-            position: relative; width: 420px; height: 420px; 
-            display: flex; align-items: center; justify-content: center; 
-            opacity: 0; transform: scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease; 
-            pointer-events: none; 
-            flex-shrink: 0; 
-        }
+        #wheel-wrapper { position: relative; width: 420px; height: 420px; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; flex-shrink: 0; }
         #wheel-wrapper.active { opacity: 1; transform: scale(1); }
         
-        #wheel-canvas { 
-            position: absolute; width: 400px; height: 400px; top: 10px; left: 10px; 
-            border-radius: 50%; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png');
-            background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1;
-        }
-        
-        #wheel-frame {
-            position: absolute; width: 420px; height: 420px; top: 0; left: 0;
-            background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 5; 
-            filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.95));
-        }
+        #wheel-canvas { position: absolute; width: 400px; height: 400px; top: 10px; left: 10px; border-radius: 50%; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1; }
+        #wheel-frame { position: absolute; width: 420px; height: 420px; top: 0; left: 0; background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 5; filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.95)); }
         
         #wheel-wrapper.buff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Buff.png'); }
         #wheel-wrapper.debuff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Debuff.png'); }
@@ -191,55 +148,56 @@
         .res-user { color: #b8a87b; font-size: 24px; margin-bottom: 5px; text-shadow: 2px 2px 0px #000; line-height: 1;}
         .res-text { font-size: 32px; text-shadow: 3px 3px 0px #000; line-height: 1; font-weight: bold;}
 
-        /* 🔥 ОБНОВЛЕННЫЙ УМНЫЙ ЧАТ 🔥 */
-        .chat-wrapper {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end; /* Кнопка справа */
-            margin-top: 90px; /* Отступ чтобы влез текст колеса */
-            height: 350px; /* Ограниченная высота чата */
-            transition: height 0.3s ease;
-        }
-        .chat-wrapper.collapsed {
-            height: 30px; /* Высота только для кнопки */
-        }
-        #toggle-chat-btn {
-            background: rgba(14, 17, 13, 0.8);
-            color: #829c73;
-            border: 1px solid #283325;
-            padding: 4px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Neucha', cursive, sans-serif;
-            font-size: 16px;
-            margin-bottom: 5px;
-            transition: all 0.2s;
-        }
-        #toggle-chat-btn:hover {
-            background: rgba(124, 150, 106, 0.2);
-            color: #c4d1b8;
-        }
-        .chat-container {
+        /* 🔥 СТРИМ ПЛЕЕР 🔥 */
+        .stream-container {
             width: 100%;
             flex-grow: 1;
-            background: transparent;
-            border: none;
+            background: #000;
+            border: 2px solid #283325;
             border-radius: 6px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
             overflow: hidden;
-            transition: opacity 0.2s ease;
-        }
-        .chat-wrapper.collapsed .chat-container {
-            opacity: 0;
-            pointer-events: none; /* Чтобы нельзя было кликать в свернутом виде */
+            margin-top: 10px; /* Отступ от надписей колеса */
         }
 
         /* =========================================
-           ПРАВАЯ ПАНЕЛЬ (АЛТАРЬ)
+           ПРАВАЯ ПАНЕЛЬ (АЛТАРЬ И ЧАТ)
            ========================================= */
-        .right-panel { flex: 0 0 320px; background: linear-gradient(180deg, #101411 0%, #080a08 100%); border: 2px solid #283325; border-radius: 6px; padding: 15px; box-shadow: -10px 0 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(40, 51, 37, 0.2); display: flex; flex-direction: column; gap: 10px; max-height: 100%; box-sizing: border-box; }
+        .right-panel { 
+            flex: 0 0 320px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+            height: 100%; 
+            box-sizing: border-box; 
+        }
+
+        /* 🔥 ОБРЕЗАННЫЙ АЛТАРЬ 🔥 */
+        .altar-section {
+            flex: 0 0 400px; /* Ограничиваем высоту (примерно 5 игр) */
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #101411 0%, #080a08 100%); 
+            border: 2px solid #283325; 
+            border-radius: 6px; 
+            padding: 15px; 
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(40, 51, 37, 0.2);
+            overflow: hidden; /* Скрываем то что не влезло, скролл внутри cauldron-list */
+        }
         
-        .cauldron-header { font-size: 26px; font-weight: 900; color: #829c73; text-align: center; text-transform: uppercase; border-bottom: 2px solid #283325; padding-bottom: 10px; letter-spacing: 2px; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); flex-shrink: 0; }
+        /* 🔥 ЧАТ В ПРАВОМ НИЖНЕМ УГЛУ 🔥 */
+        .chat-section {
+            flex-grow: 1; /* Занимает всё оставшееся место внизу */
+            background: linear-gradient(180deg, #101411 0%, #080a08 100%); 
+            border: 2px solid #283325; 
+            border-radius: 6px; 
+            box-shadow: -10px 0 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(40, 51, 37, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .cauldron-header { font-size: 26px; font-weight: 900; color: #829c73; text-align: center; text-transform: uppercase; border-bottom: 2px solid #283325; padding-bottom: 10px; letter-spacing: 2px; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); flex-shrink: 0; margin-bottom: 10px; }
         #cauldron-list { overflow-y: auto; padding-right: 5px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
 
         .cauldron-item { background: rgba(14, 17, 13, 0.8); border: 1px solid #21291f; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; flex-shrink: 0; }
@@ -275,26 +233,37 @@
                 </div>
             </div>
             
-            <!-- 🔥 БЛОК ЧАТА (Сворачиваемый) 🔥 -->
-            <div class="chat-wrapper" id="chat-wrapper">
-                <button id="toggle-chat-btn" onclick="toggleChat()">💬 Скрыть чат</button>
-                <div class="chat-container">
-                    <!-- Добавлен &transparent=true -->
-                    <iframe 
-                        id="twitch-chat-embed" 
-                        src="https://www.twitch.tv/embed/skinwalker_nozxc/chat?parent=localhost&parent=127.0.0.1&parent=skinnystreams04-ai.github.io&darkpopout&transparent=true" 
-                        frameborder="0" 
-                        scrolling="no" 
-                        height="100%" 
-                        width="100%">
-                    </iframe>
-                </div>
+            <!-- 🔥 БЛОК ПЛЕЕРА ТВИЧА 🔥 -->
+            <div class="stream-container">
+                <iframe 
+                    src="https://player.twitch.tv/?channel=skinwalker_nozxc&parent=localhost&parent=127.0.0.1&parent=skinnystreams04-ai.github.io&muted=true" 
+                    frameborder="0" 
+                    allowfullscreen="true" 
+                    scrolling="no" 
+                    height="100%" 
+                    width="100%">
+                </iframe>
             </div>
         </div>
 
         <div class="right-panel">
-            <div class="cauldron-header">Жертвенный Алтарь</div>
-            <div id="cauldron-list"></div>
+            <!-- 🔥 ОБРЕЗАННЫЙ АЛТАРЬ 🔥 -->
+            <div class="altar-section">
+                <div class="cauldron-header">Жертвенный Алтарь</div>
+                <div id="cauldron-list"></div>
+            </div>
+
+            <!-- 🔥 НОВЫЙ БЛОК ЧАТА 🔥 -->
+            <div class="chat-section">
+                <iframe 
+                    id="twitch-chat-embed" 
+                    src="https://www.twitch.tv/embed/skinwalker_nozxc/chat?parent=localhost&parent=127.0.0.1&parent=skinnystreams04-ai.github.io&darkpopout" 
+                    frameborder="0" 
+                    scrolling="no" 
+                    height="100%" 
+                    width="100%">
+                </iframe>
+            </div>
         </div>
     </div>
 
@@ -310,20 +279,6 @@
         let currentConfig = null;
         let wheelTimeout = null;
 
-        // 🔥 ФУНКЦИЯ СВОРАЧИВАНИЯ ЧАТА 🔥
-        function toggleChat() {
-            const chatWrapper = document.getElementById('chat-wrapper');
-            const btn = document.getElementById('toggle-chat-btn');
-            chatWrapper.classList.toggle('collapsed');
-            
-            if (chatWrapper.classList.contains('collapsed')) {
-                btn.innerText = "💬 Показать чат";
-            } else {
-                btn.innerText = "💬 Скрыть чат";
-            }
-        }
-
-        // 🔥 ФУНКЦИЯ КОПИРОВАНИЯ НИКНЕЙМА 🔥
         function copyNick(element, nick) {
             navigator.clipboard.writeText('@' + nick).then(() => {
                 const originalText = element.innerText;

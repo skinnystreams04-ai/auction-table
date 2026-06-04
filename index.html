@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аукцион - Оверлей V24.0 (Правила и Воркспейс)</title>
+    <title>Аукцион - Оверлей V25.0 (Динамическое Растяжение)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
-    <!-- ПОЛИФИЛЛ ДЛЯ ПЕРЕТАСКИВАНИЯ НА ТЕЛЕФОНАХ -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/default.min.css">
     <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/index.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mobile-drag-drop@2.3.0-rc.2/scroll-behaviour.min.js"></script>
@@ -221,19 +220,28 @@
         .ctrl-btn { background: rgba(40, 51, 37, 0.5); border: 1px solid #4a5c41; color: #829c73; border-radius: 4px; cursor: pointer; padding: 2px 8px; transition: 0.2s; font-size: 14px; font-weight: bold; }
         .ctrl-btn:hover { background: #4a5c41; color: #c4d1b8; }
 
-        .widget-content { flex: 1; overflow: hidden; position: relative; display: flex; flex-direction: column; }
-        .zoom-target { transform-origin: top left; width: 100%; height: 100%; transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; display: flex; flex-direction: column; flex: 1; }
+        /* 🔥 ФИКС РАСТЯГИВАНИЯ: Убрали flex: 1, добавили абсолютное позиционирование дочернего зум-контейнера 🔥 */
+        .widget-content { flex: 1; position: relative; overflow: hidden; }
+        
+        .zoom-target { 
+            position: absolute; top: 0; left: 0; 
+            transform-origin: top left; width: 100%; height: 100%; 
+            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; 
+            display: flex; flex-direction: column; 
+        }
         
         .widget-base.collapsed { height: auto !important; flex: 0 0 auto; resize: none; }
         .widget-base.collapsed .widget-content { display: none; }
         body.is-dragging iframe { pointer-events: none !important; }
 
         /* =========================================
-           🔥 ИДЕАЛЬНОЕ КОЛЕСО (УМЕНЬШЕНО ДО 300px) 🔥
+           🔥 КОЛЕСО (300px) 🔥
            ========================================= */
         .wheel-widget-content { 
             display: flex; flex-direction: column; align-items: center; 
             width: 100%; height: 100%; padding-top: 15px; 
+            /* Для колеса возвращаем стандартное поведение */
+            position: relative !important;
         }
         
         .wheel-scale-box {
@@ -281,7 +289,7 @@
         .res-text { font-size: 26px; text-shadow: 3px 3px 0px #000; font-weight: bold; word-wrap: break-word; line-height: 1.1; padding: 0 10px; }
 
         /* СТИЛИ АЛТАРЯ И ЧАТА */
-        #cauldron-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; flex-grow: 1; overflow-y: auto;}
+        #cauldron-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; box-sizing: border-box; flex: 1; width: 100%; }
         .cauldron-item { background: rgba(14, 17, 13, 0.8); border: 1px solid #21291f; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; flex-shrink: 0; }
         .c-top-row { display: flex; justify-content: space-between; align-items: center; }
         .c-game-name { font-size: 18px; font-weight: bold; color: #b5c4ab; text-transform: uppercase; width: 65%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 1px 1px 2px #000;}
@@ -295,7 +303,7 @@
         .cauldron-item.absolute .c-game-name { color: #b8a87b; }
         .status-badge.absolute { background: #2b2518; color: #b8a87b; border: 1px solid #8c7b52; box-shadow: 0 0 10px rgba(140, 123, 82, 0.3); }
 
-        .iframe-container { width: 100%; height: 100%; border: none; flex-grow: 1; }
+        .iframe-container { width: 100%; height: 100%; border: none; flex: 1; }
 
         /* =========================================
            📱 МОБИЛЬНАЯ АДАПТАЦИЯ (ТЕЛЕФОНЫ) 📱
@@ -322,12 +330,10 @@
 </head>
 <body>
 
-    <!-- 🔥 ВЕРХНЯЯ ЗАКЛАДКА (БОКОВОЕ МЕНЮ) 🔥 -->
     <div class="bookmark-tab" onclick="toggleSidebar()">
         НАВИГАЦИЯ ▼
     </div>
 
-    <!-- ВСПЛЫВАЮЩЕЕ МЕНЮ СВЕРХУ -->
     <div class="sidebar-menu" id="side-menu">
         <div class="sidebar-header">
             <h3>Меню</h3>
@@ -338,7 +344,6 @@
         <button class="sidebar-btn disabled" onclick="alert('Раздел в разработке!')">⭐ Оценка игр (Скоро)</button>
     </div>
 
-    <!-- 🔥 МОДАЛЬНОЕ ОКНО С ПРАВИЛАМИ 🔥 -->
     <div class="rules-modal" id="rules-modal">
         <div class="rules-content">
             <button class="rules-close-btn" onclick="closeRules()">✖</button>
@@ -404,24 +409,19 @@
         </div>
     </div>
 
-    <!-- ПЛАВАЮЩАЯ ПАНЕЛЬ МАСШТАБА ДЛЯ ТЕЛЕФОНОВ -->
     <div id="mobile-zoom-ui" class="global-mobile-controls">
         <span>МАСШТАБ СТРАНИЦЫ</span>
         <button onclick="changeGlobalZoom(-0.1)">➖</button>
         <button onclick="changeGlobalZoom(0.1)">➕</button>
     </div>
 
-    <!-- Обертка всей страницы для зума -->
     <div id="app-wrapper" class="app-wrapper">
         <div class="layout">
-            <!-- ФИКСИРОВАННАЯ ТАБЛИЦА -->
             <div class="left-panel" id="players-grid"></div>
             
-            <!-- МОДУЛЬНАЯ ЗОНА (4 СЛОТА) -->
             <div class="right-interactive">
                 
                 <div class="col-main">
-                    <!-- 🔥 КОЛЕСО (ПРИБИТО ГВОЗДЯМИ СВЕРХУ) 🔥 -->
                     <div class="widget-base static-widget" id="widget-wheel" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title">🎲 Колесо Скинволкера</div>
@@ -445,7 +445,6 @@
                         </div>
                     </div>
 
-                    <!-- СЛОТ 1 ДЛЯ СВАПА -->
                     <div class="drop-zone" id="zone-1">
                         <div class="widget-base draggable-widget" id="widget-chat" data-zoom="1">
                             <div class="widget-header">
@@ -466,7 +465,6 @@
                 </div>
 
                 <div class="col-side">
-                    <!-- СЛОТ 2 ДЛЯ СВАПА -->
                     <div class="drop-zone" id="zone-2">
                         <div class="widget-base draggable-widget" id="widget-altar" data-zoom="1">
                             <div class="widget-header">
@@ -479,13 +477,11 @@
                             </div>
                             <div class="widget-content">
                                 <div class="zoom-target" id="cauldron-list">
-                                    <!-- Сюда генерятся игры -->
-                                </div>
+                                    </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- СЛОТ 3 (ПУСТОЙ) -->
                     <div class="drop-zone" id="zone-3"></div>
                 </div>
 

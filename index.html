@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аукцион - Оверлей V25.0 (Динамическое Растяжение)</title>
+    <title>Аукцион - Оверлей V27.0 (3 Фазы, Без Пассива)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -120,7 +120,6 @@
         .eff-badge.freeze { color: #6e98ad; border-color: #3f5966; }
         .eff-badge.fire { color: #c97134; border-color: #7a421b; }
         .eff-badge.kill { color: #8abf86; border-color: #4b6b48; }
-        .eff-badge.passive { color: #8abf86; border-color: #4b6b48; background: rgba(138, 191, 134, 0.1); }
         .eff-badge.immortal { background: #1a2626; color: #7fa6a3; border-color: #3b5a59; }
         .eff-badge.absolute { background: #2b2518; color: #b8a87b; border-color: #8c7b52; }
 
@@ -153,13 +152,11 @@
 
         .pr-g-bottom { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; min-height: 20px; }
         .badges-mini-container { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
-        .passive-container { flex-shrink: 0; margin-left: auto; }
 
         .badge { padding: 2px 5px; font-size: 12px; font-weight: bold; font-family: sans-serif; text-transform: uppercase; background: rgba(5,5,5,0.9); border: 1px solid; border-radius: 3px; box-shadow: inset 0 0 3px rgba(0,0,0,0.9); line-height: 1; display: flex; align-items: center; gap: 2px; }
         .badge.freeze { color: #6e98ad; border-color: #3f5966; } 
         .badge.shield { color: #9c9273; border-color: #5c5541; } 
         .badge.fire   { color: #c97134; border-color: #7a421b; } 
-        .badge.passive { color: #8abf86; border-color: #4b6b48; background: rgba(138, 191, 134, 0.1); } 
 
         .role-badge { font-size: 11px; font-family: sans-serif; font-weight: 900; padding: 2px 4px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.8); color: #d0d0d0; line-height: 1; flex-shrink: 0; }
         .role-badge.sub { background: #3c2e42; border: 1px solid #574161; } 
@@ -220,9 +217,7 @@
         .ctrl-btn { background: rgba(40, 51, 37, 0.5); border: 1px solid #4a5c41; color: #829c73; border-radius: 4px; cursor: pointer; padding: 2px 8px; transition: 0.2s; font-size: 14px; font-weight: bold; }
         .ctrl-btn:hover { background: #4a5c41; color: #c4d1b8; }
 
-        /* 🔥 ФИКС РАСТЯГИВАНИЯ: Убрали flex: 1, добавили абсолютное позиционирование дочернего зум-контейнера 🔥 */
         .widget-content { flex: 1; position: relative; overflow: hidden; }
-        
         .zoom-target { 
             position: absolute; top: 0; left: 0; 
             transform-origin: top left; width: 100%; height: 100%; 
@@ -235,12 +230,11 @@
         body.is-dragging iframe { pointer-events: none !important; }
 
         /* =========================================
-           🔥 КОЛЕСО (300px) 🔥
+           🔥 ИДЕАЛЬНОЕ КОЛЕСО (300px) 🔥
            ========================================= */
         .wheel-widget-content { 
             display: flex; flex-direction: column; align-items: center; 
             width: 100%; height: 100%; padding-top: 15px; 
-            /* Для колеса возвращаем стандартное поведение */
             position: relative !important;
         }
         
@@ -350,46 +344,44 @@
             <h2>📖 СВОД ПРАВИЛ АУКЦИОНА</h2>
             
             <div class="rules-text">
-                <div class="rules-section-title">🎮 ОСНОВНЫЕ ПОЛОЖЕНИЯ</div>
+                <div class="rules-section-title">🎬 ТРИ ФАЗЫ АУКЦИОНА</div>
                 <ul>
-                    <li><b>Добавление игры:</b> Покупаешь награду «Предложить 3 игры» за баллы канала. Бот впишет твой ник и выдаст играм стартовые билеты.</li>
-                    <li><b>Прокачка игры:</b> Чтобы добавить билеты на свою игру, покупай награду «+ билеты» за баллы канала.</li>
-                    <li><b>Общий котел:</b> Ты можешь кидать билеты только на свои заказы. НО! Если заказы разных зрителей совпадают (например, два человека заказали «Ведьмак 3»), их билеты объединяются в общее значение в правой таблице.</li>
-                    <li><b>Цензура:</b> Если игра нарушает правила Twitch/TikTok или не подходит для мультистрима, лот удаляется, а баллы/деньги возвращаются.</li>
+                    <li><b>🟢 ФАЗА 1 «Зарождение» (Первые 40 мин):</b> Открыто добавление новых игр и прямая покупка билетов. Колеса закрыты. Время закидывать свои лоты и донатить золото на их гарантию.</li>
+                    <li><b>🟡 ФАЗА 2 «Гонка Вооружений» (40-80 мин):</b> Открываются Колеса Баффов и Магазин. Время крутить рулетку, чтобы разогнать свои лоты множителями и массовым хилом. Новые игры добавлять всё еще можно, но они уже отстают.</li>
+                    <li><b>🔴 ФАЗА 3 «Судная Ночь» (Последние 30-40 мин):</b> ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫВАЕТСЯ НАГЛУХО. Снайперам вход воспрещен! Открываются Колеса Дебаффов. Начинается жесткая война: воровство, налоги и убийства. Выживает сильнейший!</li>
                 </ul>
 
-                <div class="rules-section-title">🎡 КОЛЕСО ФОРТУНЫ И ПРИВИЛЕГИИ</div>
+                <div class="rules-section-title">🎮 КАК УЧАСТВОВАТЬ</div>
                 <ul>
-                    <li><b>Бесплатная рулетка (1 раз за стрим):</b> Доступна всем зрителям. Можно на халяву выбить случайное количество билетов в свой лот.</li>
-                    <li><b>Колесо Привилегий (VIP / SUB):</b> Продвинутая рулетка, в которой собраны 5 мощных баффов и 5 дебаффов. Здесь выпадают самые жесткие предметы: можно убить, украсть или сильно умножить билеты.</li>
+                    <li><b>Добавление игры (В 1-й и 2-й фазе):</b> Покупаешь награду «Предложить 3 игры» за баллы канала. Бот впишет твой ник и выдаст играм стартовые билеты.</li>
+                    <li><b>Прокачка игры:</b> Чтобы добавить билеты, покупай награду «+ билеты» за баллы канала.</li>
+                    <li><b>Общий котел:</b> Ты можешь кидать билеты только на свои заказы. НО! Если заказы разных зрителей совпадают (например, два человека заказали «Ведьмак 3»), их билеты объединяются в общее значение в правой таблице.</li>
+                </ul>
+
+                <div class="rules-section-title">🎡 КОЛЕСО ПРИВИЛЕГИЙ И ЛИМИТЫ</div>
+                <p>Продвинутая рулетка, в которой собраны 5 мощных баффов и 5 дебаффов. Здесь выпадают самые жесткие предметы. Лимиты на крутки: <b>VIP - 3 крутки</b>, <b>SUB - 6 круток</b> за аукцион.</p>
+                <ul>
                     <li><b>Инвентарь:</b> Выбитый эффект сохраняется за тобой. Чтобы применить его на нужную игру, используй команду <code>!каст</code> в чате. Бот подскажет, как правильно прописать команду.</li>
                 </ul>
 
-                <div class="rules-section-title">📈 ЭКОНОМИКА И ПАССИВНЫЙ ДОХОД</div>
-                <p>Игры в таблице генерируют билеты сами по себе <b>каждые 30 минут</b> с момента начала аукциона.</p>
-                <ul>
-                    <li><b>Стартовый доход:</b> Фолловеры и VIP-зрители изначально получают <b>3</b> пассивного дохода. Платные подписчики (SUB) получают со старта удвоенный бонус — <b>6</b> пассивного дохода.</li>
-                    <li><b>Разгон дохода:</b> Каждое твое действие на аукционе (использование команды <code>!каст</code> для атаки чужого лота или баффа своего) навсегда увеличивает твой множитель пассивного дохода. Больше экшена — больше билетов!</li>
-                </ul>
-
                 <div class="rules-section-title">⚔️ АРСЕНАЛ: БАФФЫ И ДЕБАФФЫ</div>
-                <p><i>(Точные значения «Х» настраиваются стримером и зависят от баланса текущего аукциона)</i></p>
+                <p><i>(Точные значения настраиваются стримером и зависят от баланса)</i></p>
                 
                 <p><b>ПОЗИТИВНЫЕ ЭФФЕКТЫ (БАФФЫ):</b></p>
                 <ul>
-                    <li><span class="eff-badge kill">🎟️</span> <b>Прямой хил (+X):</b> Добавляет X билетов на один выбранный лот.</li>
-                    <li><span class="eff-badge passive">✨</span> <b>Массовый хил (+X ко всем):</b> Добавляет по X билетов на ВСЕ твои живые игры в таблице.</li>
-                    <li><span class="eff-badge shield">🥷</span> <b>Кража (Робин Гуд):</b> Отнимает X билетов у чужого лота и перекидывает их на твой.</li>
+                    <li><span class="eff-badge kill">🎟️</span> <b>Прямой хил:</b> Добавляет билеты на один выбранный лот.</li>
+                    <li><span class="eff-badge passive">✨</span> <b>Массовый хил:</b> Добавляет билеты на ВСЕ твои живые игры в таблице.</li>
+                    <li><span class="eff-badge shield">🥷</span> <b>Кража (Робин Гуд):</b> Отнимает билеты у чужого лота и перекидывает их на твой.</li>
                     <li><span class="eff-badge fire">🔥</span> <b>Утепление (Огонь):</b> Вешает метку огня. В самом конце аукциона горящий лот получает финальный множитель к своим билетам. Огонь можно спрятать под щит!</li>
-                    <li><span class="eff-badge absolute">✖️</span> <b>Множитель (хX):</b> Моментально умножает текущее количество билетов твоего лота.</li>
-                    <li><span class="eff-badge shield">🛡️</span> <b>Щит / Воскрешение (Рес):</b> Как Щит: Поглощает ровно 1 любой входящий дебафф. Как Рес: оживляет убитую игру (💀).</li>
+                    <li><span class="eff-badge absolute">✖️</span> <b>Множитель:</b> Моментально умножает текущее количество билетов твоего лота.</li>
+                    <li><span class="eff-badge shield">🛡️</span> <b>Щит / Воскрешение (Рес):</b> Поглощает ровно 1 любой входящий дебафф. Либо оживляет убитую игру (💀). Можно купить в Магазине!</li>
                 </ul>
 
                 <p><b>НЕГАТИВНЫЕ ЭФФЕКТЫ (ДЕБАФФЫ):</b></p>
                 <ul>
-                    <li><span class="eff-badge kill">➖</span> <b>Урон (-X):</b> Прямой выстрел в чужой лот. Отнимает X билетов.</li>
-                    <li><span class="eff-badge fire">💸</span> <b>Налог (-X со всех):</b> Снимает по X билетов с КАЖДОГО лота на аукционе (кроме лотов под Абсолютом или Щитом).</li>
-                    <li><span class="eff-badge freeze">❄️</span> <b>Заморозка (Стазис):</b> Замороженный лот не может получать новые билеты и множители. Заморозка автоматически тушит Огонь 🔥.</li>
+                    <li><span class="eff-badge kill">➖</span> <b>Урон:</b> Прямой выстрел в чужой лот. Отнимает билеты.</li>
+                    <li><span class="eff-badge fire">💸</span> <b>Налог:</b> Снимает билеты с КАЖДОГО лота на аукционе (кроме лотов под Абсолютом или Щитом).</li>
+                    <li><span class="eff-badge freeze">❄️</span> <b>Заморозка (Стазис):</b> Замороженный лот не может получать новые билеты. Заморозка автоматически тушит Огонь 🔥.</li>
                     <li><span class="eff-badge freeze">✂️</span> <b>Ножницы (Делим на 2):</b> Моментально режет количество билетов чужого лота ровно пополам.</li>
                     <li><span class="eff-badge passive">🔄</span> <b>Свап лотов:</b> Меняет местами количество билетов твоего лота и лота жертвы.</li>
                     <li><span class="eff-badge immortal">💀</span> <b>УБИЙСТВО:</b> Вешает на лот череп. Билеты остаются на месте, но игра считается мертвой и полностью выключается из аукциона (спасти может только Рес).</li>
@@ -402,9 +394,6 @@
                     <li><b>💀 БЕССМЕРТИЕ (от 10 Золота):</b> Лот получает голубую подсветку. Игру больше невозможно УБИТЬ дебаффом.</li>
                     <li><b>🛡️ АБСОЛЮТ (от 20 Золота):</b> Лот получает золотую подсветку. Полная неуязвимость для любых негативных эффектов (урон, кража, налог, заморозка, свап).</li>
                 </ul>
-
-                <div class="rules-section-title">🏁 ФИНАЛ АУКЦИОНА</div>
-                <p>По окончанию приема ставок (команда <code>!заук</code>), все выжившие игры и их финальные билеты загружаются в Колесо Аукциона. Крутим в режиме "На выбывание". Количество билетов = процент шанса на победу.</p>
             </div>
         </div>
     </div>
@@ -634,7 +623,6 @@
         let currentConfig = null;
         let wheelTimeout = null;
 
-        // НАДЕЖНОЕ КОПИРОВАНИЕ НИКА
         function copyNick(element, nick) {
             const textToCopy = '@' + nick;
             function showCopied() {
@@ -753,12 +741,8 @@
                         if (globalGold >= 20) { itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute" title="Неуязвимость">🛡️</div>`; } 
                         else if (globalGold >= 10) { itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal" title="Бессмертие">💀</div>`; }
 
-                        let passiveBadge = "";
-                        if (game.passive && game.passive > 0) passiveBadge = `<div class="badge passive" title="Пассивный доход">📈+${game.passive}</div>`;
-
                         let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges || {});
                         
-                        // 🔥 ГРУППИРОВКА ОДИНАКОВЫХ БЕЙДЖЕЙ (СТАК) 🔥
                         let badgeCounts = {};
                         badgesArr.forEach(b => {
                             if (!b || !b.type) return;
@@ -799,7 +783,6 @@
                                 </div>
                                 <div class="pr-g-bottom">
                                     <div class="badges-mini-container">${allBadges}</div>
-                                    <div class="passive-container">${passiveBadge}</div>
                                 </div>
                             </div>
                         `;

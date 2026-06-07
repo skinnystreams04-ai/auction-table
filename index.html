@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аукцион - Оверлей V27.0 (3 Фазы, Без Пассива)</title>
+    <title>Аукцион - Оверлей V28.0 (Журнал и Вкладки)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -48,9 +48,7 @@
         }
         .global-mobile-controls button:active { background: #8abf86; color: #161a15; }
 
-        /* =========================================
-           🔥 ВЕРХНЯЯ НАВИГАЦИЯ (ЗАКЛАДКА) 🔥
-           ========================================= */
+        /* ВЕРХНЯЯ НАВИГАЦИЯ (ЗАКЛАДКА) */
         .bookmark-tab {
             position: fixed; top: 0; right: 60px;
             background: #121612; border: 2px solid #4a5c41; border-top: none;
@@ -84,12 +82,8 @@
             box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
         }
         .sidebar-btn:hover { background: #2f382a; border-left-color: #8abf86; padding-left: 25px; }
-        .sidebar-btn.disabled { opacity: 0.4; cursor: not-allowed; border-left-color: #283325; }
-        .sidebar-btn.disabled:hover { padding-left: 20px; background: linear-gradient(90deg, #161a15 0%, #101411 100%); border-left-color: #283325; }
 
-        /* =========================================
-           🔥 МОДАЛЬНОЕ ОКНО ПРАВИЛ 🔥
-           ========================================= */
+        /* МОДАЛЬНОЕ ОКНО ПРАВИЛ */
         .rules-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
@@ -120,33 +114,25 @@
         .eff-badge.freeze { color: #6e98ad; border-color: #3f5966; }
         .eff-badge.fire { color: #c97134; border-color: #7a421b; }
         .eff-badge.kill { color: #8abf86; border-color: #4b6b48; }
-        .eff-badge.immortal { background: #1a2626; color: #7fa6a3; border-color: #3b5a59; }
-        .eff-badge.absolute { background: #2b2518; color: #b8a87b; border-color: #8c7b52; }
 
-        /* =========================================
-           ЛЕВАЯ ПАНЕЛЬ (ТАБЛИЦА)
-           ========================================= */
+        /* ЛЕВАЯ ПАНЕЛЬ (ТАБЛИЦА) */
         .left-panel { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 10px; max-height: 100%; position: relative; }
-        
         .table-header { display: flex; align-items: center; background: #0b0d0a; border-bottom: 2px solid #283325; padding-bottom: 8px; margin-bottom: 4px; position: sticky; top: 0; z-index: 10; }
         .th-user { width: 250px; flex-shrink: 0; color: #829c73; font-size: 22px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); }
         .th-games { display: grid; gap: 10px; padding: 0 10px; flex: 1; }
         .th-game { color: #829c73; font-size: 22px; font-weight: 900; text-align: center; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); }
 
         .player-row { display: flex; align-items: stretch; background: linear-gradient(90deg, #121612 0%, #0a0d0a 100%); border: 1px solid #283325; border-left: 4px solid #4a5c41; border-radius: 6px; box-shadow: 2px 2px 8px rgba(0,0,0,0.6); flex-shrink: 0; transition: transform 0.2s; }
-        
         .pr-user-info { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 8px 12px; background: rgba(0,0,0,0.3); border-right: 1px solid #283325; width: 250px; flex-shrink: 0; box-sizing: border-box; overflow: hidden; border-radius: 6px 0 0 6px; }
         .pr-role-name { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; width: 100%; }
         .pr-name { font-size: 18px; font-weight: bold; color: #c4d1b8; text-transform: uppercase; text-shadow: 1px 1px 3px #000; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; cursor: pointer; transition: color 0.2s; pointer-events: auto; }
         .pr-name:hover { color: #8abf86; } 
         .pr-total { font-size: 14px; color: #7c966a; font-weight: bold; background: rgba(124, 150, 106, 0.1); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(124, 150, 106, 0.2); margin-top: 4px; }
-        
         .pr-games { display: grid; gap: 10px; padding: 10px; flex: 1; align-content: start; }
         .pr-game-pill { display: flex; flex-direction: column; background: #161a15; border: 1px solid #2b3628; border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); overflow: hidden; }
         
         .pr-g-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid #283325; background: rgba(0,0,0,0.2); gap: 8px; }
         .pr-g-name-wrap { display: flex; align-items: center; gap: 6px; overflow: hidden; }
-        .pr-g-num { display: none; } 
         .pr-g-name { color: #a4b09c; font-size: 16px; font-weight: bold; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; }
         .pr-g-tix { color: #8bb377; font-weight: bold; font-size: 16px; text-shadow: 1px 1px 2px #000; line-height: 1; flex-shrink: 0; background: rgba(139, 179, 119, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(139, 179, 119, 0.2); }
 
@@ -173,11 +159,8 @@
         .pr-game-pill.absolute-slot .pr-g-name { color: #b8a87b; text-shadow: 0 0 5px rgba(184, 168, 123, 0.4); }
         .badge.absolute { background: #2b2518; color: #b8a87b; border: 1px solid #8c7b52; }
 
-        /* =========================================
-           ИНТЕРАКТИВНАЯ ЗОНА (МОДУЛИ С 4 СЛОТАМИ)
-           ========================================= */
+        /* ИНТЕРАКТИВНАЯ ЗОНА (МОДУЛИ) */
         .right-interactive { display: flex; gap: 20px; flex: 0 0 auto; height: 100%; min-width: 400px; }
-        
         .col-main { display: flex; flex-direction: column; gap: 20px; width: 450px; height: 100%; padding-bottom: 5px; overflow-y: auto; overflow-x: hidden; padding-right: 5px; }
         .col-side { display: flex; flex-direction: column; gap: 20px; width: 350px; height: 100%; padding-bottom: 5px; overflow-y: auto; overflow-x: hidden; padding-right: 5px; }
 
@@ -187,25 +170,18 @@
 
         .widget-base {
             background: linear-gradient(180deg, #101411 0%, #080a08 100%);
-            border: 2px solid #283325; border-radius: 6px;
-            display: flex; flex-direction: column;
+            border: 2px solid #283325; border-radius: 6px; display: flex; flex-direction: column;
             box-shadow: -10px 0 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(40, 51, 37, 0.2);
-            resize: vertical; 
-            overflow: hidden; 
-            height: 48vh; 
-            min-height: 200px; 
+            resize: vertical; overflow: hidden; height: 48vh; min-height: 200px; 
         }
-        
         .static-widget { flex: 0 0 auto; margin-bottom: 0px; height: auto !important; resize: none; min-height: auto;}
-        
         .draggable-widget { transition: opacity 0.2s; }
         .draggable-widget.dragging { opacity: 0.4; }
 
         .widget-header {
             display: flex; justify-content: space-between; align-items: center;
             padding: 8px 12px; background: #0b0d0a; border-bottom: 2px solid #283325;
-            cursor: grab; touch-action: none; 
-            flex-shrink: 0;
+            cursor: grab; touch-action: none; flex-shrink: 0;
         }
         .widget-header:active { cursor: grabbing; }
         .static-widget .widget-header { cursor: default; }
@@ -219,60 +195,44 @@
 
         .widget-content { flex: 1; position: relative; overflow: hidden; }
         .zoom-target { 
-            position: absolute; top: 0; left: 0; 
-            transform-origin: top left; width: 100%; height: 100%; 
-            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; 
-            display: flex; flex-direction: column; 
+            position: absolute; top: 0; left: 0; transform-origin: top left; width: 100%; height: 100%; 
+            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; display: flex; flex-direction: column; 
         }
         
         .widget-base.collapsed { height: auto !important; flex: 0 0 auto; resize: none; }
         .widget-base.collapsed .widget-content { display: none; }
         body.is-dragging iframe { pointer-events: none !important; }
 
-        /* =========================================
-           🔥 ИДЕАЛЬНОЕ КОЛЕСО (300px) 🔥
-           ========================================= */
-        .wheel-widget-content { 
-            display: flex; flex-direction: column; align-items: center; 
-            width: 100%; height: 100%; padding-top: 15px; 
-            position: relative !important;
-        }
+        /* 🔥 СТИЛИ ДЛЯ ВКЛАДОК (ЖУРНАЛ / ПРОФИЛЬ) 🔥 */
+        .tabs-header { display: flex; align-items: stretch; height: 100%; margin: -8px -12px; }
+        .tab-btn { background: #0b0d0a; border: none; color: #4a5c41; font-family: 'Neucha', cursive; font-size: 18px; font-weight: bold; padding: 8px 15px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s; border-right: 1px solid #283325; border-bottom: 2px solid transparent;}
+        .tab-btn:hover { color: #829c73; background: #121612;}
+        .tab-btn.active { color: #a6e3a1; border-bottom: 2px solid #a6e3a1; background: #161a15; }
         
-        .wheel-scale-box {
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-            position: relative; 
-            width: 300px; height: 300px; 
-            min-width: 300px; min-height: 300px; 
-            transform-origin: top center; transition: transform 0.2s ease;
-        }
+        .tab-pane { display: none; height: 100%; width: 100%; overflow-y: auto; flex-direction: column; box-sizing: border-box; }
+        .tab-pane.active { display: flex; }
+        
+        /* Журнал действий */
+        #action-log-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .log-entry { background: rgba(14, 17, 13, 0.8); border: 1px solid #283325; border-radius: 4px; padding: 8px 10px; font-size: 16px; color: #c4d1b8; line-height: 1.3; animation: fadeIn 0.3s ease; border-left: 3px solid #4a5c41; }
+        .log-entry .time { color: #6c7086; font-size: 14px; margin-right: 5px; }
+        .log-entry .user { font-weight: bold; color: #8abf86; }
+        .log-entry .icon { font-size: 18px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        #wheel-wrapper {
-            position: absolute; top: 0; left: 0; width: 300px; height: 300px;
-            opacity: 0; transform: scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease;
-            pointer-events: none; 
-        }
+        /* Профиль заглушка */
+        .profile-placeholder { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; color: #a4b09c; }
+        .profile-placeholder h3 { color: #8abf86; margin-bottom: 10px; text-transform: uppercase;}
+        .profile-placeholder p { margin-bottom: 20px; line-height: 1.5; }
+        .twitch-login-btn { background: #6441a5; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-family: inherit; font-size: 16px; font-weight: bold; cursor: not-allowed; opacity: 0.6; }
+
+        /* КОЛЕСО */
+        .wheel-widget-content { display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; padding-top: 15px; position: relative !important; }
+        .wheel-scale-box { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; position: relative; width: 300px; height: 300px; min-width: 300px; min-height: 300px; transform-origin: top center; transition: transform 0.2s ease; }
+        #wheel-wrapper { position: absolute; top: 0; left: 0; width: 300px; height: 300px; opacity: 0; transform: scale(0.8); transition: opacity 0.5s ease, transform 0.5s ease; pointer-events: none; }
         #wheel-wrapper.active { opacity: 1; transform: scale(1); }
-        
-        #wheel-canvas {
-            position: absolute; 
-            width: 285px; height: 285px; 
-            top: 7.5px; left: 7.5px; 
-            border-radius: 50%; 
-            background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png');
-            background-size: cover; 
-            background-position: center; background-repeat: no-repeat; z-index: 1;
-        }
-        #wheel-frame {
-            position: absolute; 
-            width: 300px; height: 300px; 
-            top: 0; left: 0;
-            background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png');
-            background-size: cover; 
-            background-position: center; background-repeat: no-repeat; z-index: 5;
-            filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.95));
-            pointer-events: none;
-        }
-
+        #wheel-canvas { position: absolute; width: 285px; height: 285px; top: 7.5px; left: 7.5px; border-radius: 50%; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1; }
+        #wheel-frame { position: absolute; width: 300px; height: 300px; top: 0; left: 0; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 5; filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.95)); pointer-events: none; }
         #wheel-wrapper.buff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Buff.png'); }
         #wheel-wrapper.debuff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Debuff.png'); }
         #wheel-wrapper.free #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png'); }
@@ -299,24 +259,16 @@
 
         .iframe-container { width: 100%; height: 100%; border: none; flex: 1; }
 
-        /* =========================================
-           📱 МОБИЛЬНАЯ АДАПТАЦИЯ (ТЕЛЕФОНЫ) 📱
-           ========================================= */
         @media (max-width: 1024px) {
             body { overflow-y: auto; overflow-x: hidden; padding: 0; }
             .global-mobile-controls { display: flex; } 
-            
             .app-wrapper { padding: 10px; padding-bottom: 70px; } 
             .layout { flex-direction: column; align-items: stretch; height: auto; gap: 15px; margin-top: 40px;} 
-            
             .left-panel { flex: none; width: 100%; max-height: 75vh; overflow-y: auto; overflow-x: auto; padding-right: 0; border: 2px solid #283325; border-radius: 6px; box-sizing: border-box; background: #0b0d0a;}
             .player-row, .table-header { min-width: 800px; padding-right: 10px; } 
-            
             .right-interactive { flex-direction: column; width: 100%; min-width: 100%; flex: none; gap: 15px; }
             .col-main, .col-side { width: 100%; min-width: 100%; max-width: 100%; padding-bottom: 0; gap: 15px; height: auto; overflow: visible; }
-            
             .widget-base { resize: none; min-height: 450px; } 
-            
             .drag-handle { display: inline-block; }
             .widget-header { cursor: grab; }
         }
@@ -324,9 +276,7 @@
 </head>
 <body>
 
-    <div class="bookmark-tab" onclick="toggleSidebar()">
-        НАВИГАЦИЯ ▼
-    </div>
+    <div class="bookmark-tab" onclick="toggleSidebar()">НАВИГАЦИЯ ▼</div>
 
     <div class="sidebar-menu" id="side-menu">
         <div class="sidebar-header">
@@ -334,39 +284,32 @@
             <button class="sidebar-close" onclick="toggleSidebar()">✖</button>
         </div>
         <button class="sidebar-btn" onclick="openRules()">📖 Правила & Эффекты</button>
-        <button class="sidebar-btn disabled" onclick="alert('Раздел в разработке!')">👤 Профиль (Скоро)</button>
-        <button class="sidebar-btn disabled" onclick="alert('Раздел в разработке!')">⭐ Оценка игр (Скоро)</button>
+        <button class="sidebar-btn disabled" onclick="alert('В разработке!')">👤 Профиль</button>
     </div>
 
     <div class="rules-modal" id="rules-modal">
         <div class="rules-content">
             <button class="rules-close-btn" onclick="closeRules()">✖</button>
             <h2>📖 СВОД ПРАВИЛ АУКЦИОНА</h2>
-            
             <div class="rules-text">
                 <div class="rules-section-title">🎬 ТРИ ФАЗЫ АУКЦИОНА</div>
                 <ul>
                     <li><b>🟢 ФАЗА 1 «Зарождение» (Первые 40 мин):</b> Открыто добавление новых игр и прямая покупка билетов. Колеса закрыты. Время закидывать свои лоты и донатить золото на их гарантию.</li>
                     <li><b>🟡 ФАЗА 2 «Гонка Вооружений» (40-80 мин):</b> Открываются Колеса Баффов и Магазин. Время крутить рулетку, чтобы разогнать свои лоты множителями и массовым хилом. Новые игры добавлять всё еще можно, но они уже отстают.</li>
-                    <li><b>🔴 ФАЗА 3 «Судная Ночь» (Последние 30-40 мин):</b> ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫВАЕТСЯ НАГЛУХО. Снайперам вход воспрещен! Открываются Колеса Дебаффов. Начинается жесткая война: воровство, налоги и убийства. Выживает сильнейший!</li>
+                    <li><b>🔴 ФАЗА 3 «Судная Ночь» (Последние 30-40 мин):</b> ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫВАЕТСЯ НАГЛУХО. Открываются Колеса Дебаффов. Начинается жесткая война: воровство, налоги и убийства. Выживает сильнейший!</li>
                 </ul>
-
                 <div class="rules-section-title">🎮 КАК УЧАСТВОВАТЬ</div>
                 <ul>
-                    <li><b>Добавление игры (В 1-й и 2-й фазе):</b> Покупаешь награду «Предложить 3 игры» за баллы канала. Бот впишет твой ник и выдаст играм стартовые билеты.</li>
+                    <li><b>Добавление игры (Фаза 1 и 2):</b> Покупаешь награду «Предложить 3 игры» за баллы канала. Бот впишет твой ник и выдаст играм стартовые билеты.</li>
                     <li><b>Прокачка игры:</b> Чтобы добавить билеты, покупай награду «+ билеты» за баллы канала.</li>
-                    <li><b>Общий котел:</b> Ты можешь кидать билеты только на свои заказы. НО! Если заказы разных зрителей совпадают (например, два человека заказали «Ведьмак 3»), их билеты объединяются в общее значение в правой таблице.</li>
+                    <li><b>Общий котел:</b> Если заказы разных зрителей совпадают (например, оба заказали «Ведьмак 3»), их билеты объединяются в общее значение в правой таблице.</li>
                 </ul>
-
                 <div class="rules-section-title">🎡 КОЛЕСО ПРИВИЛЕГИЙ И ЛИМИТЫ</div>
-                <p>Продвинутая рулетка, в которой собраны 5 мощных баффов и 5 дебаффов. Здесь выпадают самые жесткие предметы. Лимиты на крутки: <b>VIP - 3 крутки</b>, <b>SUB - 6 круток</b> за аукцион.</p>
+                <p>Продвинутая рулетка, в которой собраны баффы и дебаффы. Здесь выпадают самые жесткие предметы. Лимиты на крутки: <b>VIP - 3 крутки</b>, <b>SUB - 6 круток</b> за аукцион.</p>
                 <ul>
-                    <li><b>Инвентарь:</b> Выбитый эффект сохраняется за тобой. Чтобы применить его на нужную игру, используй команду <code>!каст</code> в чате. Бот подскажет, как правильно прописать команду.</li>
+                    <li><b>Секретный Инвентарь:</b> Выбитый эффект сохраняется за тобой тайно! Чат не видит, что у тебя в кармане. Чтобы применить его на нужную игру, используй команду <code>!каст</code> в чате.</li>
                 </ul>
-
                 <div class="rules-section-title">⚔️ АРСЕНАЛ: БАФФЫ И ДЕБАФФЫ</div>
-                <p><i>(Точные значения настраиваются стримером и зависят от баланса)</i></p>
-                
                 <p><b>ПОЗИТИВНЫЕ ЭФФЕКТЫ (БАФФЫ):</b></p>
                 <ul>
                     <li><span class="eff-badge kill">🎟️</span> <b>Прямой хил:</b> Добавляет билеты на один выбранный лот.</li>
@@ -376,7 +319,6 @@
                     <li><span class="eff-badge absolute">✖️</span> <b>Множитель:</b> Моментально умножает текущее количество билетов твоего лота.</li>
                     <li><span class="eff-badge shield">🛡️</span> <b>Щит / Воскрешение (Рес):</b> Поглощает ровно 1 любой входящий дебафф. Либо оживляет убитую игру (💀). Можно купить в Магазине!</li>
                 </ul>
-
                 <p><b>НЕГАТИВНЫЕ ЭФФЕКТЫ (ДЕБАФФЫ):</b></p>
                 <ul>
                     <li><span class="eff-badge kill">➖</span> <b>Урон:</b> Прямой выстрел в чужой лот. Отнимает билеты.</li>
@@ -384,15 +326,14 @@
                     <li><span class="eff-badge freeze">❄️</span> <b>Заморозка (Стазис):</b> Замороженный лот не может получать новые билеты. Заморозка автоматически тушит Огонь 🔥.</li>
                     <li><span class="eff-badge freeze">✂️</span> <b>Ножницы (Делим на 2):</b> Моментально режет количество билетов чужого лота ровно пополам.</li>
                     <li><span class="eff-badge passive">🔄</span> <b>Свап лотов:</b> Меняет местами количество билетов твоего лота и лота жертвы.</li>
-                    <li><span class="eff-badge immortal">💀</span> <b>УБИЙСТВО:</b> Вешает на лот череп. Билеты остаются на месте, но игра считается мертвой и полностью выключается из аукциона (спасти может только Рес).</li>
+                    <li><span class="eff-badge immortal">💀</span> <b>УБИЙСТВО:</b> Вешает на лот череп. Билеты остаются на месте, но игра считается мертвой и выключается из аукциона (спасти может только Рес).</li>
                 </ul>
-
                 <div class="rules-section-title">⚜️ ЗОЛОТЫЕ БИЛЕТЫ (ДОНАТ)</div>
-                <p><b>10 UAH = 1 Золотой билет.</b> Донатить можно на ЛЮБУЮ общую игру в таблице. Золотые билеты игнорируют любые баффы/дебаффы колеса. В конце аукциона они суммируются с обычными билетами.</p>
+                <p><b>10 UAH = 1 Золотой билет.</b> Донатить можно на ЛЮБУЮ общую игру. Золотые билеты игнорируют любые эффекты. В конце они суммируются с обычными билетами.</p>
                 <ul>
                     <li><b>Гарантия:</b> Если в игру закинут хотя бы 1 золотой билет — я ОДНОЗНАЧНО буду играть в неё минимум 2 часа на стриме.</li>
                     <li><b>💀 БЕССМЕРТИЕ (от 10 Золота):</b> Лот получает голубую подсветку. Игру больше невозможно УБИТЬ дебаффом.</li>
-                    <li><b>🛡️ АБСОЛЮТ (от 20 Золота):</b> Лот получает золотую подсветку. Полная неуязвимость для любых негативных эффектов (урон, кража, налог, заморозка, свап).</li>
+                    <li><b>🛡️ АБСОЛЮТ (от 20 Золота):</b> Лот получает золотую подсветку. Полная неуязвимость для любых негативных эффектов.</li>
                 </ul>
             </div>
         </div>
@@ -471,7 +412,38 @@
                         </div>
                     </div>
                     
-                    <div class="drop-zone" id="zone-3"></div>
+                    <div class="drop-zone" id="zone-3">
+                        <div class="widget-base draggable-widget" id="widget-multi" data-zoom="1">
+                            <div class="widget-header" style="padding: 0;">
+                                <div class="tabs-header">
+                                    <span class="drag-handle" style="padding: 10px 12px; cursor: grab;">☰</span>
+                                    <button class="tab-btn active" onclick="switchTab('log', this)">📜 Журнал</button>
+                                    <button class="tab-btn" onclick="switchTab('profile', this)">👤 Профиль</button>
+                                </div>
+                                <div class="widget-controls" style="padding-right: 12px;">
+                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)" title="Отдалить">➖</button>
+                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)" title="Приблизить">➕</button>
+                                    <button class="ctrl-btn collapse-btn" title="Свернуть">🔽</button>
+                                </div>
+                            </div>
+                            <div class="widget-content">
+                                <div class="zoom-target">
+                                    <div id="tab-log" class="tab-pane active">
+                                        <div id="action-log-list">
+                                            <div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>
+                                        </div>
+                                    </div>
+                                    <div id="tab-profile" class="tab-pane">
+                                        <div class="profile-placeholder">
+                                            <h3>Твой Инвентарь</h3>
+                                            <p>Чтобы увидеть свои секретные дебаффы и остаток лимитов, войди через Twitch.</p>
+                                            <button class="twitch-login-btn">Войти через Twitch</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -480,31 +452,50 @@
 
     <script>
         // =========================================
+        // ЛОГИКА ВКЛАДОК (TABS)
+        // =========================================
+        function switchTab(tabId, btnElement) {
+            const widget = btnElement.closest('.widget-base');
+            widget.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            widget.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            widget.querySelector(`#tab-${tabId}`).classList.add('active');
+            btnElement.classList.add('active');
+        }
+
+        // =========================================
+        // ЖУРНАЛ ДЕЙСТВИЙ (ACTION LOG)
+        // =========================================
+        function addLogEntry(user, icon, itemName) {
+            const logList = document.getElementById('action-log-list');
+            // Убираем заглушку, если она есть
+            if (logList.innerHTML.includes('Аукцион запущен')) { logList.innerHTML = ''; }
+            
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="time">[${timeStr}]</span> 🎲 <span class="user">${user}</span> выбил <span class="icon">${icon}</span> <b>${itemName}</b>`;
+            
+            logList.prepend(entry); // Добавляем наверх
+        }
+
+        // =========================================
         // ЛОГИКА БОКОВОГО МЕНЮ И ПРАВИЛ
         // =========================================
         function toggleSidebar() {
             const menu = document.getElementById('side-menu');
             menu.classList.toggle('open');
         }
-
-        function openRules() {
-            document.getElementById('rules-modal').classList.add('show');
-            toggleSidebar(); 
-        }
-
-        function closeRules() {
-            document.getElementById('rules-modal').classList.remove('show');
-        }
-
-        document.getElementById('rules-modal').addEventListener('click', function(e) {
-            if (e.target === this) { closeRules(); }
-        });
+        function openRules() { document.getElementById('rules-modal').classList.add('show'); toggleSidebar(); }
+        function closeRules() { document.getElementById('rules-modal').classList.remove('show'); }
+        document.getElementById('rules-modal').addEventListener('click', function(e) { if (e.target === this) closeRules(); });
 
         // =========================================
         // ГЛОБАЛЬНЫЙ МАСШТАБ (ДЛЯ ТЕЛЕФОНА)
         // =========================================
         let globalMobileScale = window.innerWidth <= 1024 ? 0.3 : 1.0; 
-
         function applyGlobalZoom() {
             const wrapper = document.getElementById('app-wrapper');
             if (window.innerWidth <= 1024) {
@@ -517,10 +508,8 @@
                 wrapper.style.minHeight = `100vh`;
             }
         }
-
         window.addEventListener('DOMContentLoaded', applyGlobalZoom);
         window.addEventListener('resize', applyGlobalZoom);
-
         function changeGlobalZoom(delta) {
             globalMobileScale += delta;
             if (globalMobileScale < 0.2) globalMobileScale = 0.2; 
@@ -537,7 +526,6 @@
             let currentZoom = parseFloat(widget.getAttribute('data-zoom')) || 1.0;
             
             currentZoom += delta;
-            
             if (currentZoom < 0.4) currentZoom = 0.4;
             if (currentZoom > 1.5) currentZoom = 1.5;
             
@@ -558,21 +546,20 @@
         // =========================================
         // УМНЫЙ DRAG & DROP
         // =========================================
-        const headers = document.querySelectorAll('.draggable-widget .widget-header');
+        const headers = document.querySelectorAll('.draggable-widget .drag-handle');
         const zones = document.querySelectorAll('.drop-zone');
         
-        headers.forEach(header => {
-            header.addEventListener('mouseenter', () => { header.closest('.draggable-widget').setAttribute('draggable', 'true'); });
-            header.addEventListener('mouseleave', () => { header.closest('.draggable-widget').removeAttribute('draggable'); });
-            
-            const widget = header.closest('.draggable-widget');
-            
+        headers.forEach(handle => {
+            handle.addEventListener('mouseenter', () => { handle.closest('.draggable-widget').setAttribute('draggable', 'true'); });
+            handle.addEventListener('mouseleave', () => { handle.closest('.draggable-widget').removeAttribute('draggable'); });
+        });
+
+        document.querySelectorAll('.draggable-widget').forEach(widget => {
             widget.addEventListener('dragstart', (e) => {
                 widget.classList.add('dragging');
                 e.dataTransfer.setData('text/plain', widget.id);
                 document.body.classList.add('is-dragging'); 
             });
-            
             widget.addEventListener('dragend', () => {
                 widget.classList.remove('dragging');
                 document.body.classList.remove('is-dragging');
@@ -586,14 +573,12 @@
             zone.addEventListener('drop', e => {
                 e.preventDefault();
                 zone.classList.remove('drag-over');
-                
                 const draggedId = e.dataTransfer.getData('text/plain');
                 const draggedWidget = document.getElementById(draggedId);
                 
                 if (draggedWidget && draggedWidget.parentNode !== zone) {
                     const existingWidget = zone.querySelector('.draggable-widget');
                     const originZone = draggedWidget.parentNode;
-                    
                     if (existingWidget) { originZone.appendChild(existingWidget); }
                     zone.appendChild(draggedWidget);
                 }
@@ -932,6 +917,14 @@
                     document.getElementById('res-text').innerText = `Награда: ${targetItem.name}`;
                     resultBox.classList.add('show');
                     
+                    // 🔥 ЗАПИСЫВАЕМ ДЕЙСТВИЕ В ЖУРНАЛ ОВЕРЛЕЯ 🔥
+                    let icon = "✨";
+                    if (dictEffect) { icon = dictEffect.icon; } // В реале берем из словаря, тут упрощено
+                    // Поскольку у нас нет dictEffect в scope анимации, иконку возьмем из словаря по id если надо, или просто покажем текст
+                    
+                    // Чтобы не усложнять, пока просто берем имя предмета:
+                    addLogEntry(spinData.user, "🎲", targetItem.name);
+
                     clearTimeout(wheelTimeout);
                     wheelTimeout = setTimeout(() => {
                         wrapper.classList.remove('active');

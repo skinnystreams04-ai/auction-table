@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аукцион - Оверлей V33.0 (Фикс Чата и Правила)</title>
+    <title>Аукцион - Оверлей V34.0 (СУДЬЯ: Таймеры Яда и Кислоты)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -92,12 +92,6 @@
         .rules-section-title { color: #b8a87b; font-size: 24px; border-bottom: 1px dashed #283325; padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; text-transform: uppercase;}
         .rules-text ul { padding-left: 25px; margin-bottom: 20px; }
         .rules-text li { margin-bottom: 12px; }
-        
-        .eff-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; border: 1px solid; font-size: 16px; font-weight: bold; font-family: sans-serif; background: rgba(5,5,5,0.9); margin-right: 5px;}
-        .eff-badge.shield { color: #9c9273; border-color: #5c5541; }
-        .eff-badge.freeze { color: #6e98ad; border-color: #3f5966; }
-        .eff-badge.fire { color: #c97134; border-color: #7a421b; }
-        .eff-badge.kill { color: #8abf86; border-color: #4b6b48; }
 
         /* ЛЕВАЯ ПАНЕЛЬ И ИНДИКАТОР ФАЗЫ */
         .left-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; height: 100%; position: relative; }
@@ -135,10 +129,15 @@
         .pr-g-bottom { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; min-height: 20px; }
         .badges-mini-container { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 
+        /* 🔥 СТИЛИ ЗНАЧКОВ + ПУЛЬСАЦИЯ 🔥 */
+        @keyframes throb { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        
         .badge { padding: 2px 5px; font-size: 12px; font-weight: bold; font-family: sans-serif; text-transform: uppercase; background: rgba(5,5,5,0.9); border: 1px solid; border-radius: 3px; box-shadow: inset 0 0 3px rgba(0,0,0,0.9); line-height: 1; display: flex; align-items: center; gap: 2px; }
         .badge.freeze { color: #6e98ad; border-color: #3f5966; } 
         .badge.shield { color: #9c9273; border-color: #5c5541; } 
         .badge.fire   { color: #c97134; border-color: #7a421b; } 
+        .badge.poison { color: #a6e3a1; border-color: #4a664d; animation: throb 1.5s infinite; background: rgba(10, 30, 10, 0.9); }
+        .badge.acid   { color: #94e2d5; border-color: #3b5a59; animation: throb 1.5s infinite; background: rgba(10, 30, 30, 0.9); }
 
         .role-badge { font-size: 11px; font-family: sans-serif; font-weight: 900; padding: 2px 4px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 5px rgba(0,0,0,0.8); color: #d0d0d0; line-height: 1; flex-shrink: 0; }
         .role-badge.sub { background: #3c2e42; border: 1px solid #574161; } 
@@ -273,21 +272,19 @@
             <button class="rules-close-btn" onclick="closeRules()">✖</button>
             <h2>📖 СВОД ПРАВИЛ АУКЦИОНА СКИЛВОЛКЕРА</h2>
             <div class="rules-text">
-                
                 <div class="rules-section-title">🎬 ТРИ ФАЗЫ АУКЦИОНА</div>
                 <ul>
                     <li><b>🟢 ФАЗА 1 «Утро» (Начало стрима):</b> Время Зарождения. Открыто добавление новых игр, покупка билетов и <i>Бесплатное колесо</i>. Время закидывать свои лоты и копить силы.</li>
                     <li><b>🟡 ФАЗА 2 «Ясный день» (Середина):</b> Гонка Вооружений. Открывается <i>Колесо Баффов</i>. Время разгонять свои лоты множителями и массовым хилом. Новые игры и билеты добавлять всё еще можно.</li>
                     <li><b>🌑 ФАЗА 3 «Солнечное затмение» (Финал):</b> Судная Ночь. <b>ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫВАЕТСЯ НАГЛУХО.</b> Открывается <i>Колесо Дебаффов</i>. Бесплатное колесо не работает. Начинается жесткая война: воровство, налоги и убийства. Выживает сильнейший!</li>
                 </ul>
-
                 <div class="rules-section-title">🎮 КАК УЧАСТВОВАТЬ</div>
                 <ul>
                     <li><b>Добавление игры:</b> Покупаешь награду «Предложить игру» за баллы канала. Бот впишет твой ник и выдаст игре стартовые билеты (доступно только в Фазе 1 и 2).</li>
                     <li><b>Прокачка лота:</b> Покупай награду «+ билеты» за баллы канала и указывай номер лота. Доступно на протяжении всего аукциона.</li>
                     <li><b>Магазин (Щит):</b> За баллы можно купить <span class="eff-badge shield">🛡️ Щит</span> на свою игру, чтобы спасти её от вражеских проклятий в финале. Щиты стакаются!</li>
+                    <li><b>Магазин (Очищение):</b> Если твой лот отравлен Ядом или Кислотой, покупай 🧴 Очищение, чтобы снять негативный статус!</li>
                 </ul>
-
                 <div class="rules-section-title">⚜️ ЗОЛОТО И ГАРАНТИИ (ЗА ДОНАТ)</div>
                 <ul>
                     <li>Золото — это премиум валюта аукциона, которую можно получить <b>только за реальные деньги (прямой донат)</b>. Оно дает играм постоянные статусы защиты, которые нельзя снять в Фазе 3.</li>
@@ -295,14 +292,6 @@
                     <li><b>10 Золота = <span class="badge immortal">💀 БЕССМЕРТИЕ</span>:</b> Игру невозможно удалить или уничтожить дебаффом "Килл".</li>
                     <li><b>20 Золота = <span class="badge absolute">🛡️ НЕУЯЗВИМОСТЬ</span>:</b> Игра становится полностью иммунной к ЛЮБЫМ негативным эффектам из колеса.</li>
                 </ul>
-
-                <div class="rules-section-title">👑 РОЛИ И ПРИВИЛЕГИИ</div>
-                <ul>
-                    <li><span class="role-badge f">F</span> <b>Фолловеры:</b> Имеют доступ только к Бесплатному Колесу (Фаза 1 и 2). Жесткие лимиты на игры.</li>
-                    <li><span class="role-badge vip">VIP</span> <b>VIP-зрители:</b> Получают доступ к Колесу Баффов и Колесу Дебаффов (лимиты из настроек). Расширенные лимиты на игры.</li>
-                    <li><span class="role-badge sub">SUB</span> <b>Платные Сабы:</b> Элита аукциона. Максимальные лимиты. Могут крутить премиум-колеса и уничтожать врагов.</li>
-                </ul>
-
             </div>
         </div>
     </div>
@@ -413,7 +402,6 @@
     </div>
 
     <script>
-        // Функция для копирования текста по клику
         function copyText(element, text) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text);
@@ -443,7 +431,6 @@
         function closeRules() { document.getElementById('rules-modal').classList.remove('show'); }
         document.getElementById('rules-modal').addEventListener('click', function(e) { if (e.target === this) closeRules(); });
 
-        // 🔥 ИСПРАВЛЕННЫЙ ЗУМ ДЛЯ ЧАТА ТВИЧА 🔥
         function changeWidgetZoom(btn, delta) {
             const widget = btn.closest('.widget-base');
             const target = widget.querySelector('.zoom-target');
@@ -459,7 +446,6 @@
                 const shrinkFactor = (1 - currentZoom) * 300;
                 wheelBox.style.marginBottom = currentZoom < 1 ? `-${shrinkFactor}px` : '0px';
             } else if (widget.id === 'widget-chat') {
-                // Фикс для айфрейма (теперь мышка кликает в правильное место)
                 target.style.transform = 'none';
                 target.style.width = '100%';
                 target.style.height = '100%';
@@ -528,6 +514,98 @@
         let currentConfig = null;
         let wheelTimeout = null;
 
+        // 🔥 ЛОГИКА ТАЙМЕРОВ (СУДЬЯ) 🔥
+        let activeTimers = {}; // Хранит время последнего тика для каждой игры
+
+        function processTimers(data, config) {
+            if (!data || !data.players) return;
+
+            let dbNeedsUpdate = false;
+            let logEntries = [];
+            const now = Date.now();
+
+            // Читаем тайминги из базы, если не находим - ставим дефолтные
+            let poisonTick = 15;
+            let acidTick = 30;
+            
+            if (config && config.dictionary && config.dictionary.debuffs) {
+                const pConf = config.dictionary.debuffs.find(d => d.mech === 'poison_tickets');
+                if (pConf && pConf.tick > 0) poisonTick = pConf.tick;
+                
+                const aConf = config.dictionary.debuffs.find(d => d.mech === 'acid_shield');
+                if (aConf && aConf.tick > 0) acidTick = aConf.tick;
+            }
+
+            data.players.forEach((player) => {
+                if (!player.games) return;
+                let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
+                
+                gamesArr.forEach((game) => {
+                    if (!game.badges || game.gold >= 20) return; // Неуязвимые не получают урон
+                    
+                    let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges);
+                    let isDead = badgesArr.some(b => b.type === 'kill');
+                    if (isDead) return;
+
+                    let safeName = game.name || "Без названия";
+
+                    // ☠️ ЯД (Сжигает билеты)
+                    let hasPoison = badgesArr.some(b => b.type === 'poison');
+                    if (hasPoison) {
+                        let key = safeName + "_poison";
+                        if (!activeTimers[key]) activeTimers[key] = now;
+                        
+                        if (now - activeTimers[key] >= poisonTick * 1000) {
+                            let curT = parseInt(game.tickets) || 0;
+                            let deduct = 5; // Фиксированный урон яда (5 билетов за тик)
+                            game.tickets = Math.max(0, curT - deduct);
+                            activeTimers[key] = now;
+                            dbNeedsUpdate = true;
+                            logEntries.push(`<span class="user">СИСТЕМА</span>: ☠️ Яд сжег ${deduct} билетов у лота [${safeName}]`);
+                        }
+                    } else { delete activeTimers[safeName + "_poison"]; }
+
+                    // 🧪 КИСЛОТА (Сжигает щиты)
+                    let hasAcid = badgesArr.some(b => b.type === 'acid');
+                    if (hasAcid) {
+                        let key = safeName + "_acid";
+                        if (!activeTimers[key]) activeTimers[key] = now;
+                        
+                        if (now - activeTimers[key] >= acidTick * 1000) {
+                            let sIdx = badgesArr.findIndex(b => b.type === 'shield');
+                            if (sIdx !== -1) {
+                                badgesArr.splice(sIdx, 1);
+                                game.badges = badgesArr;
+                                logEntries.push(`<span class="user">СИСТЕМА</span>: 🧪 Кислота разъела 1 🛡️ Щит у лота [${safeName}]`);
+                                dbNeedsUpdate = true;
+                            }
+                            activeTimers[key] = now;
+                        }
+                    } else { delete activeTimers[safeName + "_acid"]; }
+                });
+                player.games = gamesArr;
+            });
+
+            if (dbNeedsUpdate) {
+                // Тихо обновляем базу
+                fetch(firebaseUrl, { method: 'PUT', body: JSON.stringify(data) });
+
+                // Обновляем Журнал
+                if (logEntries.length > 0) {
+                    try {
+                        let currentLog = data.log || [];
+                        let timeStr = new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
+                        logEntries.forEach(txt => { currentLog.unshift({ time: timeStr, text: txt }); });
+                        while (currentLog.length > 30) currentLog.pop();
+                        
+                        fetch("https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/auction_data/log.json", {
+                            method: 'PUT', body: JSON.stringify(currentLog)
+                        });
+                    } catch(e) {}
+                }
+            }
+        }
+
         async function fetchFromCloud() {
             try {
                 const [dataRes, confRes] = await Promise.all([
@@ -538,7 +616,6 @@
                 const data = await dataRes.json();
                 currentConfig = await confRes.json();
                 
-                // 🔥 ОБНОВЛЕНИЕ ИНДИКАТОРА ФАЗЫ 🔥
                 if (data && data.current_phase) {
                     const phaseInd = document.getElementById('phase-indicator');
                     if (data.current_phase === 1) {
@@ -557,6 +634,11 @@
                     dictionaryMap = {};
                     if (currentConfig.dictionary.buffs) currentConfig.dictionary.buffs.forEach(e => dictionaryMap[e.id] = e);
                     if (currentConfig.dictionary.debuffs) currentConfig.dictionary.debuffs.forEach(e => dictionaryMap[e.id] = e);
+                }
+
+                // 🔥 ВЫЗЫВАЕМ СУДЬЮ (ТАЙМЕРЫ) 🔥
+                if (data && data.players && currentConfig) {
+                    processTimers(data, currentConfig);
                 }
 
                 if (data && data.players) {
@@ -660,6 +742,7 @@
                             else {
                                 if(type === 'shield') iconText = "🛡️"; else if(type === 'fire') iconText = "🔥";
                                 else if(type === 'freeze') iconText = "❄️"; else if(type === 'kill') iconText = "💀";
+                                else if(type === 'poison') iconText = "☠️"; else if(type === 'acid') iconText = "🧪";
                                 else iconText = `✨`; titleText = type;
                             }
                             let displayContent = count > 1 ? `${iconText}&nbsp;x${count}` : iconText;
@@ -702,7 +785,6 @@
                 if (game.gold >= 20) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
                 else if (game.gold >= 10) { itemClass = "immortal"; statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`; }
 
-                // Экранируем кавычки для копирования
                 let safeNameEscaped = game.rawName.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
                 html += `

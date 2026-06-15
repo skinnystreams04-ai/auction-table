@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аукцион - Оверлей V34.0 (СУДЬЯ: Таймеры Яда и Кислоты)</title>
+    <title>Аукцион - Оверлей V35.0 (Динамический урон)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -515,7 +515,7 @@
         let wheelTimeout = null;
 
         // 🔥 ЛОГИКА ТАЙМЕРОВ (СУДЬЯ) 🔥
-        let activeTimers = {}; // Хранит время последнего тика для каждой игры
+        let activeTimers = {}; 
 
         function processTimers(data, config) {
             if (!data || !data.players) return;
@@ -524,7 +524,6 @@
             let logEntries = [];
             const now = Date.now();
 
-            // Читаем тайминги из базы, если не находим - ставим дефолтные
             let poisonTick = 15;
             let acidTick = 30;
             
@@ -541,7 +540,7 @@
                 let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                 
                 gamesArr.forEach((game) => {
-                    if (!game.badges || game.gold >= 20) return; // Неуязвимые не получают урон
+                    if (!game.badges || game.gold >= 20) return; 
                     
                     let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges);
                     let isDead = badgesArr.some(b => b.type === 'kill');
@@ -550,14 +549,17 @@
                     let safeName = game.name || "Без названия";
 
                     // ☠️ ЯД (Сжигает билеты)
-                    let hasPoison = badgesArr.some(b => b.type === 'poison');
-                    if (hasPoison) {
+                    let poisonBadge = badgesArr.find(b => b.type === 'poison');
+                    if (poisonBadge) {
                         let key = safeName + "_poison";
                         if (!activeTimers[key]) activeTimers[key] = now;
                         
                         if (now - activeTimers[key] >= poisonTick * 1000) {
                             let curT = parseInt(game.tickets) || 0;
-                            let deduct = 5; // Фиксированный урон яда (5 билетов за тик)
+                            // 🔥 ЧИТАЕМ СИЛУ УРОНА ПРЯМО ИЗ НАСТРОЕК КОЛЕСА 🔥
+                            let deduct = parseInt(poisonBadge.value);
+                            if (isNaN(deduct) || deduct <= 0) deduct = 1; 
+                            
                             game.tickets = Math.max(0, curT - deduct);
                             activeTimers[key] = now;
                             dbNeedsUpdate = true;
@@ -566,17 +568,28 @@
                     } else { delete activeTimers[safeName + "_poison"]; }
 
                     // 🧪 КИСЛОТА (Сжигает щиты)
-                    let hasAcid = badgesArr.some(b => b.type === 'acid');
-                    if (hasAcid) {
+                    let acidBadge = badgesArr.find(b => b.type === 'acid');
+                    if (acidBadge) {
                         let key = safeName + "_acid";
                         if (!activeTimers[key]) activeTimers[key] = now;
                         
                         if (now - activeTimers[key] >= acidTick * 1000) {
-                            let sIdx = badgesArr.findIndex(b => b.type === 'shield');
-                            if (sIdx !== -1) {
-                                badgesArr.splice(sIdx, 1);
+                            // 🔥 ЧИТАЕМ СИЛУ УРОНА КИСЛОТЫ 🔥
+                            let deduct = parseInt(acidBadge.value);
+                            if (isNaN(deduct) || deduct <= 0) deduct = 1;
+                            
+                            let broken = 0;
+                            for(let i=0; i<deduct; i++) {
+                                let sIdx = badgesArr.findIndex(b => b.type === 'shield');
+                                if (sIdx !== -1) {
+                                    badgesArr.splice(sIdx, 1);
+                                    broken++;
+                                }
+                            }
+                            
+                            if (broken > 0) {
                                 game.badges = badgesArr;
-                                logEntries.push(`<span class="user">СИСТЕМА</span>: 🧪 Кислота разъела 1 🛡️ Щит у лота [${safeName}]`);
+                                logEntries.push(`<span class="user">СИСТЕМА</span>: 🧪 Кислота разъела ${broken} 🛡️ Щит(ов) у лота [${safeName}]`);
                                 dbNeedsUpdate = true;
                             }
                             activeTimers[key] = now;
@@ -587,10 +600,8 @@
             });
 
             if (dbNeedsUpdate) {
-                // Тихо обновляем базу
                 fetch(firebaseUrl, { method: 'PUT', body: JSON.stringify(data) });
 
-                // Обновляем Журнал
                 if (logEntries.length > 0) {
                     try {
                         let currentLog = data.log || [];
@@ -636,7 +647,6 @@
                     if (currentConfig.dictionary.debuffs) currentConfig.dictionary.debuffs.forEach(e => dictionaryMap[e.id] = e);
                 }
 
-                // 🔥 ВЫЗЫВАЕМ СУДЬЮ (ТАЙМЕРЫ) 🔥
                 if (data && data.players && currentConfig) {
                     processTimers(data, currentConfig);
                 }

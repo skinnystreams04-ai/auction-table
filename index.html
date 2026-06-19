@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аукцион - Оверлей V35.0 (Динамический урон)</title>
+    <title>Аукцион - Оверлей V37.0 (Симметрия и Навигация)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -19,92 +19,62 @@
         /* ГЛОБАЛЬНЫЙ СТИЛЬ */
         body { margin: 0; padding: 0; font-family: 'Neucha', cursive, sans-serif; overflow: hidden; background-color: #0b0d0a; color: #a4b09c; letter-spacing: 0.5px; }
         
-        .app-wrapper {
-            transform-origin: top left;
-            width: 100%; height: 100vh;
-            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
-            box-sizing: border-box; padding: 20px;
-        }
-
+        .app-wrapper { transform-origin: top left; width: 100%; height: 100vh; transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; box-sizing: border-box; padding: 20px; }
         .layout { display: flex; gap: 20px; align-items: flex-start; height: 100%; width: 100%; justify-content: space-between; }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(10, 14, 10, 0.5); border-radius: 4px; }
         ::-webkit-scrollbar-thumb { background: #2f382a; border-radius: 4px; }
 
-        /* ВЕРХНЯЯ НАВИГАЦИЯ (ЗАКЛАДКА) */
-        .bookmark-tab {
-            position: fixed; top: 0; right: 60px;
-            background: #121612; border: 2px solid #4a5c41; border-top: none;
-            color: #8abf86; padding: 8px 20px; border-radius: 0 0 12px 12px;
-            cursor: pointer; font-weight: bold; font-size: 16px; z-index: 1000;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.9);
-            transition: padding-top 0.3s, background 0.2s;
-            letter-spacing: 2px;
-        }
-        .bookmark-tab:hover { background: #2f382a; color: #c4d1b8; padding-top: 12px; }
-
-        .sidebar-menu {
-            position: fixed; top: -100%; right: 20px; width: 320px; height: auto; max-height: 80vh;
-            background: rgba(11, 13, 10, 0.95); border: 2px solid #4a5c41; border-top: none; border-radius: 0 0 12px 12px;
-            z-index: 1001; transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            padding: 25px; box-sizing: border-box; backdrop-filter: blur(10px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.9); display: flex; flex-direction: column; gap: 15px;
-        }
-        .sidebar-menu.open { top: 0; }
-        
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #283325; padding-bottom: 10px; margin-bottom: 10px; }
-        .sidebar-header h3 { margin: 0; color: #829c73; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
-        .sidebar-close { background: none; border: none; color: #a4b09c; font-size: 28px; cursor: pointer; transition: 0.2s; line-height: 1; padding: 0; }
-        .sidebar-close:hover { color: #c45c5c; transform: scale(1.1); }
-
-        .sidebar-btn {
-            background: linear-gradient(90deg, #161a15 0%, #101411 100%);
-            border: 1px solid #283325; border-left: 4px solid #4a5c41;
-            color: #c4d1b8; padding: 15px 20px; text-align: left; font-family: 'Neucha', cursive;
-            font-size: 20px; font-weight: bold; cursor: pointer; border-radius: 4px; transition: 0.2s;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
-        }
-        .sidebar-btn:hover { background: #2f382a; border-left-color: #8abf86; padding-left: 25px; }
-
-        /* МОДАЛЬНОЕ ОКНО ПРАВИЛ */
-        .rules-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
-            z-index: 2000; display: none; align-items: center; justify-content: center;
-            opacity: 0; transition: opacity 0.3s;
-        }
+        /* МОДАЛЬНОЕ ОКНО ПРАВИЛ И ЭФФЕКТОВ */
+        .rules-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .rules-modal.show { display: flex; opacity: 1; }
-        .rules-content {
-            background: linear-gradient(180deg, #121612 0%, #0a0d0a 100%);
-            border: 2px solid #4a5c41; border-radius: 12px;
-            width: 90%; max-width: 900px; max-height: 85vh; overflow-y: auto;
-            padding: 35px; position: relative; box-shadow: 0 15px 50px rgba(0,0,0,0.95);
-        }
-        .rules-close-btn {
-            position: absolute; top: 20px; right: 25px; background: none; border: none;
-            color: #a4b09c; font-size: 32px; cursor: pointer; transition: 0.2s;
-        }
+        .rules-content { background: linear-gradient(180deg, #121612 0%, #0a0d0a 100%); border: 2px solid #4a5c41; border-radius: 12px; width: 90%; max-width: 950px; max-height: 85vh; overflow-y: auto; padding: 35px; position: relative; box-shadow: 0 15px 50px rgba(0,0,0,0.95); }
+        .rules-close-btn { position: absolute; top: 20px; right: 25px; background: none; border: none; color: #a4b09c; font-size: 32px; cursor: pointer; transition: 0.2s; z-index: 10;}
         .rules-close-btn:hover { color: #c45c5c; transform: scale(1.1); }
-        .rules-content h2 { color: #8abf86; text-align: center; border-bottom: 2px solid #283325; padding-bottom: 15px; margin-top: 0; font-size: 32px; text-transform: uppercase; letter-spacing: 2px; }
         
-        .rules-text { color: #c4d1b8; font-size: 20px; line-height: 1.6; margin-top: 20px; }
+        .modal-nav { display: flex; gap: 15px; margin-bottom: 25px; border-bottom: 2px solid #283325; padding-bottom: 15px; justify-content: center;}
+        .modal-nav-btn { background: #0b0d0a; color: #a4b09c; border: 1px solid #283325; padding: 10px 30px; font-family: 'Neucha', cursive; font-size: 24px; cursor: pointer; border-radius: 6px; transition: 0.2s; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;}
+        .modal-nav-btn:hover { background: #161a15; color: #c4d1b8;}
+        .modal-nav-btn.active { background: #8abf86; color: #121612; border-color: #a6e3a1; box-shadow: 0 0 15px rgba(138, 191, 134, 0.4);}
+        
+        .modal-view { display: none; animation: fadeIn 0.3s ease;}
+        .modal-view.active { display: block; }
+        
+        /* Таб Правил */
+        .rules-text { color: #c4d1b8; font-size: 20px; line-height: 1.6; }
         .rules-section-title { color: #b8a87b; font-size: 24px; border-bottom: 1px dashed #283325; padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; text-transform: uppercase;}
         .rules-text ul { padding-left: 25px; margin-bottom: 20px; }
         .rules-text li { margin-bottom: 12px; }
+        .eff-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; border: 1px solid; font-size: 16px; font-weight: bold; font-family: sans-serif; background: rgba(5,5,5,0.9); margin-right: 5px;}
+        .eff-badge.shield { color: #9c9273; border-color: #5c5541; }
 
-        /* ЛЕВАЯ ПАНЕЛЬ И ИНДИКАТОР ФАЗЫ */
+        /* Таб Эффектов (Словарь) */
+        .dict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .dict-item { background: rgba(0,0,0,0.3); border: 1px solid #283325; padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s;}
+        .dict-item:hover { background: rgba(138, 191, 134, 0.05); border-color: #4a5c41; transform: translateY(-2px);}
+        .dict-item.buff { border-left: 4px solid #8abf86; }
+        .dict-item.debuff { border-left: 4px solid #c45c5c; }
+        .dict-icon { font-size: 36px; background: #121612; border: 1px solid #4a5c41; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 8px; flex-shrink: 0; text-shadow: 2px 2px 5px rgba(0,0,0,0.8);}
+        .dict-info { flex: 1; }
+        .dict-info h4 { margin: 0 0 5px 0; color: #c4d1b8; font-size: 22px; text-transform: uppercase; letter-spacing: 1px;}
+        .dict-info p { margin: 0; color: #829c73; font-size: 16px; line-height: 1.3;}
+        .dict-info .target-lbl { display: inline-block; font-family: sans-serif; font-size: 11px; font-weight: bold; padding: 2px 6px; border-radius: 4px; background: #161a15; color: #a4b09c; border: 1px solid #283325; margin-top: 6px;}
+
+        /* ЛЕВАЯ ПАНЕЛЬ И ВЕРХНИЙ БАР */
         .left-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; height: 100%; position: relative; }
-        .phase-bar { display: flex; justify-content: center; padding-bottom: 12px; background: #0b0d0a; z-index: 20; position: sticky; top: 0; }
-        .phase-indicator {
-            background: linear-gradient(90deg, rgba(18,22,18,0.95) 0%, rgba(10,13,10,0.95) 100%);
-            border: 2px solid #4a5c41; padding: 4px 20px; border-radius: 8px;
-            font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.6); display: inline-flex; align-items: center; gap: 8px; transition: all 0.4s ease;
-        }
+        
+        .phase-bar { position: sticky; top: 0; display: flex; align-items: center; justify-content: center; padding-bottom: 12px; background: #0b0d0a; z-index: 20; width: 100%; }
+        
+        .phase-indicator { background: linear-gradient(90deg, rgba(18,22,18,0.95) 0%, rgba(10,13,10,0.95) 100%); border: 2px solid #4a5c41; padding: 4px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.6); display: inline-flex; align-items: center; gap: 8px; transition: all 0.4s ease; z-index: 2;}
         .phase-indicator.p1 { border-color: #8abf86; color: #8abf86; text-shadow: 0 0 10px rgba(138, 191, 134, 0.3); }
         .phase-indicator.p2 { border-color: #b8a87b; color: #b8a87b; text-shadow: 0 0 10px rgba(184, 168, 123, 0.3); }
         .phase-indicator.p3 { border-color: #c45c5c; color: #c45c5c; text-shadow: 0 0 10px rgba(196, 92, 92, 0.3); }
+
+        .top-nav-btn { background: #121612; border: 1px solid #283325; color: #a4b09c; padding: 6px 15px; border-radius: 6px; font-family: 'Neucha', cursive; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 2; position: absolute; top: 0;}
+        .top-nav-btn:hover { background: #161a15; color: #c4d1b8; border-color: #4a5c41; transform: translateY(-2px); }
+        .top-nav-btn.left-btn { left: 0; }
+        .top-nav-btn.right-btn { right: 10px; } /* 10px сдвиг из-за скроллбара ниже */
 
         .left-panel { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 10px; }
         .table-header { display: flex; align-items: center; background: #0b0d0a; border-bottom: 2px solid #283325; padding-bottom: 8px; margin-bottom: 4px; position: sticky; top: 0; z-index: 10; }
@@ -129,9 +99,7 @@
         .pr-g-bottom { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; min-height: 20px; }
         .badges-mini-container { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 
-        /* 🔥 СТИЛИ ЗНАЧКОВ + ПУЛЬСАЦИЯ 🔥 */
         @keyframes throb { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
-        
         .badge { padding: 2px 5px; font-size: 12px; font-weight: bold; font-family: sans-serif; text-transform: uppercase; background: rgba(5,5,5,0.9); border: 1px solid; border-radius: 3px; box-shadow: inset 0 0 3px rgba(0,0,0,0.9); line-height: 1; display: flex; align-items: center; gap: 2px; }
         .badge.freeze { color: #6e98ad; border-color: #3f5966; } 
         .badge.shield { color: #9c9273; border-color: #5c5541; } 
@@ -163,21 +131,12 @@
         .drop-zone.drag-over { border: 2px dashed #8abf86; background: rgba(138, 191, 134, 0.05); }
         .drop-zone:empty { flex: 1; border: 2px dashed rgba(138, 191, 134, 0.2); background: rgba(0,0,0,0.2); }
 
-        .widget-base {
-            background: linear-gradient(180deg, #101411 0%, #080a08 100%);
-            border: 2px solid #283325; border-radius: 6px; display: flex; flex-direction: column;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(40, 51, 37, 0.2);
-            resize: vertical; overflow: hidden; height: 48vh; min-height: 200px; 
-        }
+        .widget-base { background: linear-gradient(180deg, #101411 0%, #080a08 100%); border: 2px solid #283325; border-radius: 6px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.8), inset 0 0 40px rgba(40, 51, 37, 0.2); resize: vertical; overflow: hidden; height: 48vh; min-height: 200px; }
         .static-widget { flex: 0 0 auto; margin-bottom: 0px; height: auto !important; resize: none; min-height: auto;}
         .draggable-widget { transition: opacity 0.2s; }
         .draggable-widget.dragging { opacity: 0.4; }
 
-        .widget-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 12px; background: #0b0d0a; border-bottom: 2px solid #283325;
-            cursor: grab; touch-action: none; flex-shrink: 0;
-        }
+        .widget-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #0b0d0a; border-bottom: 2px solid #283325; cursor: grab; touch-action: none; flex-shrink: 0; }
         .widget-header:active { cursor: grabbing; }
         .static-widget .widget-header { cursor: default; }
 
@@ -189,10 +148,7 @@
         .ctrl-btn:hover { background: #4a5c41; color: #c4d1b8; }
 
         .widget-content { flex: 1; position: relative; overflow: hidden; }
-        .zoom-target { 
-            position: absolute; top: 0; left: 0; transform-origin: top left; width: 100%; height: 100%; 
-            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; display: flex; flex-direction: column; 
-        }
+        .zoom-target { position: absolute; top: 0; left: 0; transform-origin: top left; width: 100%; height: 100%; transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; display: flex; flex-direction: column; }
         
         .widget-base.collapsed { height: auto !important; flex: 0 0 auto; resize: none; }
         .widget-base.collapsed .widget-content { display: none; }
@@ -217,7 +173,6 @@
 
         .profile-placeholder { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; color: #a4b09c; }
         .profile-placeholder h3 { color: #8abf86; margin-bottom: 10px; text-transform: uppercase;}
-        .profile-placeholder p { margin-bottom: 20px; line-height: 1.5; }
 
         /* КОЛЕСО */
         .wheel-widget-content { display: flex; flex-direction: column; align-items: center; width: 100%; height: 100%; padding-top: 15px; position: relative !important; }
@@ -256,53 +211,65 @@
 </head>
 <body>
 
-    <div class="bookmark-tab" onclick="toggleSidebar()">МЕНЮ / ПРАВИЛА ▼</div>
-
-    <div class="sidebar-menu" id="side-menu">
-        <div class="sidebar-header">
-            <h3>Меню</h3>
-            <button class="sidebar-close" onclick="toggleSidebar()">✖</button>
-        </div>
-        <button class="sidebar-btn" onclick="openRules()">📖 Правила & Эффекты</button>
-        <button class="sidebar-btn disabled" onclick="alert('В разработке!')">👤 Профиль</button>
-    </div>
-
     <div class="rules-modal" id="rules-modal">
         <div class="rules-content">
-            <button class="rules-close-btn" onclick="closeRules()">✖</button>
-            <h2>📖 СВОД ПРАВИЛ АУКЦИОНА СКИЛВОЛКЕРА</h2>
-            <div class="rules-text">
-                <div class="rules-section-title">🎬 ТРИ ФАЗЫ АУКЦИОНА</div>
-                <ul>
-                    <li><b>🟢 ФАЗА 1 «Утро» (Начало стрима):</b> Время Зарождения. Открыто добавление новых игр, покупка билетов и <i>Бесплатное колесо</i>. Время закидывать свои лоты и копить силы.</li>
-                    <li><b>🟡 ФАЗА 2 «Ясный день» (Середина):</b> Гонка Вооружений. Открывается <i>Колесо Баффов</i>. Время разгонять свои лоты множителями и массовым хилом. Новые игры и билеты добавлять всё еще можно.</li>
-                    <li><b>🌑 ФАЗА 3 «Солнечное затмение» (Финал):</b> Судная Ночь. <b>ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫВАЕТСЯ НАГЛУХО.</b> Открывается <i>Колесо Дебаффов</i>. Бесплатное колесо не работает. Начинается жесткая война: воровство, налоги и убийства. Выживает сильнейший!</li>
-                </ul>
-                <div class="rules-section-title">🎮 КАК УЧАСТВОВАТЬ</div>
-                <ul>
-                    <li><b>Добавление игры:</b> Покупаешь награду «Предложить игру» за баллы канала. Бот впишет твой ник и выдаст игре стартовые билеты (доступно только в Фазе 1 и 2).</li>
-                    <li><b>Прокачка лота:</b> Покупай награду «+ билеты» за баллы канала и указывай номер лота. Доступно на протяжении всего аукциона.</li>
-                    <li><b>Магазин (Щит):</b> За баллы можно купить <span class="eff-badge shield">🛡️ Щит</span> на свою игру, чтобы спасти её от вражеских проклятий в финале. Щиты стакаются!</li>
-                    <li><b>Магазин (Очищение):</b> Если твой лот отравлен Ядом или Кислотой, покупай 🧴 Очищение, чтобы снять негативный статус!</li>
-                </ul>
-                <div class="rules-section-title">⚜️ ЗОЛОТО И ГАРАНТИИ (ЗА ДОНАТ)</div>
-                <ul>
-                    <li>Золото — это премиум валюта аукциона, которую можно получить <b>только за реальные деньги (прямой донат)</b>. Оно дает играм постоянные статусы защиты, которые нельзя снять в Фазе 3.</li>
-                    <li><b>Курс: 10 гривен = 1 Золото (з. билет).</b></li>
-                    <li><b>10 Золота = <span class="badge immortal">💀 БЕССМЕРТИЕ</span>:</b> Игру невозможно удалить или уничтожить дебаффом "Килл".</li>
-                    <li><b>20 Золота = <span class="badge absolute">🛡️ НЕУЯЗВИМОСТЬ</span>:</b> Игра становится полностью иммунной к ЛЮБЫМ негативным эффектам из колеса.</li>
-                </ul>
+            <button class="rules-close-btn" onclick="closeRulesModal()">✖</button>
+            
+            <div class="modal-nav">
+                <button class="modal-nav-btn active" onclick="switchModalView('rules', this)">📖 Правила</button>
+                <button class="modal-nav-btn" onclick="switchModalView('effects', this)">🔮 Словарь Эффектов</button>
             </div>
+
+            <div id="modal-view-rules" class="modal-view active">
+                <div class="rules-text">
+                    <div class="rules-section-title">🎬 ТРИ ФАЗЫ АУКЦИОНА</div>
+                    <ul>
+                        <li><b>🟢 ФАЗА 1 «Утро»:</b> Время Зарождения. Открыто добавление новых игр и <i>Бесплатное колесо</i>. Время закидывать свои лоты и копить силы.</li>
+                        <li><b>🟡 ФАЗА 2 «Ясный день»:</b> Гонка Вооружений. Открывается <i>Колесо Баффов</i>. Время разгонять лоты множителями. Игры добавлять всё еще можно.</li>
+                        <li><b>🌑 ФАЗА 3 «Солнечное затмение»:</b> Судная Ночь. <b>ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫТО.</b> Открывается <i>Колесо Дебаффов</i>. Начинается жесткая война: воровство, яды, налоги и убийства. Выживает сильнейший!</li>
+                    </ul>
+
+                    <div class="rules-section-title">🎮 КАК УЧАСТВОВАТЬ</div>
+                    <ul>
+                        <li>Все касты и покупки работают <b>ТОЛЬКО ПО ЦИФРАМ (номерам лотов)</b>. Например: <code>!каст 1</code> или <code>!каст 1 @vrag 2</code></li>
+                        <li><b>Минимум 1 билет:</b> Ни один дебафф (кроме статуса "Смерть") не может опустить билеты лота ниже 1. Игра всегда цепляется за жизнь!</li>
+                        <li><b>Магазин (Щит):</b> За баллы покупай <span class="eff-badge shield">🛡️ Щит</span> на свою игру (введи цифру лота), чтобы спасти её от вражеских кастов в финале. Щиты стакаются!</li>
+                        <li><b>Магазин (Очищение):</b> Если лот отравлен Ядом ☠️ или Кислотой 🧪, покупай 🧴 Очищение, чтобы снять статус, пока он не сжег всё!</li>
+                    </ul>
+
+                    <div class="rules-section-title">⚜️ ЗОЛОТО И ГАРАНТИИ (ЗА ДОНАТ)</div>
+                    <ul>
+                        <li>Золото — это премиум валюта. Курс: <b>10 гривен = 1 Золото</b>.</li>
+                        <li><b>10 Золота = БЕССМЕРТИЕ:</b> Игру невозможно удалить или уничтожить дебаффом "Килл".</li>
+                        <li><b>20 Золота = НЕУЯЗВИМОСТЬ:</b> Игра становится иммунной к ЛЮБЫМ негативным эффектам и налогам из колеса.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="modal-view-effects" class="modal-view">
+                <div class="rules-text">
+                    <p style="text-align: center; color: #8abf86; margin-bottom: 0;">Здесь собраны все актуальные эффекты, которые могут выпасть на рулетке.</p>
+                    
+                    <div class="rules-section-title" style="color: #8abf86;">🟢 БАФФЫ</div>
+                    <div class="dict-grid" id="dict-render-buffs">Загрузка...</div>
+
+                    <div class="rules-section-title" style="color: #c45c5c; margin-top: 30px;">🔴 ДЕБАФФЫ</div>
+                    <div class="dict-grid" id="dict-render-debuffs">Загрузка...</div>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <div id="app-wrapper" class="app-wrapper">
         <div class="layout">
-            
             <div class="left-container">
                 <div class="phase-bar">
+                    <button class="top-nav-btn left-btn" onclick="openModalTab('rules')">📖 Правила</button>
                     <div id="phase-indicator" class="phase-indicator p1">🟢 ФАЗА 1: УТРО</div>
+                    <button class="top-nav-btn right-btn" onclick="openModalTab('effects')">🔮 Эффекты</button>
                 </div>
+
                 <div class="left-panel" id="players-grid"></div>
             </div>
             
@@ -383,15 +350,8 @@
                             </div>
                             <div class="widget-content">
                                 <div class="zoom-target">
-                                    <div id="tab-log" class="tab-pane active">
-                                        <div id="action-log-list"></div>
-                                    </div>
-                                    <div id="tab-profile" class="tab-pane">
-                                        <div class="profile-placeholder">
-                                            <h3>Твой Инвентарь</h3>
-                                            <p>Чтобы увидеть свои секретные дебаффы и остаток лимитов, войди через Twitch.</p>
-                                        </div>
-                                    </div>
+                                    <div id="tab-log" class="tab-pane active"><div id="action-log-list"></div></div>
+                                    <div id="tab-profile" class="tab-pane"><div class="profile-placeholder"><h3>Твой Инвентарь</h3><p>Чтобы увидеть свои секретные дебаффы, войди через Twitch.</p></div></div>
                                 </div>
                             </div>
                         </div>
@@ -403,20 +363,9 @@
 
     <script>
         function copyText(element, text) {
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text);
-                const oldColor = element.style.color;
-                element.style.color = "#ffffff";
-                setTimeout(() => { element.style.color = oldColor; }, 300);
-            }
+            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text); const oldColor = element.style.color; element.style.color = "#ffffff"; setTimeout(() => { element.style.color = oldColor; }, 300); }
         }
-
-        function copyNick(element, nick) {
-            const textToCopy = '@' + nick;
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(textToCopy);
-            }
-        }
+        function copyNick(element, nick) { const textToCopy = '@' + nick; if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(textToCopy); } }
 
         function switchTab(tabId, btnElement) {
             const widget = btnElement.closest('.widget-base');
@@ -426,11 +375,80 @@
             btnElement.classList.add('active');
         }
 
-        function toggleSidebar() { document.getElementById('side-menu').classList.toggle('open'); }
-        function openRules() { document.getElementById('rules-modal').classList.add('show'); toggleSidebar(); }
-        function closeRules() { document.getElementById('rules-modal').classList.remove('show'); }
-        document.getElementById('rules-modal').addEventListener('click', function(e) { if (e.target === this) closeRules(); });
+        // 🔥 УПРАВЛЕНИЕ НОВЫМ ОКНОМ ПРАВИЛ И ЭФФЕКТОВ 🔥
+        function openModalTab(tabId) {
+            document.getElementById('rules-modal').classList.add('show');
+            renderDictionaryUI();
+            
+            document.querySelectorAll('.modal-nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.modal-view').forEach(v => v.classList.remove('active'));
+            
+            if (tabId === 'rules') {
+                document.querySelector('.modal-nav-btn:nth-child(1)').classList.add('active');
+                document.getElementById('modal-view-rules').classList.add('active');
+            } else {
+                document.querySelector('.modal-nav-btn:nth-child(2)').classList.add('active');
+                document.getElementById('modal-view-effects').classList.add('active');
+            }
+        }
+        
+        function switchModalView(viewId, btn) {
+            document.querySelectorAll('.modal-nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.modal-view').forEach(v => v.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('modal-view-' + viewId).classList.add('active');
+        }
+        
+        function closeRulesModal() { document.getElementById('rules-modal').classList.remove('show'); }
+        document.getElementById('rules-modal').addEventListener('click', function(e) { if (e.target === this) closeRulesModal(); });
 
+        // ГЕНЕРАТОР ЭНЦИКЛОПЕДИИ (Перевод системных механик)
+        const mechDescriptions = {
+            'add_tickets': 'Моментально добавляет указанное число билетов.',
+            'add_all': 'Добавляет билеты сразу всем твоим живым лотам.',
+            'multiply': 'Умножает текущие билеты лота.',
+            'cleanse': 'Снимает 1 любой негативный статус (Яд, Кислота и т.д.).',
+            'sub_tickets': 'Срезает билеты у врага (но не ниже 1). Бьется об Щит.',
+            'divide': 'Делит билеты врага (но не ниже 1). Бьется об Щит.',
+            'steal': 'Забирает билеты у врага в твою пользу (оставляя ему минимум 1).',
+            'swap': 'Полностью меняет местами билеты твоего лота и вражеского.',
+            'tax': 'Глобальный налог: отнимает билеты у ВСЕХ игр на Алтаре (пробивает обычные щиты).',
+            'emp': 'Уничтожает абсолютно все щиты на выбранном лоте.',
+            'poison_tickets': 'Отравляет лот. Сжигает билеты по таймеру (до 1), пока не купят Очищение. Игнорирует щиты.',
+            'acid_shield': 'Разъедает броню. Ломает щиты по таймеру, пока не купят Очищение. Игнорирует щиты.',
+            'status': 'Вешает на лот статус (Защита, Заморозка или мгновенная Смерть).'
+        };
+
+        function renderDictionaryUI() {
+            if(!currentConfig || !currentConfig.dictionary) return;
+            
+            const renderGrid = (arr, containerId, cssClass) => {
+                const container = document.getElementById(containerId);
+                let html = "";
+                if(!arr || arr.length === 0) { container.innerHTML = "<p>Пусто</p>"; return; }
+                
+                arr.forEach(eff => {
+                    let desc = mechDescriptions[eff.mech] || "Уникальная магия Скинволкера.";
+                    let targetTxt = eff.target === 'self' ? 'На свой лот' : (eff.target === 'enemy' ? 'На лот врага' : 'Глобально');
+                    html += `
+                        <div class="dict-item ${cssClass}">
+                            <div class="dict-icon">${eff.icon}</div>
+                            <div class="dict-info">
+                                <h4>${eff.name}</h4>
+                                <p>${desc}</p>
+                                <span class="target-lbl">Цель: ${targetTxt}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            };
+
+            renderGrid(currentConfig.dictionary.buffs, 'dict-render-buffs', 'buff');
+            renderGrid(currentConfig.dictionary.debuffs, 'dict-render-debuffs', 'debuff');
+        }
+
+        // ЗУМ ВИДЖЕТОВ
         function changeWidgetZoom(btn, delta) {
             const widget = btn.closest('.widget-base');
             const target = widget.querySelector('.zoom-target');
@@ -446,14 +464,9 @@
                 const shrinkFactor = (1 - currentZoom) * 300;
                 wheelBox.style.marginBottom = currentZoom < 1 ? `-${shrinkFactor}px` : '0px';
             } else if (widget.id === 'widget-chat') {
-                target.style.transform = 'none';
-                target.style.width = '100%';
-                target.style.height = '100%';
-                target.style.zoom = currentZoom;
+                target.style.transform = 'none'; target.style.width = '100%'; target.style.height = '100%'; target.style.zoom = currentZoom;
             } else {
-                target.style.transform = `scale(${currentZoom})`;
-                target.style.width = `${100 / currentZoom}%`;
-                target.style.height = `${100 / currentZoom}%`;
+                target.style.transform = `scale(${currentZoom})`; target.style.width = `${100 / currentZoom}%`; target.style.height = `${100 / currentZoom}%`;
             }
         }
 
@@ -466,25 +479,17 @@
         });
 
         document.querySelectorAll('.draggable-widget').forEach(widget => {
-            widget.addEventListener('dragstart', (e) => {
-                widget.classList.add('dragging');
-                e.dataTransfer.setData('text/plain', widget.id);
-            });
-            widget.addEventListener('dragend', () => {
-                widget.classList.remove('dragging');
-                zones.forEach(z => z.classList.remove('drag-over'));
-            });
+            widget.addEventListener('dragstart', (e) => { widget.classList.add('dragging'); e.dataTransfer.setData('text/plain', widget.id); });
+            widget.addEventListener('dragend', () => { widget.classList.remove('dragging'); zones.forEach(z => z.classList.remove('drag-over')); });
         });
 
         zones.forEach(zone => {
             zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
             zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); });
             zone.addEventListener('drop', e => {
-                e.preventDefault();
-                zone.classList.remove('drag-over');
+                e.preventDefault(); zone.classList.remove('drag-over');
                 const draggedId = e.dataTransfer.getData('text/plain');
                 const draggedWidget = document.getElementById(draggedId);
-                
                 if (draggedWidget && draggedWidget.parentNode !== zone) {
                     const existingWidget = zone.querySelector('.draggable-widget');
                     const originZone = draggedWidget.parentNode;
@@ -498,8 +503,7 @@
             btn.addEventListener('click', (e) => {
                 const widget = e.target.closest('.widget-base');
                 widget.classList.toggle('collapsed');
-                if (widget.classList.contains('collapsed')) { e.target.innerText = '▶️'; } 
-                else { e.target.innerText = '🔽'; }
+                if (widget.classList.contains('collapsed')) { e.target.innerText = '▶️'; } else { e.target.innerText = '🔽'; }
             });
         });
 
@@ -513,24 +517,18 @@
         let isSpinning = false;
         let currentConfig = null;
         let wheelTimeout = null;
-
-        // 🔥 ЛОГИКА ТАЙМЕРОВ (СУДЬЯ) 🔥
         let activeTimers = {}; 
 
         function processTimers(data, config) {
             if (!data || !data.players) return;
-
             let dbNeedsUpdate = false;
             let logEntries = [];
             const now = Date.now();
-
-            let poisonTick = 15;
-            let acidTick = 30;
+            let poisonTick = 15; let acidTick = 30;
             
             if (config && config.dictionary && config.dictionary.debuffs) {
                 const pConf = config.dictionary.debuffs.find(d => d.mech === 'poison_tickets');
                 if (pConf && pConf.tick > 0) poisonTick = pConf.tick;
-                
                 const aConf = config.dictionary.debuffs.find(d => d.mech === 'acid_shield');
                 if (aConf && aConf.tick > 0) acidTick = aConf.tick;
             }
@@ -548,7 +546,6 @@
 
                     let safeName = game.name || "Без названия";
 
-                    // ☠️ ЯД (Сжигает билеты)
                     let poisonBadge = badgesArr.find(b => b.type === 'poison');
                     if (poisonBadge) {
                         let key = safeName + "_poison";
@@ -556,35 +553,32 @@
                         
                         if (now - activeTimers[key] >= poisonTick * 1000) {
                             let curT = parseInt(game.tickets) || 0;
-                            // 🔥 ЧИТАЕМ СИЛУ УРОНА ПРЯМО ИЗ НАСТРОЕК КОЛЕСА 🔥
                             let deduct = parseInt(poisonBadge.value);
                             if (isNaN(deduct) || deduct <= 0) deduct = 1; 
                             
-                            game.tickets = Math.max(0, curT - deduct);
+                            let actualDeduct = Math.min(curT - 1, deduct);
+                            if (actualDeduct > 0) {
+                                game.tickets = curT - actualDeduct;
+                                dbNeedsUpdate = true;
+                                logEntries.push(`<span class="user">СИСТЕМА</span>: ☠️ Яд сжег ${actualDeduct} билетов у лота [${safeName}]`);
+                            }
                             activeTimers[key] = now;
-                            dbNeedsUpdate = true;
-                            logEntries.push(`<span class="user">СИСТЕМА</span>: ☠️ Яд сжег ${deduct} билетов у лота [${safeName}]`);
                         }
                     } else { delete activeTimers[safeName + "_poison"]; }
 
-                    // 🧪 КИСЛОТА (Сжигает щиты)
                     let acidBadge = badgesArr.find(b => b.type === 'acid');
                     if (acidBadge) {
                         let key = safeName + "_acid";
                         if (!activeTimers[key]) activeTimers[key] = now;
                         
                         if (now - activeTimers[key] >= acidTick * 1000) {
-                            // 🔥 ЧИТАЕМ СИЛУ УРОНА КИСЛОТЫ 🔥
                             let deduct = parseInt(acidBadge.value);
                             if (isNaN(deduct) || deduct <= 0) deduct = 1;
                             
                             let broken = 0;
                             for(let i=0; i<deduct; i++) {
                                 let sIdx = badgesArr.findIndex(b => b.type === 'shield');
-                                if (sIdx !== -1) {
-                                    badgesArr.splice(sIdx, 1);
-                                    broken++;
-                                }
+                                if (sIdx !== -1) { badgesArr.splice(sIdx, 1); broken++; }
                             }
                             
                             if (broken > 0) {
@@ -601,17 +595,13 @@
 
             if (dbNeedsUpdate) {
                 fetch(firebaseUrl, { method: 'PUT', body: JSON.stringify(data) });
-
                 if (logEntries.length > 0) {
                     try {
                         let currentLog = data.log || [];
                         let timeStr = new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
                         logEntries.forEach(txt => { currentLog.unshift({ time: timeStr, text: txt }); });
                         while (currentLog.length > 30) currentLog.pop();
-                        
-                        fetch("https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/auction_data/log.json", {
-                            method: 'PUT', body: JSON.stringify(currentLog)
-                        });
+                        fetch("https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/auction_data/log.json", { method: 'PUT', body: JSON.stringify(currentLog) });
                     } catch(e) {}
                 }
             }
@@ -629,16 +619,9 @@
                 
                 if (data && data.current_phase) {
                     const phaseInd = document.getElementById('phase-indicator');
-                    if (data.current_phase === 1) {
-                        phaseInd.className = 'phase-indicator p1';
-                        phaseInd.innerHTML = '🟢 ФАЗА 1: УТРО';
-                    } else if (data.current_phase === 2) {
-                        phaseInd.className = 'phase-indicator p2';
-                        phaseInd.innerHTML = '🟡 ФАЗА 2: ЯСНЫЙ ДЕНЬ';
-                    } else if (data.current_phase === 3) {
-                        phaseInd.className = 'phase-indicator p3';
-                        phaseInd.innerHTML = '🌑 ФАЗА 3: СОЛНЕЧНОЕ ЗАТМЕНИЕ';
-                    }
+                    if (data.current_phase === 1) { phaseInd.className = 'phase-indicator p1'; phaseInd.innerHTML = '🟢 ФАЗА 1: УТРО'; } 
+                    else if (data.current_phase === 2) { phaseInd.className = 'phase-indicator p2'; phaseInd.innerHTML = '🟡 ФАЗА 2: ЯСНЫЙ ДЕНЬ'; } 
+                    else if (data.current_phase === 3) { phaseInd.className = 'phase-indicator p3'; phaseInd.innerHTML = '🌑 ФАЗА 3: СОЛНЕЧНОЕ ЗАТМЕНИЕ'; }
                 }
 
                 if (currentConfig && currentConfig.dictionary) {
@@ -647,29 +630,17 @@
                     if (currentConfig.dictionary.debuffs) currentConfig.dictionary.debuffs.forEach(e => dictionaryMap[e.id] = e);
                 }
 
-                if (data && data.players && currentConfig) {
-                    processTimers(data, currentConfig);
-                }
+                if (data && data.players && currentConfig) { processTimers(data, currentConfig); }
 
-                if (data && data.players) {
-                    try { drawSlots(data.players); } catch (e) {}
-                } else {
-                    playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%;'>Алтарь пуст... Ждем жертв.</h2>";
-                    cauldronList.innerHTML = "";
-                }
+                if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } 
+                else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
 
-                if (data && data.log) {
-                    drawLog(data.log);
-                } else {
-                    document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>';
-                }
+                if (data && data.log) { drawLog(data.log); } 
+                else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
 
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
                     const spinData = data.last_spin;
-                    if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) {
-                        lastProcessedSpinTime = spinData.timestamp;
-                        startWheelAnimation(spinData);
-                    }
+                    if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) { lastProcessedSpinTime = spinData.timestamp; startWheelAnimation(spinData); }
                 }
             } catch (error) {}
         }
@@ -678,19 +649,13 @@
         fetchFromCloud();
 
         let lastLogDataString = "";
-        
         function drawLog(logArray) {
             const currentLogString = JSON.stringify(logArray);
             if (lastLogDataString === currentLogString) return; 
-            
             lastLogDataString = currentLogString;
             const logList = document.getElementById('action-log-list');
             let html = '';
-            
-            logArray.forEach(entry => {
-                html += `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`;
-            });
-            
+            logArray.forEach(entry => { html += `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`; });
             logList.innerHTML = html;
         }
 
@@ -699,8 +664,7 @@
             let globalMaxGames = 3; 
 
             playersData.forEach(player => {
-                let playerTotalTickets = 0; 
-                let localGameCount = 0;
+                let playerTotalTickets = 0; let localGameCount = 0;
                 if (player.games) {
                     let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     localGameCount = gamesArr.length;
@@ -740,10 +704,7 @@
 
                         let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges || {});
                         let badgeCounts = {};
-                        badgesArr.forEach(b => {
-                            if (!b || !b.type) return;
-                            badgeCounts[b.type] = (badgeCounts[b.type] || 0) + 1;
-                        });
+                        badgesArr.forEach(b => { if (!b || !b.type) return; badgeCounts[b.type] = (badgeCounts[b.type] || 0) + 1; });
 
                         let localBadges = Object.keys(badgeCounts).map(type => {
                             let count = badgeCounts[type];
@@ -794,7 +755,6 @@
                 let statusBadge = ""; let itemClass = "";
                 if (game.gold >= 20) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
                 else if (game.gold >= 10) { itemClass = "immortal"; statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`; }
-
                 let safeNameEscaped = game.rawName.replace(/'/g, "\\'").replace(/"/g, "&quot;");
 
                 html += `
@@ -821,60 +781,30 @@
             const resultBox = document.getElementById('wheel-result');
             const resText = document.getElementById('res-text');
             
-            resultBox.classList.remove('show');
-            wrapper.className = 'active'; 
-            canvas.style.transform = `scale(1) rotate(0rad)`;
+            resultBox.classList.remove('show'); wrapper.className = 'active'; canvas.style.transform = `scale(1) rotate(0rad)`;
 
-            let itemsRaw = [];
-            let neonColor = "#8abf86"; 
-            
-            if (spinData.action === "SPIN_BUFF_SUB") {
-                itemsRaw = currentConfig.wheels.premium.buffs;
-                wrapper.classList.add('buff');
-                neonColor = "#8abf86"; 
-            } else if (spinData.action === "SPIN_DEBUFF_SUB") {
-                itemsRaw = currentConfig.wheels.premium.debuffs;
-                wrapper.classList.add('debuff');
-                neonColor = "#c45c5c"; 
-            } else if (spinData.action === "SPIN_FREE_WHEEL") {
-                itemsRaw = currentConfig.wheels.free.buffs;
-                wrapper.classList.add('free');
-                neonColor = "#b0b8a8"; 
-            }
+            let itemsRaw = []; let neonColor = "#8abf86"; 
+            if (spinData.action === "SPIN_BUFF_SUB") { itemsRaw = currentConfig.wheels.premium.buffs; wrapper.classList.add('buff'); neonColor = "#8abf86"; } 
+            else if (spinData.action === "SPIN_DEBUFF_SUB") { itemsRaw = currentConfig.wheels.premium.debuffs; wrapper.classList.add('debuff'); neonColor = "#c45c5c"; } 
+            else if (spinData.action === "SPIN_FREE_WHEEL") { itemsRaw = currentConfig.wheels.free.buffs; wrapper.classList.add('free'); neonColor = "#b0b8a8"; }
             
             resText.style.color = neonColor;
-
             const activeItems = itemsRaw.filter(i => i.active);
             if (activeItems.length === 0) { isSpinning = false; wrapper.className = ''; return; }
 
-            const targetIndex = spinData.index; 
-            const targetItem = activeItems[targetIndex];
-            
-            const cx = 400, cy = 400;
-            const sliceAngle = (Math.PI * 2) / activeItems.length;
+            const targetIndex = spinData.index; const targetItem = activeItems[targetIndex];
+            const cx = 400, cy = 400; const sliceAngle = (Math.PI * 2) / activeItems.length;
 
-            ctx.clearRect(0, 0, 800, 800);
-            const lineRadius = 400; const textRadius = 265; 
+            ctx.clearRect(0, 0, 800, 800); const lineRadius = 400; const textRadius = 265; 
 
             for (let i = 0; i < activeItems.length; i++) {
                 const startA = i * sliceAngle; const endA = startA + sliceAngle;
-                
-                ctx.beginPath();
-                ctx.moveTo(cx, cy); ctx.arc(cx, cy, lineRadius, startA, endA);
-                ctx.closePath();
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, lineRadius, startA, endA); ctx.closePath();
                 ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; ctx.lineWidth = 4; ctx.stroke();
-
-                ctx.save();
-                ctx.translate(cx, cy); ctx.rotate(startA + sliceAngle / 2);
-                ctx.textAlign = "right"; ctx.textBaseline = "middle";
-                
-                let text = activeItems[i].name;
-                if(text.length > 18) text = text.substring(0, 16) + "...";
-                
-                ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; 
-                ctx.lineWidth = 6; ctx.strokeStyle = "black"; ctx.strokeText(text, textRadius, 0);
+                ctx.save(); ctx.translate(cx, cy); ctx.rotate(startA + sliceAngle / 2); ctx.textAlign = "right"; ctx.textBaseline = "middle";
+                let text = activeItems[i].name; if(text.length > 18) text = text.substring(0, 16) + "...";
+                ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; ctx.lineWidth = 6; ctx.strokeStyle = "black"; ctx.strokeText(text, textRadius, 0);
                 ctx.fillStyle = neonColor; ctx.shadowBlur = 0; ctx.fillText(text, textRadius, 0); 
-                
                 ctx.restore();
             }
 
@@ -884,29 +814,21 @@
             const randomOffset = (Math.random() - 0.5) * (sliceAngle * 0.7); 
             const absoluteFinalAngle = finalAngle + randomOffset;
 
-            let startTime = null;
-            const duration = (currentConfig.wheels.spin_duration || 5) * 1000;
-
+            let startTime = null; const duration = (currentConfig.wheels.spin_duration || 5) * 1000;
             function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
 
             function animateWheel(timestamp) {
                 if (!startTime) startTime = timestamp;
                 const progress = Math.min((timestamp - startTime) / duration, 1);
-                
                 canvas.style.transform = `scale(1) rotate(${absoluteFinalAngle * easeOut(progress)}rad)`;
 
-                if (progress < 1) {
-                    requestAnimationFrame(animateWheel);
-                } else {
+                if (progress < 1) { requestAnimationFrame(animateWheel); } 
+                else {
                     document.getElementById('res-user').innerText = `КРУТИТ: ${spinData.user}`;
                     document.getElementById('res-text').innerText = `Награда: ${targetItem.name}`;
                     resultBox.classList.add('show');
-                    
                     clearTimeout(wheelTimeout);
-                    wheelTimeout = setTimeout(() => {
-                        wrapper.classList.remove('active');
-                        setTimeout(() => { isSpinning = false; }, 500); 
-                    }, duration);
+                    wheelTimeout = setTimeout(() => { wrapper.classList.remove('active'); setTimeout(() => { isSpinning = false; }, 500); }, duration);
                 }
             }
             requestAnimationFrame(animateWheel);

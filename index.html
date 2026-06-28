@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аукцион - Оверлей V37.0 (Симметрия и Навигация)</title>
+    <title>Аукцион - Оверлей V38.0 (Умный Яд и Золото)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -41,7 +41,6 @@
         .modal-view { display: none; animation: fadeIn 0.3s ease;}
         .modal-view.active { display: block; }
         
-        /* Таб Правил */
         .rules-text { color: #c4d1b8; font-size: 20px; line-height: 1.6; }
         .rules-section-title { color: #b8a87b; font-size: 24px; border-bottom: 1px dashed #283325; padding-bottom: 5px; margin-top: 25px; margin-bottom: 15px; text-transform: uppercase;}
         .rules-text ul { padding-left: 25px; margin-bottom: 20px; }
@@ -49,7 +48,6 @@
         .eff-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; border: 1px solid; font-size: 16px; font-weight: bold; font-family: sans-serif; background: rgba(5,5,5,0.9); margin-right: 5px;}
         .eff-badge.shield { color: #9c9273; border-color: #5c5541; }
 
-        /* Таб Эффектов (Словарь) */
         .dict-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
         .dict-item { background: rgba(0,0,0,0.3); border: 1px solid #283325; padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s;}
         .dict-item:hover { background: rgba(138, 191, 134, 0.05); border-color: #4a5c41; transform: translateY(-2px);}
@@ -74,7 +72,7 @@
         .top-nav-btn { background: #121612; border: 1px solid #283325; color: #a4b09c; padding: 6px 15px; border-radius: 6px; font-family: 'Neucha', cursive; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 2; position: absolute; top: 0;}
         .top-nav-btn:hover { background: #161a15; color: #c4d1b8; border-color: #4a5c41; transform: translateY(-2px); }
         .top-nav-btn.left-btn { left: 0; }
-        .top-nav-btn.right-btn { right: 10px; } /* 10px сдвиг из-за скроллбара ниже */
+        .top-nav-btn.right-btn { right: 10px; }
 
         .left-panel { flex: 1; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; padding-right: 10px; }
         .table-header { display: flex; align-items: center; background: #0b0d0a; border-bottom: 2px solid #283325; padding-bottom: 8px; margin-bottom: 4px; position: sticky; top: 0; z-index: 10; }
@@ -153,7 +151,6 @@
         .widget-base.collapsed { height: auto !important; flex: 0 0 auto; resize: none; }
         .widget-base.collapsed .widget-content { display: none; }
 
-        /* Вкладки Журнала */
         .multi-widget-header { padding: 0 !important; }
         .tabs-header { display: flex; align-items: stretch; height: 100%; }
         .tab-drag { padding: 10px 12px; cursor: grab; color: #4a5c41; font-size: 18px; display: flex; align-items: center; border-right: 1px solid #283325; }
@@ -220,6 +217,7 @@
                 <button class="modal-nav-btn" onclick="switchModalView('effects', this)">🔮 Словарь Эффектов</button>
             </div>
 
+            <!-- ВКЛАДКА: ПРАВИЛА -->
             <div id="modal-view-rules" class="modal-view active">
                 <div class="rules-text">
                     <div class="rules-section-title">🎬 ТРИ ФАЗЫ АУКЦИОНА</div>
@@ -241,18 +239,17 @@
                     <ul>
                         <li>Золото — это премиум валюта. Курс: <b>10 гривен = 1 Золото</b>.</li>
                         <li><b>10 Золота = БЕССМЕРТИЕ:</b> Игру невозможно удалить или уничтожить дебаффом "Килл".</li>
-                        <li><b>20 Золота = НЕУЯЗВИМОСТЬ:</b> Игра становится иммунной к ЛЮБЫМ негативным эффектам и налогам из колеса.</li>
+                        <li><b>20 Золота = НЕУЯЗВИМОСТЬ:</b> Игра становится иммунной к ЛЮБЫМ негативным эффектам и налогам из колеса. Очищает все проклятия.</li>
                     </ul>
                 </div>
             </div>
 
+            <!-- ВКЛАДКА: СЛОВАРЬ (Генерируется динамически) -->
             <div id="modal-view-effects" class="modal-view">
                 <div class="rules-text">
                     <p style="text-align: center; color: #8abf86; margin-bottom: 0;">Здесь собраны все актуальные эффекты, которые могут выпасть на рулетке.</p>
-                    
                     <div class="rules-section-title" style="color: #8abf86;">🟢 БАФФЫ</div>
                     <div class="dict-grid" id="dict-render-buffs">Загрузка...</div>
-
                     <div class="rules-section-title" style="color: #c45c5c; margin-top: 30px;">🔴 ДЕБАФФЫ</div>
                     <div class="dict-grid" id="dict-render-debuffs">Загрузка...</div>
                 </div>
@@ -261,6 +258,7 @@
         </div>
     </div>
 
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div id="app-wrapper" class="app-wrapper">
         <div class="layout">
             <div class="left-container">
@@ -269,7 +267,6 @@
                     <div id="phase-indicator" class="phase-indicator p1">🟢 ФАЗА 1: УТРО</div>
                     <button class="top-nav-btn right-btn" onclick="openModalTab('effects')">🔮 Эффекты</button>
                 </div>
-
                 <div class="left-panel" id="players-grid"></div>
             </div>
             
@@ -375,14 +372,11 @@
             btnElement.classList.add('active');
         }
 
-        // 🔥 УПРАВЛЕНИЕ НОВЫМ ОКНОМ ПРАВИЛ И ЭФФЕКТОВ 🔥
         function openModalTab(tabId) {
             document.getElementById('rules-modal').classList.add('show');
             renderDictionaryUI();
-            
             document.querySelectorAll('.modal-nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.modal-view').forEach(v => v.classList.remove('active'));
-            
             if (tabId === 'rules') {
                 document.querySelector('.modal-nav-btn:nth-child(1)').classList.add('active');
                 document.getElementById('modal-view-rules').classList.add('active');
@@ -402,7 +396,6 @@
         function closeRulesModal() { document.getElementById('rules-modal').classList.remove('show'); }
         document.getElementById('rules-modal').addEventListener('click', function(e) { if (e.target === this) closeRulesModal(); });
 
-        // ГЕНЕРАТОР ЭНЦИКЛОПЕДИИ (Перевод системных механик)
         const mechDescriptions = {
             'add_tickets': 'Моментально добавляет указанное число билетов.',
             'add_all': 'Добавляет билеты сразу всем твоим живым лотам.',
@@ -421,34 +414,21 @@
 
         function renderDictionaryUI() {
             if(!currentConfig || !currentConfig.dictionary) return;
-            
             const renderGrid = (arr, containerId, cssClass) => {
                 const container = document.getElementById(containerId);
                 let html = "";
                 if(!arr || arr.length === 0) { container.innerHTML = "<p>Пусто</p>"; return; }
-                
                 arr.forEach(eff => {
                     let desc = mechDescriptions[eff.mech] || "Уникальная магия Скинволкера.";
                     let targetTxt = eff.target === 'self' ? 'На свой лот' : (eff.target === 'enemy' ? 'На лот врага' : 'Глобально');
-                    html += `
-                        <div class="dict-item ${cssClass}">
-                            <div class="dict-icon">${eff.icon}</div>
-                            <div class="dict-info">
-                                <h4>${eff.name}</h4>
-                                <p>${desc}</p>
-                                <span class="target-lbl">Цель: ${targetTxt}</span>
-                            </div>
-                        </div>
-                    `;
+                    html += `<div class="dict-item ${cssClass}"><div class="dict-icon">${eff.icon}</div><div class="dict-info"><h4>${eff.name}</h4><p>${desc}</p><span class="target-lbl">Цель: ${targetTxt}</span></div></div>`;
                 });
                 container.innerHTML = html;
             };
-
             renderGrid(currentConfig.dictionary.buffs, 'dict-render-buffs', 'buff');
             renderGrid(currentConfig.dictionary.debuffs, 'dict-render-debuffs', 'debuff');
         }
 
-        // ЗУМ ВИДЖЕТОВ
         function changeWidgetZoom(btn, delta) {
             const widget = btn.closest('.widget-base');
             const target = widget.querySelector('.zoom-target');
@@ -472,40 +452,10 @@
 
         const headers = document.querySelectorAll('.draggable-widget .drag-handle');
         const zones = document.querySelectorAll('.drop-zone');
-        
-        headers.forEach(handle => {
-            handle.addEventListener('mouseenter', () => { handle.closest('.draggable-widget').setAttribute('draggable', 'true'); });
-            handle.addEventListener('mouseleave', () => { handle.closest('.draggable-widget').removeAttribute('draggable'); });
-        });
-
-        document.querySelectorAll('.draggable-widget').forEach(widget => {
-            widget.addEventListener('dragstart', (e) => { widget.classList.add('dragging'); e.dataTransfer.setData('text/plain', widget.id); });
-            widget.addEventListener('dragend', () => { widget.classList.remove('dragging'); zones.forEach(z => z.classList.remove('drag-over')); });
-        });
-
-        zones.forEach(zone => {
-            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-            zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); });
-            zone.addEventListener('drop', e => {
-                e.preventDefault(); zone.classList.remove('drag-over');
-                const draggedId = e.dataTransfer.getData('text/plain');
-                const draggedWidget = document.getElementById(draggedId);
-                if (draggedWidget && draggedWidget.parentNode !== zone) {
-                    const existingWidget = zone.querySelector('.draggable-widget');
-                    const originZone = draggedWidget.parentNode;
-                    if (existingWidget) { originZone.appendChild(existingWidget); }
-                    zone.appendChild(draggedWidget);
-                }
-            });
-        });
-
-        document.querySelectorAll('.collapse-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const widget = e.target.closest('.widget-base');
-                widget.classList.toggle('collapsed');
-                if (widget.classList.contains('collapsed')) { e.target.innerText = '▶️'; } else { e.target.innerText = '🔽'; }
-            });
-        });
+        headers.forEach(handle => { handle.addEventListener('mouseenter', () => { handle.closest('.draggable-widget').setAttribute('draggable', 'true'); }); handle.addEventListener('mouseleave', () => { handle.closest('.draggable-widget').removeAttribute('draggable'); }); });
+        document.querySelectorAll('.draggable-widget').forEach(widget => { widget.addEventListener('dragstart', (e) => { widget.classList.add('dragging'); e.dataTransfer.setData('text/plain', widget.id); }); widget.addEventListener('dragend', () => { widget.classList.remove('dragging'); zones.forEach(z => z.classList.remove('drag-over')); }); });
+        zones.forEach(zone => { zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); }); zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); }); zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); const draggedId = e.dataTransfer.getData('text/plain'); const draggedWidget = document.getElementById(draggedId); if (draggedWidget && draggedWidget.parentNode !== zone) { const existingWidget = zone.querySelector('.draggable-widget'); const originZone = draggedWidget.parentNode; if (existingWidget) { originZone.appendChild(existingWidget); } zone.appendChild(draggedWidget); } }); });
+        document.querySelectorAll('.collapse-btn').forEach(btn => { btn.addEventListener('click', (e) => { const widget = e.target.closest('.widget-base'); widget.classList.toggle('collapsed'); if (widget.classList.contains('collapsed')) { e.target.innerText = '▶️'; } else { e.target.innerText = '🔽'; } }); });
 
         const playersGrid = document.getElementById("players-grid");
         const cauldronList = document.getElementById("cauldron-list");
@@ -517,6 +467,8 @@
         let isSpinning = false;
         let currentConfig = null;
         let wheelTimeout = null;
+        
+        // 🔥 ЛОГИКА ТАЙМЕРОВ (СУДЬЯ) 🔥
         let activeTimers = {}; 
 
         function processTimers(data, config) {
@@ -533,42 +485,74 @@
                 if (aConf && aConf.tick > 0) acidTick = aConf.tick;
             }
 
-            data.players.forEach((player) => {
+            data.players.forEach((player, pIdx) => {
                 if (!player.games) return;
                 let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                 
-                gamesArr.forEach((game) => {
-                    if (!game.badges || game.gold >= 20) return; 
-                    
+                gamesArr.forEach((game, gIdx) => {
+                    if (!game.badges) return; 
                     let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges);
+                    let safeName = game.name || "Без названия";
+                    
+                    // 🔥 ИДЕАЛЬНО УНИКАЛЬНЫЙ КЛЮЧ ТАЙМЕРА 🔥
+                    let uniqueKey = player.user + "_" + gIdx + "_" + safeName;
+
+                    // 🔥 АВТООЧИЩЕНИЕ ПРИ 20 ЗОЛОТА 🔥
+                    if (game.gold >= 20) {
+                        let cleaned = false;
+                        for (let i = badgesArr.length - 1; i >= 0; i--) {
+                            if (['poison', 'acid', 'freeze'].includes(badgesArr[i].type)) {
+                                badgesArr.splice(i, 1);
+                                cleaned = true;
+                            }
+                        }
+                        if (cleaned) {
+                            game.badges = badgesArr;
+                            dbNeedsUpdate = true;
+                            logEntries.push(`<span class="user">СИСТЕМА</span>: 🛡️ Неуязвимость (20 Золота) очистила все проклятия с лота [${safeName}]!`);
+                        }
+                        return; // Выходим из цикла, таймеры не работают на эту игру
+                    }
+
                     let isDead = badgesArr.some(b => b.type === 'kill');
                     if (isDead) return;
 
-                    let safeName = game.name || "Без названия";
-
+                    // ☠️ ЯД
                     let poisonBadge = badgesArr.find(b => b.type === 'poison');
                     if (poisonBadge) {
-                        let key = safeName + "_poison";
-                        if (!activeTimers[key]) activeTimers[key] = now;
+                        let curT = parseInt(game.tickets) || 0;
                         
-                        if (now - activeTimers[key] >= poisonTick * 1000) {
-                            let curT = parseInt(game.tickets) || 0;
-                            let deduct = parseInt(poisonBadge.value);
-                            if (isNaN(deduct) || deduct <= 0) deduct = 1; 
+                        // 🔥 ЯД ИСЧЕЗАЕТ НА 1 БИЛЕТЕ 🔥
+                        if (curT <= 1) {
+                            let pIdxToRemove = badgesArr.findIndex(b => b.type === 'poison');
+                            if (pIdxToRemove !== -1) badgesArr.splice(pIdxToRemove, 1);
+                            game.badges = badgesArr;
+                            dbNeedsUpdate = true;
+                            logEntries.push(`<span class="user">СИСТЕМА</span>: ☠️ Яд выветрился с лота [${safeName}] (Остался 1 билет)!`);
+                            delete activeTimers[uniqueKey + "_poison"];
+                        } else {
+                            let key = uniqueKey + "_poison";
+                            if (!activeTimers[key]) activeTimers[key] = now;
                             
-                            let actualDeduct = Math.min(curT - 1, deduct);
-                            if (actualDeduct > 0) {
-                                game.tickets = curT - actualDeduct;
-                                dbNeedsUpdate = true;
-                                logEntries.push(`<span class="user">СИСТЕМА</span>: ☠️ Яд сжег ${actualDeduct} билетов у лота [${safeName}]`);
+                            if (now - activeTimers[key] >= poisonTick * 1000) {
+                                let deduct = parseInt(poisonBadge.value);
+                                if (isNaN(deduct) || deduct <= 0) deduct = 1; 
+                                
+                                let actualDeduct = Math.min(curT - 1, deduct);
+                                if (actualDeduct > 0) {
+                                    game.tickets = curT - actualDeduct;
+                                    dbNeedsUpdate = true;
+                                    logEntries.push(`<span class="user">СИСТЕМА</span>: ☠️ Яд сжег ${actualDeduct} билетов у лота [${safeName}]`);
+                                }
+                                activeTimers[key] = now;
                             }
-                            activeTimers[key] = now;
                         }
-                    } else { delete activeTimers[safeName + "_poison"]; }
+                    } else { delete activeTimers[uniqueKey + "_poison"]; }
 
+                    // 🧪 КИСЛОТА
                     let acidBadge = badgesArr.find(b => b.type === 'acid');
                     if (acidBadge) {
-                        let key = safeName + "_acid";
+                        let key = uniqueKey + "_acid";
                         if (!activeTimers[key]) activeTimers[key] = now;
                         
                         if (now - activeTimers[key] >= acidTick * 1000) {
@@ -588,7 +572,7 @@
                             }
                             activeTimers[key] = now;
                         }
-                    } else { delete activeTimers[safeName + "_acid"]; }
+                    } else { delete activeTimers[uniqueKey + "_acid"]; }
                 });
                 player.games = gamesArr;
             });
@@ -609,13 +593,8 @@
 
         async function fetchFromCloud() {
             try {
-                const [dataRes, confRes] = await Promise.all([
-                    fetch(firebaseUrl + "?nocache=" + new Date().getTime()),
-                    fetch(configUrl + "?nocache=" + new Date().getTime())
-                ]);
-                
-                const data = await dataRes.json();
-                currentConfig = await confRes.json();
+                const [dataRes, confRes] = await Promise.all([ fetch(firebaseUrl + "?nocache=" + new Date().getTime()), fetch(configUrl + "?nocache=" + new Date().getTime()) ]);
+                const data = await dataRes.json(); currentConfig = await confRes.json();
                 
                 if (data && data.current_phase) {
                     const phaseInd = document.getElementById('phase-indicator');
@@ -631,12 +610,8 @@
                 }
 
                 if (data && data.players && currentConfig) { processTimers(data, currentConfig); }
-
-                if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } 
-                else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
-
-                if (data && data.log) { drawLog(data.log); } 
-                else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
+                if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
+                if (data && data.log) { drawLog(data.log); } else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
 
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
                     const spinData = data.last_spin;
@@ -644,9 +619,7 @@
                 }
             } catch (error) {}
         }
-
-        setInterval(fetchFromCloud, 1000);
-        fetchFromCloud();
+        setInterval(fetchFromCloud, 1000); fetchFromCloud();
 
         let lastLogDataString = "";
         function drawLog(logArray) {
@@ -660,55 +633,42 @@
         }
 
         function drawSlots(playersData) {
-            const globalCauldron = {};
-            let globalMaxGames = 3; 
-
+            const globalCauldron = {}; let globalMaxGames = 3; 
             playersData.forEach(player => {
                 let playerTotalTickets = 0; let localGameCount = 0;
                 if (player.games) {
                     let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     localGameCount = gamesArr.length;
                     gamesArr.forEach(game => {
-                        let safeName = game.name != null ? String(game.name) : "Без названия";
-                        let upperName = safeName.toUpperCase();
-                        let t = parseInt(game.tickets) || 0;
+                        let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let t = parseInt(game.tickets) || 0;
                         if (!globalCauldron[upperName]) globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: safeName };
-                        globalCauldron[upperName].tickets += t;
-                        globalCauldron[upperName].gold += parseInt(game.gold) || 0; 
-                        playerTotalTickets += t;
+                        globalCauldron[upperName].tickets += t; globalCauldron[upperName].gold += parseInt(game.gold) || 0; playerTotalTickets += t;
                     });
                 }
-                player.totalTickets = playerTotalTickets;
-                if (localGameCount > globalMaxGames) globalMaxGames = localGameCount; 
+                player.totalTickets = playerTotalTickets; if (localGameCount > globalMaxGames) globalMaxGames = localGameCount; 
             });
-
             playersData.sort((a, b) => b.totalTickets - a.totalTickets);
             
             let headerHtml = `<div class="table-header"><div class="th-user">ЗРИТЕЛЬ</div><div class="th-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">`;
             for(let i = 1; i <= globalMaxGames; i++) { headerHtml += `<div class="th-game">ИГРА ${i}</div>`; }
-            headerHtml += `</div></div>`;
-            playersGrid.innerHTML = headerHtml;
+            headerHtml += `</div></div>`; playersGrid.innerHTML = headerHtml;
 
             playersData.forEach(player => {
                 let gamesHtml = "";
                 if (player.games) {
                     let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     gamesArr.forEach(game => {
-                        let safeName = game.name != null ? String(game.name) : "Без названия";
-                        let upperName = safeName.toUpperCase();
-                        let globalGold = globalCauldron[upperName].gold;
+                        let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let globalGold = globalCauldron[upperName].gold;
                         let itemClass = ""; let globalBadge = "";
 
                         if (globalGold >= 20) { itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute" title="Неуязвимость">🛡️</div>`; } 
                         else if (globalGold >= 10) { itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal" title="Бессмертие">💀</div>`; }
 
-                        let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges || {});
-                        let badgeCounts = {};
+                        let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges || {}); let badgeCounts = {};
                         badgesArr.forEach(b => { if (!b || !b.type) return; badgeCounts[b.type] = (badgeCounts[b.type] || 0) + 1; });
 
                         let localBadges = Object.keys(badgeCounts).map(type => {
-                            let count = badgeCounts[type];
-                            let iconText = ""; let titleText = "";
+                            let count = badgeCounts[type]; let iconText = ""; let titleText = "";
                             if (dictionaryMap[type]) { iconText = `${dictionaryMap[type].icon}`; titleText = dictionaryMap[type].name; } 
                             else {
                                 if(type === 'shield') iconText = "🛡️"; else if(type === 'fire') iconText = "🔥";
@@ -716,119 +676,55 @@
                                 else if(type === 'poison') iconText = "☠️"; else if(type === 'acid') iconText = "🧪";
                                 else iconText = `✨`; titleText = type;
                             }
-                            let displayContent = count > 1 ? `${iconText}&nbsp;x${count}` : iconText;
-                            return `<div class="badge ${type}" title="${titleText}">${displayContent}</div>`;
+                            let displayContent = count > 1 ? `${iconText}&nbsp;x${count}` : iconText; return `<div class="badge ${type}" title="${titleText}">${displayContent}</div>`;
                         }).join("");
                         
                         let allBadges = globalBadge + localBadges;
-                        
-                        gamesHtml += `
-                            <div class="pr-game-pill ${itemClass}">
-                                <div class="pr-g-top">
-                                    <div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div>
-                                    <span class="pr-g-tix">🎟️ ${game.tickets || 0}</span>
-                                </div>
-                                <div class="pr-g-bottom"><div class="badges-mini-container">${allBadges}</div></div>
-                            </div>
-                        `;
+                        gamesHtml += `<div class="pr-game-pill ${itemClass}"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><span class="pr-g-tix">🎟️ ${game.tickets || 0}</span></div><div class="pr-g-bottom"><div class="badges-mini-container">${allBadges}</div></div></div>`;
                     });
                 }
-
-                playersGrid.innerHTML += `
-                    <div class="player-row">
-                        <div class="pr-user-info">
-                            <div class="pr-role-name">
-                                <span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span>
-                                <span class="pr-name" onclick="copyNick(this, '${player.user || "Зритель"}')">${player.user || "Зритель"}</span>
-                            </div>
-                            <div class="pr-total">Σ ${player.totalTickets} билетов</div>
-                        </div>
-                        <div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div>
-                    </div>
-                `;
+                playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name" onclick="copyNick(this, '${player.user || "Зритель"}')">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
             });
 
-            const sortedGames = Object.values(globalCauldron).sort((a, b) => b.tickets - a.tickets);
-            const cauldronListEl = document.getElementById("cauldron-list");
-            let html = "";
+            const sortedGames = Object.values(globalCauldron).sort((a, b) => b.tickets - a.tickets); const cauldronListEl = document.getElementById("cauldron-list"); let html = "";
             sortedGames.forEach(game => {
                 let statusBadge = ""; let itemClass = "";
                 if (game.gold >= 20) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
                 else if (game.gold >= 10) { itemClass = "immortal"; statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`; }
                 let safeNameEscaped = game.rawName.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-
-                html += `
-                    <div class="cauldron-item ${itemClass}">
-                        <div class="c-top-row">
-                            <div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div>
-                            <div class="c-tickets">🎟️ ${game.tickets}</div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
-                            ${game.gold > 0 ? `<div class="c-gold">⚜️ Золото: ${game.gold}</div>` : '<div></div>'}
-                            ${statusBadge}
-                        </div>
-                    </div>
-                `;
+                html += `<div class="cauldron-item ${itemClass}"><div class="c-top-row"><div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div><div class="c-tickets">🎟️ ${game.tickets}</div></div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">${game.gold > 0 ? `<div class="c-gold">⚜️ Золото: ${game.gold}</div>` : '<div></div>'}${statusBadge}</div></div>`;
             });
             cauldronListEl.innerHTML = html;
         }
 
         function startWheelAnimation(spinData) {
-            isSpinning = true;
-            const wrapper = document.getElementById('wheel-wrapper');
-            const canvas = document.getElementById('wheel-canvas');
-            const ctx = canvas.getContext('2d');
-            const resultBox = document.getElementById('wheel-result');
-            const resText = document.getElementById('res-text');
-            
+            isSpinning = true; const wrapper = document.getElementById('wheel-wrapper'); const canvas = document.getElementById('wheel-canvas'); const ctx = canvas.getContext('2d'); const resultBox = document.getElementById('wheel-result'); const resText = document.getElementById('res-text');
             resultBox.classList.remove('show'); wrapper.className = 'active'; canvas.style.transform = `scale(1) rotate(0rad)`;
-
             let itemsRaw = []; let neonColor = "#8abf86"; 
             if (spinData.action === "SPIN_BUFF_SUB") { itemsRaw = currentConfig.wheels.premium.buffs; wrapper.classList.add('buff'); neonColor = "#8abf86"; } 
             else if (spinData.action === "SPIN_DEBUFF_SUB") { itemsRaw = currentConfig.wheels.premium.debuffs; wrapper.classList.add('debuff'); neonColor = "#c45c5c"; } 
             else if (spinData.action === "SPIN_FREE_WHEEL") { itemsRaw = currentConfig.wheels.free.buffs; wrapper.classList.add('free'); neonColor = "#b0b8a8"; }
-            
-            resText.style.color = neonColor;
-            const activeItems = itemsRaw.filter(i => i.active);
+            resText.style.color = neonColor; const activeItems = itemsRaw.filter(i => i.active);
             if (activeItems.length === 0) { isSpinning = false; wrapper.className = ''; return; }
-
             const targetIndex = spinData.index; const targetItem = activeItems[targetIndex];
             const cx = 400, cy = 400; const sliceAngle = (Math.PI * 2) / activeItems.length;
-
             ctx.clearRect(0, 0, 800, 800); const lineRadius = 400; const textRadius = 265; 
-
             for (let i = 0; i < activeItems.length; i++) {
                 const startA = i * sliceAngle; const endA = startA + sliceAngle;
-                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, lineRadius, startA, endA); ctx.closePath();
-                ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, lineRadius, startA, endA); ctx.closePath(); ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; ctx.lineWidth = 4; ctx.stroke();
                 ctx.save(); ctx.translate(cx, cy); ctx.rotate(startA + sliceAngle / 2); ctx.textAlign = "right"; ctx.textBaseline = "middle";
                 let text = activeItems[i].name; if(text.length > 18) text = text.substring(0, 16) + "...";
-                ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; ctx.lineWidth = 6; ctx.strokeStyle = "black"; ctx.strokeText(text, textRadius, 0);
-                ctx.fillStyle = neonColor; ctx.shadowBlur = 0; ctx.fillText(text, textRadius, 0); 
-                ctx.restore();
+                ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; ctx.lineWidth = 6; ctx.strokeStyle = "black"; ctx.strokeText(text, textRadius, 0); ctx.fillStyle = neonColor; ctx.shadowBlur = 0; ctx.fillText(text, textRadius, 0); ctx.restore();
             }
-
-            const spins = 5;
-            const targetCenterAngle = targetIndex * sliceAngle + (sliceAngle / 2);
-            const finalAngle = (spins * Math.PI * 2) - (Math.PI / 2) - targetCenterAngle;
-            const randomOffset = (Math.random() - 0.5) * (sliceAngle * 0.7); 
-            const absoluteFinalAngle = finalAngle + randomOffset;
-
+            const spins = 5; const targetCenterAngle = targetIndex * sliceAngle + (sliceAngle / 2); const finalAngle = (spins * Math.PI * 2) - (Math.PI / 2) - targetCenterAngle; const randomOffset = (Math.random() - 0.5) * (sliceAngle * 0.7); const absoluteFinalAngle = finalAngle + randomOffset;
             let startTime = null; const duration = (currentConfig.wheels.spin_duration || 5) * 1000;
             function easeOut(t) { return 1 - Math.pow(1 - t, 4); }
-
             function animateWheel(timestamp) {
-                if (!startTime) startTime = timestamp;
-                const progress = Math.min((timestamp - startTime) / duration, 1);
+                if (!startTime) startTime = timestamp; const progress = Math.min((timestamp - startTime) / duration, 1);
                 canvas.style.transform = `scale(1) rotate(${absoluteFinalAngle * easeOut(progress)}rad)`;
-
-                if (progress < 1) { requestAnimationFrame(animateWheel); } 
-                else {
-                    document.getElementById('res-user').innerText = `КРУТИТ: ${spinData.user}`;
-                    document.getElementById('res-text').innerText = `Награда: ${targetItem.name}`;
-                    resultBox.classList.add('show');
-                    clearTimeout(wheelTimeout);
-                    wheelTimeout = setTimeout(() => { wrapper.classList.remove('active'); setTimeout(() => { isSpinning = false; }, 500); }, duration);
+                if (progress < 1) { requestAnimationFrame(animateWheel); } else {
+                    document.getElementById('res-user').innerText = `КРУТИТ: ${spinData.user}`; document.getElementById('res-text').innerText = `Награда: ${targetItem.name}`; resultBox.classList.add('show');
+                    clearTimeout(wheelTimeout); wheelTimeout = setTimeout(() => { wrapper.classList.remove('active'); setTimeout(() => { isSpinning = false; }, 500); }, duration);
                 }
             }
             requestAnimationFrame(animateWheel);

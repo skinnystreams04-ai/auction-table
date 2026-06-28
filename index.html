@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Аукцион - Оверлей V38.0 (Умный Яд и Золото)</title>
+    <title>Аукцион - Оверлей V39.0 (Mobile Stream Deck)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -19,7 +19,7 @@
         /* ГЛОБАЛЬНЫЙ СТИЛЬ */
         body { margin: 0; padding: 0; font-family: 'Neucha', cursive, sans-serif; overflow: hidden; background-color: #0b0d0a; color: #a4b09c; letter-spacing: 0.5px; }
         
-        .app-wrapper { transform-origin: top left; width: 100%; height: 100vh; transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; box-sizing: border-box; padding: 20px; }
+        .app-wrapper { transform-origin: top left; width: 100%; height: 100vh; transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; box-sizing: border-box; padding: 20px; overflow-y: auto; overflow-x: hidden; }
         .layout { display: flex; gap: 20px; align-items: flex-start; height: 100%; width: 100%; justify-content: space-between; }
         
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -204,6 +204,39 @@
         .status-badge.absolute { background: #2b2518; color: #b8a87b; border: 1px solid #8c7b52; box-shadow: 0 0 10px rgba(140, 123, 82, 0.3); }
 
         .iframe-container { width: 100%; height: 100%; border: none; flex: 1; }
+
+        /* 🔥 АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ (STREAM DECK РЕЖИМ) 🔥 */
+        @media (max-width: 1024px) {
+            body, html { overflow-y: auto; height: auto; }
+            .app-wrapper { height: auto; padding: 10px; overflow: visible; }
+            .layout { flex-direction: column; gap: 15px; height: auto; overflow: visible; }
+            
+            .left-container { width: 100%; height: auto; flex: none; overflow: visible; }
+            .phase-bar { padding: 10px 5px; justify-content: space-between; box-sizing: border-box; }
+            .top-nav-btn { position: static; font-size: 12px; padding: 6px 10px; flex-shrink: 0;}
+            .phase-indicator { font-size: 14px; padding: 4px 10px; margin: 0 5px; flex-shrink: 0;}
+            
+            /* Горизонтальный скролл для таблицы Алтаря */
+            .left-panel { overflow-x: auto; overflow-y: hidden; padding-bottom: 15px; }
+            .table-header { min-width: max-content; }
+            .player-row { min-width: max-content; margin-bottom: 10px; }
+            
+            /* Складываем виджеты в колонку */
+            .right-interactive { flex-direction: column; width: 100%; min-width: 100%; height: auto; gap: 15px; }
+            .col-main, .col-side { width: 100%; padding-right: 0; height: auto; gap: 15px; overflow: visible; }
+            
+            .widget-base { height: 450px; min-height: 450px; }
+            .static-widget { height: auto !important; min-height: auto; }
+            
+            /* Уменьшаем рулетку, чтобы влезала на экран мобилки */
+            .wheel-scale-box { transform: scale(0.85); margin-bottom: -45px; }
+            
+            /* Правила и словарь на весь экран */
+            .rules-content { width: 95%; padding: 20px; }
+            .modal-nav { flex-direction: column; gap: 10px; align-items: center; }
+            .modal-nav-btn { width: 100%; font-size: 18px; }
+            .dict-grid { grid-template-columns: 1fr; } /* Словарь в один столбик */
+        }
     </style>
 </head>
 <body>
@@ -217,7 +250,6 @@
                 <button class="modal-nav-btn" onclick="switchModalView('effects', this)">🔮 Словарь Эффектов</button>
             </div>
 
-            <!-- ВКЛАДКА: ПРАВИЛА -->
             <div id="modal-view-rules" class="modal-view active">
                 <div class="rules-text">
                     <div class="rules-section-title">🎬 ТРИ ФАЗЫ АУКЦИОНА</div>
@@ -244,7 +276,6 @@
                 </div>
             </div>
 
-            <!-- ВКЛАДКА: СЛОВАРЬ (Генерируется динамически) -->
             <div id="modal-view-effects" class="modal-view">
                 <div class="rules-text">
                     <p style="text-align: center; color: #8abf86; margin-bottom: 0;">Здесь собраны все актуальные эффекты, которые могут выпасть на рулетке.</p>
@@ -258,7 +289,6 @@
         </div>
     </div>
 
-    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div id="app-wrapper" class="app-wrapper">
         <div class="layout">
             <div class="left-container">
@@ -468,7 +498,6 @@
         let currentConfig = null;
         let wheelTimeout = null;
         
-        // 🔥 ЛОГИКА ТАЙМЕРОВ (СУДЬЯ) 🔥
         let activeTimers = {}; 
 
         function processTimers(data, config) {
@@ -493,11 +522,8 @@
                     if (!game.badges) return; 
                     let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges);
                     let safeName = game.name || "Без названия";
-                    
-                    // 🔥 ИДЕАЛЬНО УНИКАЛЬНЫЙ КЛЮЧ ТАЙМЕРА 🔥
                     let uniqueKey = player.user + "_" + gIdx + "_" + safeName;
 
-                    // 🔥 АВТООЧИЩЕНИЕ ПРИ 20 ЗОЛОТА 🔥
                     if (game.gold >= 20) {
                         let cleaned = false;
                         for (let i = badgesArr.length - 1; i >= 0; i--) {
@@ -511,18 +537,15 @@
                             dbNeedsUpdate = true;
                             logEntries.push(`<span class="user">СИСТЕМА</span>: 🛡️ Неуязвимость (20 Золота) очистила все проклятия с лота [${safeName}]!`);
                         }
-                        return; // Выходим из цикла, таймеры не работают на эту игру
+                        return; 
                     }
 
                     let isDead = badgesArr.some(b => b.type === 'kill');
                     if (isDead) return;
 
-                    // ☠️ ЯД
                     let poisonBadge = badgesArr.find(b => b.type === 'poison');
                     if (poisonBadge) {
                         let curT = parseInt(game.tickets) || 0;
-                        
-                        // 🔥 ЯД ИСЧЕЗАЕТ НА 1 БИЛЕТЕ 🔥
                         if (curT <= 1) {
                             let pIdxToRemove = badgesArr.findIndex(b => b.type === 'poison');
                             if (pIdxToRemove !== -1) badgesArr.splice(pIdxToRemove, 1);
@@ -533,11 +556,9 @@
                         } else {
                             let key = uniqueKey + "_poison";
                             if (!activeTimers[key]) activeTimers[key] = now;
-                            
                             if (now - activeTimers[key] >= poisonTick * 1000) {
                                 let deduct = parseInt(poisonBadge.value);
                                 if (isNaN(deduct) || deduct <= 0) deduct = 1; 
-                                
                                 let actualDeduct = Math.min(curT - 1, deduct);
                                 if (actualDeduct > 0) {
                                     game.tickets = curT - actualDeduct;
@@ -549,22 +570,18 @@
                         }
                     } else { delete activeTimers[uniqueKey + "_poison"]; }
 
-                    // 🧪 КИСЛОТА
                     let acidBadge = badgesArr.find(b => b.type === 'acid');
                     if (acidBadge) {
                         let key = uniqueKey + "_acid";
                         if (!activeTimers[key]) activeTimers[key] = now;
-                        
                         if (now - activeTimers[key] >= acidTick * 1000) {
                             let deduct = parseInt(acidBadge.value);
                             if (isNaN(deduct) || deduct <= 0) deduct = 1;
-                            
                             let broken = 0;
                             for(let i=0; i<deduct; i++) {
                                 let sIdx = badgesArr.findIndex(b => b.type === 'shield');
                                 if (sIdx !== -1) { badgesArr.splice(sIdx, 1); broken++; }
                             }
-                            
                             if (broken > 0) {
                                 game.badges = badgesArr;
                                 logEntries.push(`<span class="user">СИСТЕМА</span>: 🧪 Кислота разъела ${broken} 🛡️ Щит(ов) у лота [${safeName}]`);

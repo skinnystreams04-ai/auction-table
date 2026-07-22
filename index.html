@@ -252,11 +252,10 @@
 
             <div id="modal-view-rules" class="modal-view active">
                 <div class="rules-text">
-                    <div class="rules-section-title">🎬 ТРИ ФАЗЫ АУКЦИОНА</div>
+                    <div class="rules-section-title">🎬 ДВЕ ФАЗЫ АУКЦИОНА</div>
                     <ul>
-                        <li><b>🟢 ФАЗА 1 «Утро»:</b> Время Зарождения. Открыто добавление новых игр и <i>Бесплатное колесо</i>. Время закидывать свои лоты и копить силы.</li>
-                        <li><b>🟡 ФАЗА 2 «Ясный день»:</b> Гонка Вооружений. Открывается <i>Колесо Баффов</i>. Время разгонять лоты множителями. Игры добавлять всё еще можно.</li>
-                        <li><b>🌑 ФАЗА 3 «Солнечное затмение»:</b> Судная Ночь. <b>ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫТО.</b> Открывается <i>Колесо Дебаффов</i>. Начинается жесткая война: воровство, яды, налоги и убийства. Выживает сильнейший!</li>
+                        <li><b>🟡 ФАЗА 1 «Ясный день»:</b> Время Зарождения. Открыто добавление новых игр и <i>Колеса Баффов</i>. Время закидывать свои лоты, баффать их и копить силы.</li>
+                        <li><b>🌑 ФАЗА 2 «Солнечное затмение»:</b> Судная Ночь. <b>ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫТО.</b> Открывается <i>Колесо Дебаффов</i>. Начинается жесткая война: воровство, яды, налоги и убийства. Выживает сильнейший!</li>
                     </ul>
 
                     <div class="rules-section-title">🎮 КАК УЧАСТВОВАТЬ</div>
@@ -294,7 +293,7 @@
             <div class="left-container">
                 <div class="phase-bar">
                     <button class="top-nav-btn left-btn" onclick="openModalTab('rules')">📖 Правила</button>
-                    <div id="phase-indicator" class="phase-indicator p1">🟢 ФАЗА 1: УТРО</div>
+                    <div id="phase-indicator" class="phase-indicator p2">🟡 ФАЗА 1: ЯСНЫЙ ДЕНЬ</div>
                     <button class="top-nav-btn right-btn" onclick="openModalTab('effects')">🔮 Эффекты</button>
                 </div>
                 <div class="left-panel" id="players-grid"></div>
@@ -615,9 +614,18 @@
                 
                 if (data && data.current_phase) {
                     const phaseInd = document.getElementById('phase-indicator');
-                    if (data.current_phase === 1) { phaseInd.className = 'phase-indicator p1'; phaseInd.innerHTML = '🟢 ФАЗА 1: УТРО'; } 
-                    else if (data.current_phase === 2) { phaseInd.className = 'phase-indicator p2'; phaseInd.innerHTML = '🟡 ФАЗА 2: ЯСНЫЙ ДЕНЬ'; } 
-                    else if (data.current_phase === 3) { phaseInd.className = 'phase-indicator p3'; phaseInd.innerHTML = '🌑 ФАЗА 3: СОЛНЕЧНОЕ ЗАТМЕНИЕ'; }
+                    if (data.current_phase === 1) { 
+                        phaseInd.className = 'phase-indicator p2'; 
+                        phaseInd.innerHTML = '🟡 ФАЗА 1: ЯСНЫЙ ДЕНЬ'; 
+                    } 
+                    else if (data.current_phase === 2) { 
+                        phaseInd.className = 'phase-indicator p3'; 
+                        phaseInd.innerHTML = '🌑 ФАЗА 2: ЗАТМЕНИЕ'; 
+                    } 
+                    else { 
+                        phaseInd.className = 'phase-indicator'; 
+                        phaseInd.innerHTML = 'ОЖИДАНИЕ СТАРТА'; 
+                    }
                 }
 
                 if (currentConfig && currentConfig.dictionary) {

@@ -678,18 +678,30 @@
                     let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     localGameCount = gamesArr.length;
                     gamesArr.forEach(game => {
-                        let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let t = parseInt(game.tickets) || 0;
+                        let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); 
+                        let t = parseInt(game.tickets) || 0;
+                        let g = parseInt(game.gold) || 0;
+                        
                         if (!globalCauldron[upperName]) globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: safeName };
-                        globalCauldron[upperName].tickets += t; globalCauldron[upperName].gold += parseInt(game.gold) || 0; playerTotalTickets += t;
+                        globalCauldron[upperName].tickets += t; 
+                        globalCauldron[upperName].gold += g; 
+                        
+                        // Теперь в общую сумму игрока (Σ) идет и золото тоже
+                        playerTotalTickets += (t + g); 
                     });
                 }
                 player.totalTickets = playerTotalTickets; if (localGameCount > globalMaxGames) globalMaxGames = localGameCount; 
             });
+            
+            // Сортировка зрителей слева по общей сумме (билеты + золото)
             playersData.sort((a, b) => b.totalTickets - a.totalTickets);
             
             let headerHtml = `<div class="table-header"><div class="th-user">ЗРИТЕЛЬ</div><div class="th-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">`;
             for(let i = 1; i <= globalMaxGames; i++) { headerHtml += `<div class="th-game">ИГРА ${i}</div>`; }
             headerHtml += `</div></div>`; playersGrid.innerHTML = headerHtml;
+
+            // Кэш для сломанных картинок (Анти-моргание)
+            if(typeof window.failedImages === 'undefined') window.failedImages = {};
 
             playersData.forEach(player => {
                 let gamesHtml = "";
@@ -715,30 +727,50 @@
                                 else { iconText = `✨`; titleText = type; }
                             }
                             
-                            let imgTag = `<img src="${baseUrl}${type}.png" class="custom-icon" onerror="this.outerHTML='${iconText}'">`;
+                            let imgUrl = `${baseUrl}${type}.png`;
+                            let imgTag = "";
+                            if(window.failedImages[imgUrl]) { imgTag = iconText; } 
+                            else { imgTag = `<img src="${imgUrl}" class="custom-icon" onerror="window.failedImages['${imgUrl}']=true; this.outerHTML='${iconText}'">`; }
+
                             let displayContent = count > 1 ? `${imgTag}&nbsp;x${count}` : imgTag; 
-                            
                             return `<div class="badge ${type}" title="${titleText}">${displayContent}</div>`;
                         }).join("");
                         
                         let allBadges = globalBadge + localBadges;
                         
-                        gamesHtml += `<div class="pr-game-pill ${itemClass}"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div><div class="pr-g-bottom"><div class="badges-mini-container">${allBadges}</div></div></div>`;
+                        let goldHtmlPill = game.gold > 0 ? `<span class="pr-g-tix" style="color: #b8a87b; background: rgba(184, 168, 123, 0.1); border-color: rgba(184, 168, 123, 0.2); margin-right: 5px;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon"> ${game.gold}</span>` : '';
+                        
+                        gamesHtml += `<div class="pr-game-pill ${itemClass}"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${allBadges}</div></div></div>`;
                     });
                 }
                 playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name" onclick="copyNick(this, '${player.user || "Зритель"}')">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
             });
 
-            const sortedGames = Object.values(globalCauldron).sort((a, b) => b.tickets - a.tickets); const cauldronListEl = document.getElementById("cauldron-list"); let html = "";
+            // Сортировка Алтаря (правая панель) по сумме обычных билетов и золотых
+            const sortedGames = Object.values(globalCauldron).sort((a, b) => (b.tickets + b.gold) - (a.tickets + a.gold)); 
+            const cauldronListEl = document.getElementById("cauldron-list"); let html = "";
             sortedGames.forEach(game => {
                 let statusBadge = ""; let itemClass = "";
                 if (game.gold >= 20) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
                 else if (game.gold >= 10) { itemClass = "immortal"; statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`; }
                 let safeNameEscaped = game.rawName.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 
-                let goldHtml = game.gold > 0 ? `<div class="c-gold"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon"> Золото: ${game.gold}</div>` : '<div></div>';
+                // Перенесли Золото наверх к билетам
+                let goldTickets = game.gold > 0 ? `<span style="color: #b8a87b; margin-right: 12px; display:flex; align-items:center;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon" style="margin-right: 4px;"> ${game.gold}</span>` : '';
                 
-                html += `<div class="cauldron-item ${itemClass}"><div class="c-top-row"><div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div><div class="c-tickets"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets}</div></div><div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">${goldHtml}${statusBadge}</div></div>`;
+                // Если есть бейдж Неуязвимости/Бессмертия, отрисовываем нижнюю строку с выравниванием по правому краю
+                let bottomRow = statusBadge ? `<div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 5px;">${statusBadge}</div>` : '';
+
+                html += `<div class="cauldron-item ${itemClass}">
+                            <div class="c-top-row">
+                                <div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div>
+                                <div class="c-tickets" style="display:flex; align-items:center;">
+                                    ${goldTickets}
+                                    <span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span>
+                                </div>
+                            </div>
+                            ${bottomRow}
+                         </div>`;
             });
             cauldronListEl.innerHTML = html;
         }

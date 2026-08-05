@@ -277,9 +277,9 @@
 
                     <div class="rules-section-title">⚜️ ЗОЛОТО И ГАРАНТИИ (ЗА ДОНАТ)</div>
                     <ul>
-                        <li>Золото — это премиум валюта. Курс: <b>10 гривен = 1 Золото</b>.</li>
-                        <li><b>10 Золота = БЕССМЕРТИЕ:</b> Игру невозможно удалить или уничтожить дебаффом "Килл".</li>
-                        <li><b>20 Золота = НЕУЯЗВИМОСТЬ:</b> Игра становится иммунной к ЛЮБЫМ негативным эффектам и налогам из колеса. Очищает все проклятия.</li>
+                        <li>Золото — это премиум валюта. Курс: <b>2 гривны = 1 Золото</b>.</li>
+                        <li><b>50 Золота (100 грн) = БЕССМЕРТИЕ:</b> Игру невозможно удалить или уничтожить дебаффом "Килл".</li>
+                        <li><b>100 Золота (200 грн) = НЕУЯЗВИМОСТЬ:</b> Игра становится иммунной к ЛЮБЫМ негативным эффектам и налогам из колеса. Очищает все проклятия.</li>
                     </ul>
                 </div>
             </div>
@@ -534,7 +534,7 @@
                     let safeName = game.name || "Без названия";
                     let uniqueKey = player.user + "_" + gIdx + "_" + safeName;
 
-                    if (game.gold >= 20) {
+                    if (game.gold >= 100) {
                         let cleaned = false;
                         for (let i = badgesArr.length - 1; i >= 0; i--) {
                             if (['poison', 'acid', 'freeze'].includes(badgesArr[i].type)) {
@@ -545,7 +545,7 @@
                         if (cleaned) {
                             game.badges = badgesArr;
                             dbNeedsUpdate = true;
-                            logEntries.push(`<span class="user">СИСТЕМА</span>: 🛡️ Неуязвимость (20 Золота) очистила все проклятия с лота [${safeName}]!`);
+                            logEntries.push(`<span class="user">СИСТЕМА</span>: 🛡️ Неуязвимость (100 Золота) очистила все проклятия с лота [${safeName}]!`);
                         }
                         return; 
                     }
@@ -686,21 +686,18 @@
                         globalCauldron[upperName].tickets += t; 
                         globalCauldron[upperName].gold += g; 
                         
-                        // Теперь в общую сумму игрока (Σ) идет и золото тоже
                         playerTotalTickets += (t + g); 
                     });
                 }
                 player.totalTickets = playerTotalTickets; if (localGameCount > globalMaxGames) globalMaxGames = localGameCount; 
             });
             
-            // Сортировка зрителей слева по общей сумме (билеты + золото)
             playersData.sort((a, b) => b.totalTickets - a.totalTickets);
             
             let headerHtml = `<div class="table-header"><div class="th-user">ЗРИТЕЛЬ</div><div class="th-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">`;
             for(let i = 1; i <= globalMaxGames; i++) { headerHtml += `<div class="th-game">ИГРА ${i}</div>`; }
             headerHtml += `</div></div>`; playersGrid.innerHTML = headerHtml;
 
-            // Кэш для сломанных картинок (Анти-моргание)
             if(typeof window.failedImages === 'undefined') window.failedImages = {};
 
             playersData.forEach(player => {
@@ -711,8 +708,8 @@
                         let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let globalGold = globalCauldron[upperName].gold;
                         let itemClass = ""; let globalBadge = "";
 
-                        if (globalGold >= 20) { itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute" title="Неуязвимость">🛡️</div>`; } 
-                        else if (globalGold >= 10) { itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal" title="Бессмертие">💀</div>`; }
+                        if (globalGold >= 100) { itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute" title="Неуязвимость">🛡️</div>`; } 
+                        else if (globalGold >= 50) { itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal" title="Бессмертие">💀</div>`; }
 
                         let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges || {}); let badgeCounts = {};
                         badgesArr.forEach(b => { if (!b || !b.type) return; badgeCounts[b.type] = (badgeCounts[b.type] || 0) + 1; });
@@ -746,19 +743,16 @@
                 playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name" onclick="copyNick(this, '${player.user || "Зритель"}')">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
             });
 
-            // Сортировка Алтаря (правая панель) по сумме обычных билетов и золотых
             const sortedGames = Object.values(globalCauldron).sort((a, b) => (b.tickets + b.gold) - (a.tickets + a.gold)); 
             const cauldronListEl = document.getElementById("cauldron-list"); let html = "";
             sortedGames.forEach(game => {
                 let statusBadge = ""; let itemClass = "";
-                if (game.gold >= 20) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
-                else if (game.gold >= 10) { itemClass = "immortal"; statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`; }
+                if (game.gold >= 100) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
+                else if (game.gold >= 50) { itemClass = "immortal"; statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`; }
                 let safeNameEscaped = game.rawName.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                 
-                // Перенесли Золото наверх к билетам
                 let goldTickets = game.gold > 0 ? `<span style="color: #b8a87b; margin-right: 12px; display:flex; align-items:center;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon" style="margin-right: 4px;"> ${game.gold}</span>` : '';
                 
-                // Если есть бейдж Неуязвимости/Бессмертия, отрисовываем нижнюю строку с выравниванием по правому краю
                 let bottomRow = statusBadge ? `<div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 5px;">${statusBadge}</div>` : '';
 
                 html += `<div class="cauldron-item ${itemClass}">

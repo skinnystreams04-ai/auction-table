@@ -507,116 +507,6 @@
         let isSpinning = false;
         let currentConfig = null;
         let wheelTimeout = null;
-        
-        let activeTimers = {}; 
-
-        function processTimers(data, config) {
-            if (!data || !data.players) return;
-            let dbNeedsUpdate = false;
-            let logEntries = [];
-            const now = Date.now();
-            let poisonTick = 15; let acidTick = 30;
-            
-            if (config && config.dictionary && config.dictionary.debuffs) {
-                const pConf = config.dictionary.debuffs.find(d => d.mech === 'poison_tickets');
-                if (pConf && pConf.tick > 0) poisonTick = pConf.tick;
-                const aConf = config.dictionary.debuffs.find(d => d.mech === 'acid_shield');
-                if (aConf && aConf.tick > 0) acidTick = aConf.tick;
-            }
-
-            data.players.forEach((player, pIdx) => {
-                if (!player.games) return;
-                let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
-                
-                gamesArr.forEach((game, gIdx) => {
-                    if (!game.badges) return; 
-                    let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges);
-                    let safeName = game.name || "Без названия";
-                    let uniqueKey = player.user + "_" + gIdx + "_" + safeName;
-
-                    if (game.gold >= 100) {
-                        let cleaned = false;
-                        for (let i = badgesArr.length - 1; i >= 0; i--) {
-                            if (['poison', 'acid', 'freeze'].includes(badgesArr[i].type)) {
-                                badgesArr.splice(i, 1);
-                                cleaned = true;
-                            }
-                        }
-                        if (cleaned) {
-                            game.badges = badgesArr;
-                            dbNeedsUpdate = true;
-                            logEntries.push(`<span class="user">СИСТЕМА</span>: 🛡️ Неуязвимость (100 Золота) очистила все проклятия с лота [${safeName}]!`);
-                        }
-                        return; 
-                    }
-
-                    let isDead = badgesArr.some(b => b.type === 'kill');
-                    if (isDead) return;
-
-                    let poisonBadge = badgesArr.find(b => b.type === 'poison');
-                    if (poisonBadge) {
-                        let curT = parseInt(game.tickets) || 0;
-                        if (curT <= 1) {
-                            let pIdxToRemove = badgesArr.findIndex(b => b.type === 'poison');
-                            if (pIdxToRemove !== -1) badgesArr.splice(pIdxToRemove, 1);
-                            game.badges = badgesArr;
-                            dbNeedsUpdate = true;
-                            logEntries.push(`<span class="user">СИСТЕМА</span>: ☠️ Яд выветрился с лота [${safeName}] (Остался 1 билет)!`);
-                            delete activeTimers[uniqueKey + "_poison"];
-                        } else {
-                            let key = uniqueKey + "_poison";
-                            if (!activeTimers[key]) activeTimers[key] = now;
-                            if (now - activeTimers[key] >= poisonTick * 1000) {
-                                let deduct = parseInt(poisonBadge.value);
-                                if (isNaN(deduct) || deduct <= 0) deduct = 1; 
-                                let actualDeduct = Math.min(curT - 1, deduct);
-                                if (actualDeduct > 0) {
-                                    game.tickets = curT - actualDeduct;
-                                    dbNeedsUpdate = true;
-                                    logEntries.push(`<span class="user">СИСТЕМА</span>: ☠️ Яд сжег ${actualDeduct} билетов у лота [${safeName}]`);
-                                }
-                                activeTimers[key] = now;
-                            }
-                        }
-                    } else { delete activeTimers[uniqueKey + "_poison"]; }
-
-                    let acidBadge = badgesArr.find(b => b.type === 'acid');
-                    if (acidBadge) {
-                        let key = uniqueKey + "_acid";
-                        if (!activeTimers[key]) activeTimers[key] = now;
-                        if (now - activeTimers[key] >= acidTick * 1000) {
-                            let deduct = parseInt(acidBadge.value);
-                            if (isNaN(deduct) || deduct <= 0) deduct = 1;
-                            let broken = 0;
-                            for(let i=0; i<deduct; i++) {
-                                let sIdx = badgesArr.findIndex(b => b.type === 'shield');
-                                if (sIdx !== -1) { badgesArr.splice(sIdx, 1); broken++; }
-                            }
-                            if (broken > 0) {
-                                game.badges = badgesArr;
-                                logEntries.push(`<span class="user">СИСТЕМА</span>: 🧪 Кислота разъела ${broken} 🛡️ Щит(ов) у лота [${safeName}]`);
-                                dbNeedsUpdate = true;
-                            }
-                            activeTimers[key] = now;
-                        }
-                    } else { delete activeTimers[uniqueKey + "_acid"]; }
-                });
-                player.games = gamesArr;
-            });
-
-            if (dbNeedsUpdate) {
-                fetch(firebaseUrl, { method: 'PUT', body: JSON.stringify(data) });
-                if (logEntries.length > 0) {
-                    try {
-                        let currentLog = data.log || [];
-                        let timeStr = new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'});
-                        logEntries.forEach(txt => { currentLog.unshift({ time: timeStr, text: txt }); });
-                        while (currentLog.length > 30) currentLog.pop();
-                        fetch("https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/auction_data/log.json", { method: 'PUT', body: JSON.stringify(currentLog) });
-                    } catch(e) {}
-                }
-            }
-        }
 
         async function fetchFromCloud() {
             try {
@@ -645,7 +535,6 @@
                     if (currentConfig.dictionary.debuffs) currentConfig.dictionary.debuffs.forEach(e => dictionaryMap[e.id] = e);
                 }
 
-                if (data && data.players && currentConfig) { processTimers(data, currentConfig); }
                 if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
                 if (data && data.log) { drawLog(data.log); } else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
 
@@ -655,7 +544,12 @@
                 }
             } catch (error) {}
         }
-        setInterval(fetchFromCloud, 1000); fetchFromCloud();
+        
+        async function fetchLoop() {
+            await fetchFromCloud();
+            setTimeout(fetchLoop, 1000);
+        }
+        fetchLoop();
 
         let lastLogDataString = "";
         function drawLog(logArray) {

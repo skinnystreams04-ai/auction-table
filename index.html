@@ -151,9 +151,15 @@
         .widget-title { color: #829c73; font-weight: bold; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; pointer-events: none; }
         .drag-handle { color: #4a5c41; font-size: 18px; }
         
-        .widget-controls { display: flex; gap: 6px; align-items: center; }
-        .ctrl-btn { background: rgba(40, 51, 37, 0.5); border: 1px solid #4a5c41; color: #829c73; border-radius: 4px; cursor: pointer; padding: 2px 8px; transition: 0.2s; font-size: 14px; font-weight: bold; }
-        .ctrl-btn:hover { background: #4a5c41; color: #c4d1b8; }
+        /* 🔥 НОВЫЕ СТИЛИ ДЛЯ КНОПОК ВИДЖЕТОВ 🔥 */
+        .widget-controls { display: flex; gap: 2px; align-items: center; background: #0b0d0a; border: 1px solid #283325; border-radius: 6px; padding: 2px 6px; }
+        .ctrl-btn { background: transparent; border: none; color: #a4b09c; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: 0.2s; }
+        .ctrl-btn:hover { background: rgba(138, 191, 134, 0.15); color: #c4d1b8; }
+        .ctrl-btn svg { width: 18px; height: 18px; fill: currentColor; }
+        .zoom-level { font-size: 13px; font-family: sans-serif; font-weight: bold; color: #829c73; min-width: 40px; text-align: center; user-select: none; }
+        .ctrl-divider { width: 1px; height: 16px; background: #283325; margin: 0 4px; }
+        .collapse-btn svg { transition: transform 0.3s ease; }
+        .widget-base.collapsed .collapse-btn svg { transform: rotate(-90deg); }
 
         .widget-content { flex: 1; position: relative; overflow: hidden; }
         .zoom-target { position: absolute; top: 0; left: 0; transform-origin: top left; width: 100%; height: 100%; transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease; display: flex; flex-direction: column; }
@@ -308,7 +314,6 @@
     <div id="app-wrapper" class="app-wrapper">
         <div class="layout">
             <div class="left-container">
-                <!-- 🔥 ОБНОВЛЕННАЯ ПАНЕЛЬ С КНОПКОЙ КОШЕЛЬКА 🔥 -->
                 <div class="phase-bar">
                     <button class="top-nav-btn left-btn" onclick="openWallet()" style="color: #b8a87b; border-color: #8c7b52; display: flex; align-items: center; gap: 5px;">
                         <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET_GOLD.png" class="custom-icon" style="width: 18px; height: 18px;"> Мой баланс
@@ -321,7 +326,6 @@
                         <button class="top-nav-btn" style="position: static;" onclick="openModalTab('effects')">🔮 Эффекты</button>
                     </div>
                 </div>
-                <!-- КОНЕЦ ПАНЕЛИ -->
 
                 <div class="left-panel" id="players-grid"></div>
             </div>
@@ -331,10 +335,19 @@
                     <div class="widget-base static-widget" id="widget-wheel" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title">🎲 Колесо Скинволкера</div>
+                            <!-- 🔥 НОВЫЕ КНОПКИ ВИДЖЕТА 🔥 -->
                             <div class="widget-controls">
-                                <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)">➖</button>
-                                <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)">➕</button>
-                                <button class="ctrl-btn collapse-btn">🔽</button>
+                                <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)" title="Уменьшить">
+                                    <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                                </button>
+                                <span class="zoom-level">100%</span>
+                                <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)" title="Увеличить">
+                                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                </button>
+                                <div class="ctrl-divider"></div>
+                                <button class="ctrl-btn collapse-btn" title="Свернуть">
+                                    <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                                </button>
                             </div>
                         </div>
                         <div class="wheel-widget-content">
@@ -355,10 +368,19 @@
                         <div class="widget-base draggable-widget" id="widget-chat" data-zoom="1">
                             <div class="widget-header">
                                 <div class="widget-title"><span class="drag-handle">☰</span> 💬 Чат Твича</div>
+                                <!-- 🔥 НОВЫЕ КНОПКИ ВИДЖЕТА 🔥 -->
                                 <div class="widget-controls">
-                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)">➖</button>
-                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)">➕</button>
-                                    <button class="ctrl-btn collapse-btn">🔽</button>
+                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)" title="Уменьшить">
+                                        <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                                    </button>
+                                    <span class="zoom-level">100%</span>
+                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)" title="Увеличить">
+                                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                    </button>
+                                    <div class="ctrl-divider"></div>
+                                    <button class="ctrl-btn collapse-btn" title="Свернуть">
+                                        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                                    </button>
                                 </div>
                             </div>
                             <div class="widget-content">
@@ -375,10 +397,19 @@
                         <div class="widget-base draggable-widget" id="widget-altar" data-zoom="1">
                             <div class="widget-header">
                                 <div class="widget-title"><span class="drag-handle">☰</span> 🩸 Жертвенный Алтарь</div>
+                                <!-- 🔥 НОВЫЕ КНОПКИ ВИДЖЕТА 🔥 -->
                                 <div class="widget-controls">
-                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)">➖</button>
-                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)">➕</button>
-                                    <button class="ctrl-btn collapse-btn">🔽</button>
+                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)" title="Уменьшить">
+                                        <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                                    </button>
+                                    <span class="zoom-level">100%</span>
+                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)" title="Увеличить">
+                                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                    </button>
+                                    <div class="ctrl-divider"></div>
+                                    <button class="ctrl-btn collapse-btn" title="Свернуть">
+                                        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                                    </button>
                                 </div>
                             </div>
                             <div class="widget-content">
@@ -395,17 +426,25 @@
                                     <button class="tab-btn active" onclick="switchTab('log', this)">📜 Журнал</button>
                                     <button class="tab-btn" onclick="switchTab('profile', this)">👤 Профиль</button>
                                 </div>
-                                <div class="widget-controls" style="padding-right: 12px;">
-                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)">➖</button>
-                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)">➕</button>
-                                    <button class="ctrl-btn collapse-btn">🔽</button>
+                                <!-- 🔥 НОВЫЕ КНОПКИ ВИДЖЕТА 🔥 -->
+                                <div class="widget-controls" style="margin-right: 12px;">
+                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)" title="Уменьшить">
+                                        <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                                    </button>
+                                    <span class="zoom-level">100%</span>
+                                    <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)" title="Увеличить">
+                                        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                                    </button>
+                                    <div class="ctrl-divider"></div>
+                                    <button class="ctrl-btn collapse-btn" title="Свернуть">
+                                        <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+                                    </button>
                                 </div>
                             </div>
                             <div class="widget-content">
                                 <div class="zoom-target">
                                     <div id="tab-log" class="tab-pane active"><div id="action-log-list"></div></div>
                                     
-                                    <!-- 🔥 ОБНОВЛЕННАЯ ВКЛАДКА ПРОФИЛЯ С АВТОРИЗАЦИЕЙ 🔥 -->
                                     <div id="tab-profile" class="tab-pane">
                                         <!-- НЕ АВТОРИЗОВАН -->
                                         <div class="profile-placeholder" id="profile-unauth">
@@ -440,7 +479,6 @@
                                             <p style="color: #6c7086; font-size: 14px; margin-top: 20px;">* Используй команды в чате (!золото и !билет), чтобы перевести баланс в лоты.</p>
                                         </div>
                                     </div>
-                                    <!-- КОНЕЦ ВКЛАДКИ ПРОФИЛЯ -->
 
                                 </div>
                             </div>
@@ -473,12 +511,11 @@
             let token = localStorage.getItem('tw_token');
             const hash = window.location.hash;
             
-            // Если мы только что вернулись от Твича с токеном в ссылке
             if (hash && hash.includes('access_token=')) {
                 const params = new URLSearchParams(hash.substring(1));
                 token = params.get('access_token');
                 localStorage.setItem('tw_token', token);
-                window.history.replaceState(null, null, window.location.pathname); // Прячем токен из адресной строки
+                window.history.replaceState(null, null, window.location.pathname); 
             }
 
             if (token) {
@@ -498,7 +535,6 @@
                         
                         if (window.latestAuctionData) renderWallet(window.latestAuctionData);
                         
-                        // Если только что залогинился, сразу открываем профиль
                         if (hash && hash.includes('access_token=')) openWallet();
                     } else {
                         logoutTwitch();
@@ -529,8 +565,6 @@
             const multiWidget = document.getElementById('widget-multi');
             if (multiWidget && multiWidget.classList.contains('collapsed')) {
                 multiWidget.classList.remove('collapsed');
-                const collapseBtn = multiWidget.querySelector('.collapse-btn');
-                if (collapseBtn) collapseBtn.innerText = '🔽';
             }
         }
         // 🔥 КОНЕЦ TWITCH АВТОРИЗАЦИИ 🔥
@@ -630,11 +664,14 @@
         function changeWidgetZoom(btn, delta) {
             const widget = btn.closest('.widget-base');
             const target = widget.querySelector('.zoom-target');
+            const zoomLabel = widget.querySelector('.zoom-level');
             let currentZoom = parseFloat(widget.getAttribute('data-zoom')) || 1.0;
             currentZoom += delta;
             if (currentZoom < 0.4) currentZoom = 0.4;
             if (currentZoom > 1.5) currentZoom = 1.5;
             widget.setAttribute('data-zoom', currentZoom.toFixed(1));
+            
+            if (zoomLabel) zoomLabel.innerText = Math.round(currentZoom * 100) + '%';
             
             if (widget.id === 'widget-wheel') {
                 const wheelBox = widget.querySelector('.wheel-scale-box');
@@ -653,7 +690,13 @@
         headers.forEach(handle => { handle.addEventListener('mouseenter', () => { handle.closest('.draggable-widget').setAttribute('draggable', 'true'); }); handle.addEventListener('mouseleave', () => { handle.closest('.draggable-widget').removeAttribute('draggable'); }); });
         document.querySelectorAll('.draggable-widget').forEach(widget => { widget.addEventListener('dragstart', (e) => { widget.classList.add('dragging'); e.dataTransfer.setData('text/plain', widget.id); }); widget.addEventListener('dragend', () => { widget.classList.remove('dragging'); zones.forEach(z => z.classList.remove('drag-over')); }); });
         zones.forEach(zone => { zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); }); zone.addEventListener('dragleave', () => { zone.classList.remove('drag-over'); }); zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('drag-over'); const draggedId = e.dataTransfer.getData('text/plain'); const draggedWidget = document.getElementById(draggedId); if (draggedWidget && draggedWidget.parentNode !== zone) { const existingWidget = zone.querySelector('.draggable-widget'); const originZone = draggedWidget.parentNode; if (existingWidget) { originZone.appendChild(existingWidget); } zone.appendChild(draggedWidget); } }); });
-        document.querySelectorAll('.collapse-btn').forEach(btn => { btn.addEventListener('click', (e) => { const widget = e.target.closest('.widget-base'); widget.classList.toggle('collapsed'); if (widget.classList.contains('collapsed')) { e.target.innerText = '▶️'; } else { e.target.innerText = '🔽'; } }); });
+        
+        document.querySelectorAll('.collapse-btn').forEach(btn => { 
+            btn.addEventListener('click', (e) => { 
+                const widget = e.target.closest('.widget-base'); 
+                widget.classList.toggle('collapsed'); 
+            }); 
+        });
 
         const playersGrid = document.getElementById("players-grid");
         const cauldronList = document.getElementById("cauldron-list");
@@ -711,7 +754,6 @@
             setTimeout(fetchLoop, 1000);
         }
         
-        // Запускаем проверку авторизации ПЕРЕД загрузкой базы
         checkTwitchAuth();
         fetchLoop();
 

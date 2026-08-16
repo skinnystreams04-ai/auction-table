@@ -549,7 +549,8 @@
         let currentUserLogin = null;
 
         function loginTwitch() {
-            const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=`;
+            // Добавлен &force_verify=true в конец ссылки
+            const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=&force_verify=true`;
             window.location.href = authUrl;
         }
 
@@ -638,6 +639,7 @@
         let isSpinning = false;
         let currentConfig = null;
         let wheelTimeout = null;
+        let isFirstLoad = true; // 🔥 НОВЫЙ ПРЕДОХРАНИТЕЛЬ 🔥
 
         async function fetchFromCloud() {
             try {
@@ -672,13 +674,24 @@
                 if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
                 if (data && data.log) { drawLog(data.log); } else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
 
+                // 🔥 ИСПРАВЛЕННАЯ ЛОГИКА РУЛЕТКИ 🔥
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
                     const spinData = data.last_spin;
-                    if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) { lastProcessedSpinTime = spinData.timestamp; startWheelAnimation(spinData); }
+                    
+                    if (isFirstLoad) {
+                        // При первой загрузке просто запоминаем время, без анимации
+                        lastProcessedSpinTime = spinData.timestamp;
+                        isFirstLoad = false;
+                    } else if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) { 
+                        // А вот если это реально новая крутка во время работы сайта — крутим!
+                        lastProcessedSpinTime = spinData.timestamp; 
+                        startWheelAnimation(spinData); 
+                    }
+                } else {
+                    isFirstLoad = false; // Снимаем предохранитель, даже если круток еще не было
                 }
             } catch (error) {}
         }
-        
         async function fetchLoop() {
             await fetchFromCloud();
             setTimeout(fetchLoop, 1000);

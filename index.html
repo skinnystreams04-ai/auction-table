@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V47.0 (Strict Sync & Fixes)</title>
+    <title>Аукцион - Оверлей V48.0 (Strict Firebase Sync)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -785,9 +785,9 @@
 
                 // БЕРЕМ ИНФОРМАЦИЮ СТРОГО ИЗ БАЗЫ БЕЗ ВЫЧИСЛЕНИЙ ПО ЛОТАМ!
                 ticketsBought = parseInt(player.tickets_bought || player.bought_tickets || 0);
-                buffsUsed = parseInt(player.buffs_used || player.used_buffs || 0); 
-                debuffsUsed = parseInt(player.debuffs_used || player.used_debuffs || 0); 
-                freeUsed = parseInt(player.free_used || player.used_free || player.free_spins || 0);
+                buffsUsed = parseInt(player.spins_buff_used || player.buffs_used || 0); 
+                debuffsUsed = parseInt(player.spins_debuff_used || player.debuffs_used || 0); 
+                freeUsed = parseInt(player.spins_free_used || player.free_used || 0);
 
                 // ОБНОВЛЕНИЕ ИНВЕНТАРЯ
                 const invCount = document.getElementById('inv-count');

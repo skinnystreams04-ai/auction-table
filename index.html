@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V43.2 (Clean Headers)</title>
+    <title>Аукцион - Оверлей V44.0 (Profile Layout Fixed)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -78,7 +78,6 @@
         .pr-user-info { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 8px 12px; background: rgba(0,0,0,0.3); border-right: 1px solid #283325; width: 250px; flex-shrink: 0; box-sizing: border-box; overflow: hidden; border-radius: 6px 0 0 6px; }
         .pr-role-name { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; width: 100%; }
         .pr-name { font-size: 18px; font-weight: bold; color: #c4d1b8; text-transform: uppercase; text-shadow: 1px 1px 3px #000; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; cursor: pointer; transition: color 0.2s; pointer-events: auto; }
-        .pr-name:hover { color: #8abf86; } 
         .pr-total { font-size: 14px; color: #7c966a; font-weight: bold; background: rgba(124, 150, 106, 0.1); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(124, 150, 106, 0.2); margin-top: 4px; }
         .pr-games { display: grid; gap: 10px; padding: 10px; flex: 1; align-content: start; }
         .pr-game-pill { display: flex; flex-direction: column; background: #161a15; border: 1px solid #2b3628; border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); overflow: hidden; }
@@ -123,7 +122,7 @@
         .widget-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #0b0d0a; border-bottom: 2px solid #283325; flex-shrink: 0; box-sizing: border-box; width: 100%;}
         .widget-title { color: #829c73; font-weight: bold; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
         
-        /* 🔥 МИНИАТЮРНЫЕ КНОПКИ ЗУМА (БЕЗ РАМОК И ФОНА) 🔥 */
+        /* 🔥 МИНИАТЮРНЫЕ КНОПКИ ЗУМА БЕЗ РАМОК 🔥 */
         .widget-controls { display: flex; gap: 2px; align-items: center; padding: 1px 4px; flex-shrink: 0;}
         .ctrl-btn { background: transparent; border: none; color: #a4b09c; cursor: pointer; padding: 2px; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: 0.2s; }
         .ctrl-btn:hover { background: rgba(138, 191, 134, 0.15); color: #c4d1b8; }
@@ -156,20 +155,21 @@
         .log-entry .icon { font-size: 18px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* 🔥 ОБНОВЛЕННЫЙ ПРОФИЛЬ (РАСТЯГИВАЕТСЯ ПО ВЫСОТЕ) 🔥 */
+        /* 🔥 ОБНОВЛЕННЫЙ ПРОФИЛЬ (БЕЗ ОБРЕЗАНИЯ КНОПОК + ГОРИЗОНТАЛЬНЫЕ БАЛАНСЫ) 🔥 */
         .profile-placeholder { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px; color: #a4b09c; }
         
-        .prof-header { background: #121612; border: 1px solid #283325; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; width: 100%; box-sizing: border-box; }
+        .prof-header { background: #121612; border: 1px solid #283325; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; width: 100%; box-sizing: border-box; }
         .prof-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #4a5c41; object-fit: cover; background: #0b0d0a; }
         .logout-btn { margin-left: auto; background: #c45c5c; color: #1e1e2e; border: none; padding: 6px 10px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s;}
         .logout-btn:hover { background: #e06c6c; }
 
-        .prof-balances { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; width: 100%; box-sizing: border-box; }
-        .bal-card { background: rgba(138, 191, 134, 0.1); border: 1px solid #4a5c41; padding: 6px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        /* Горизонтальные плашки баланса */
+        .prof-balances { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; width: 100%; box-sizing: border-box; }
+        .bal-card { background: rgba(138, 191, 134, 0.1); border: 1px solid #4a5c41; padding: 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .bal-card.gold { background: rgba(184, 168, 123, 0.1); border: 1px solid #8c7b52; }
-        .bal-val { font-size: 24px; font-weight: bold; margin: 0; text-shadow: 2px 2px 0 #000; line-height: 1; }
+        .bal-val { font-size: 34px; font-weight: bold; margin: 0; text-shadow: 2px 2px 0 #000; line-height: 1; }
 
-        .prof-limits { background: #121612; border: 1px dashed #283325; padding: 6px 10px; border-radius: 8px; margin-bottom: 8px; width: 100%; box-sizing: border-box; }
+        .prof-limits { background: #121612; border: 1px dashed #283325; padding: 8px 12px; border-radius: 8px; margin-bottom: 12px; width: 100%; box-sizing: border-box; }
         .limit-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 2px; color: #c4d1b8; }
         .limit-val { font-weight: bold; color: #a6e3a1; }
 
@@ -305,7 +305,7 @@
                 <!-- КОЛОНКА 1: ПРОФИЛЬ и ЧАТ -->
                 <div class="col-main">
                     
-                    <!-- ПРОФИЛЬ (Без жесткой высоты, растягивается по контенту) -->
+                    <!-- ПРОФИЛЬ -->
                     <div class="widget-base static-widget" id="widget-profile" style="flex: 0 0 auto;" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title">👤 Профиль</div>
@@ -317,8 +317,8 @@
                                 <button class="ctrl-btn collapse-btn" title="Свернуть"><svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg></button>
                             </div>
                         </div>
-                        <div class="widget-content">
-                            <div class="zoom-target" style="padding: 10px; position: relative;">
+                        <div class="widget-content" style="overflow-y: visible;">
+                            <div class="zoom-target" style="padding: 12px; position: relative !important; height: auto !important; width: 100% !important; transform: none !important; box-sizing: border-box;">
                                 <!-- НЕ АВТОРИЗОВАН -->
                                 <div class="profile-placeholder" id="profile-unauth">
                                     <h3>Твой Кошелек</h3>
@@ -340,17 +340,17 @@
                                     <!-- ГОРИЗОНТАЛЬНЫЕ БАЛАНСЫ -->
                                     <div class="prof-balances">
                                         <div class="bal-card">
-                                            <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET.png" style="width: 28px; filter: drop-shadow(0 0 10px rgba(138,191,134,0.5));">
-                                            <div style="text-align: left;">
-                                                <div style="font-size: 11px; color: #a4b09c; text-transform: uppercase;">Обычные</div>
-                                                <div id="tw-tickets" class="bal-val" style="color: #8abf86;">0</div>
+                                            <div style="width: 100%; font-size: 13px; color: #a4b09c; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Обычные</div>
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
+                                                <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET.png" style="width: 32px; filter: drop-shadow(0 0 10px rgba(138,191,134,0.5));">
+                                                <div id="tw-tickets" class="bal-val" style="color: #8abf86; font-size: 34px;">0</div>
                                             </div>
                                         </div>
                                         <div class="bal-card gold">
-                                            <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET_GOLD.png" style="width: 28px; filter: drop-shadow(0 0 10px rgba(184,168,123,0.5));">
-                                            <div style="text-align: left;">
-                                                <div style="font-size: 11px; color: #b8a87b; text-transform: uppercase;">Золотые</div>
-                                                <div id="tw-gold" class="bal-val" style="color: #b8a87b;">0</div>
+                                            <div style="width: 100%; font-size: 13px; color: #b8a87b; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Золотые</div>
+                                            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
+                                                <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET_GOLD.png" style="width: 32px; filter: drop-shadow(0 0 10px rgba(184,168,123,0.5));">
+                                                <div id="tw-gold" class="bal-val" style="color: #b8a87b; font-size: 34px;">0</div>
                                             </div>
                                         </div>
                                     </div>
@@ -453,10 +453,15 @@
             
             if (zoomLabel) zoomLabel.innerText = Math.round(currentZoom * 100) + '%';
             
-            if (widget.id === 'widget-chat') {
-                target.style.transform = 'none'; target.style.width = '100%'; target.style.height = '100%'; target.style.zoom = currentZoom;
+            if (widget.id === 'widget-chat' || widget.id === 'widget-profile') {
+                target.style.transform = 'none'; 
+                target.style.width = '100%'; 
+                target.style.height = widget.id === 'widget-chat' ? '100%' : 'auto'; 
+                target.style.zoom = currentZoom;
             } else {
-                target.style.transform = `scale(${currentZoom})`; target.style.width = `${100 / currentZoom}%`; target.style.height = `${100 / currentZoom}%`;
+                target.style.transform = `scale(${currentZoom})`; 
+                target.style.width = `${100 / currentZoom}%`; 
+                target.style.height = `${100 / currentZoom}%`;
             }
         }
         
@@ -643,14 +648,12 @@
                 wGold = player.wallet_gold || 0;
                 wTickets = player.wallet_tickets || 0;
                 
-                // Проверяем роль из базы (игнорируем F если в базе есть статус выше)
                 if (player.role && (player.role.toLowerCase() === 'vip' || player.is_vip)) {
                     role = "VIP";
                 } else if (player.role && (player.role.toLowerCase() === 'sub' || player.is_sub)) {
                     role = "SUB";
                 }
 
-                // Считаем купленные билеты зрителя
                 if (player.games) {
                     let gArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     gArr.forEach(g => { ticketsBought += parseInt(g.tickets) || 0; });
@@ -668,7 +671,6 @@
             roleBadge.innerText = role.toUpperCase();
             roleBadge.className = `role-badge ${role.toLowerCase()}`;
 
-            // Рассчитываем актуальные лимиты из конфигурации
             if (currentConfig) {
                 const gl = currentConfig.global_limits || {};
                 const lim = currentConfig.limits || {};

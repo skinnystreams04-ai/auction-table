@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.0 (Strict Firebase Sync)</title>
+    <title>Аукцион - Оверлей V48.0 (Labels Fixed)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -417,10 +417,10 @@
 
                                     <div class="prof-limits">
                                         <div style="color: #8abf86; font-weight: bold; margin-bottom: 3px; border-bottom: 1px solid #283325; padding-bottom: 4px;">Лимиты на стрим:</div>
-                                        <div class="limit-row"><span>Куплено билетов:</span> <span class="limit-val" id="lim-tix">0 / 0</span></div>
-                                        <div class="limit-row"><span>Бесплатных круток:</span> <span class="limit-val" style="color: #b0b8a8;" id="lim-free">0 / 0</span></div>
-                                        <div class="limit-row"><span>Баффов доступно:</span> <span class="limit-val" id="lim-buff">0 / 0</span></div>
-                                        <div class="limit-row"><span>Дебаффов доступно:</span> <span class="limit-val" style="color: #c45c5c;" id="lim-debuff">0 / 0</span></div>
+                                        <div class="limit-row"><span>Использовано билетов:</span> <span class="limit-val" id="lim-tix">0 / 0</span></div>
+                                        <div class="limit-row"><span>Использовано беспл. колес:</span> <span class="limit-val" style="color: #b0b8a8;" id="lim-free">0 / 0</span></div>
+                                        <div class="limit-row"><span>Использовано баффов:</span> <span class="limit-val" id="lim-buff">0 / 0</span></div>
+                                        <div class="limit-row"><span>Использовано дебаффов:</span> <span class="limit-val" style="color: #c45c5c;" id="lim-debuff">0 / 0</span></div>
                                     </div>
 
                                     <div class="spin-actions">
@@ -785,8 +785,8 @@
 
                 // БЕРЕМ ИНФОРМАЦИЮ СТРОГО ИЗ БАЗЫ БЕЗ ВЫЧИСЛЕНИЙ ПО ЛОТАМ!
                 ticketsBought = parseInt(player.tickets_bought || player.bought_tickets || 0);
-                buffsUsed = parseInt(player.spins_buff_used || player.buffs_used || 0); 
-                debuffsUsed = parseInt(player.spins_debuff_used || player.debuffs_used || 0); 
+                buffsUsed = parseInt(player.spins_buffs_used || player.buffs_used || 0); 
+                debuffsUsed = parseInt(player.spins_debuffs_used || player.debuffs_used || 0); 
                 freeUsed = parseInt(player.spins_free_used || player.free_used || 0);
 
                 // ОБНОВЛЕНИЕ ИНВЕНТАРЯ

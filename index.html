@@ -2,14 +2,19 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V44.0 (Perfect PC + Vertical Mobile)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Аукцион - Оверлей V45.0 (Interactive Cast System)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
     <style>
         /* ГЛОБАЛЬНЫЙ СТИЛЬ: Жесткая сетка для ПК */
-        body { margin: 0; padding: 0; font-family: 'Neucha', cursive, sans-serif; overflow: auto; background-color: #0b0d0a; color: #a4b09c; letter-spacing: 0.5px; min-width: 1350px; min-height: 800px; }
+        body { margin: 0; padding: 0; font-family: 'Neucha', cursive, sans-serif; overflow: auto; background-color: #0b0d0a; color: #a4b09c; letter-spacing: 0.5px; min-width: 1350px; min-height: 800px; transition: background 0.3s;}
+        
+        /* Эффект режима наведения (таргетинга) */
+        body.targeting-active { background-color: #121f12; }
+        body.targeting-active .pr-game-pill { border: 2px dashed #a6e3a1; cursor: crosshair; box-shadow: 0 0 15px rgba(166, 227, 161, 0.2); }
+        body.targeting-active .pr-game-pill:hover { background: #1a2618; transform: scale(1.02); border: 2px solid #a6e3a1; box-shadow: 0 0 20px rgba(166, 227, 161, 0.6); z-index: 10;}
         
         .app-wrapper { width: 100%; height: 100vh; box-sizing: border-box; padding: 15px 20px; display: flex; flex-direction: column; overflow: hidden; }
         .layout { display: flex; gap: 20px; align-items: flex-start; width: 100%; height: calc(100vh - 60px); justify-content: space-between; margin-top: 15px;}
@@ -20,6 +25,13 @@
 
         .custom-icon { width: 20px; height: 20px; vertical-align: text-bottom; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.9)); }
         .c-tickets .custom-icon { width: 24px; height: 24px; }
+
+        /* ТОСТЫ УВЕДОМЛЕНИЙ */
+        #toast-container { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10001; pointer-events: none; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(18, 22, 18, 0.95); border: 2px solid #8abf86; color: #c4d1b8; padding: 10px 25px; border-radius: 8px; font-weight: bold; font-family: 'Neucha', cursive; font-size: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards; white-space: nowrap;}
+        .toast.error { border-color: #c45c5c; color: #eba0a0; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-20px); } }
 
         /* МОДАЛЬНОЕ ОКНО ПРАВИЛ И ЭФФЕКТОВ */
         .rules-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 2000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
@@ -81,14 +93,14 @@
         .pr-name:hover { color: #8abf86; } 
         .pr-total { font-size: 14px; color: #7c966a; font-weight: bold; background: rgba(124, 150, 106, 0.1); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(124, 150, 106, 0.2); margin-top: 4px; }
         .pr-games { display: grid; gap: 10px; padding: 10px; flex: 1; align-content: start; }
-        .pr-game-pill { display: flex; flex-direction: column; background: #161a15; border: 1px solid #2b3628; border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); overflow: hidden; }
+        .pr-game-pill { display: flex; flex-direction: column; background: #161a15; border: 1px solid #2b3628; border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); overflow: hidden; transition: 0.2s ease;}
         
-        .pr-g-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid #283325; background: rgba(0,0,0,0.2); gap: 8px; }
+        .pr-g-top { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; border-bottom: 1px solid #283325; background: rgba(0,0,0,0.2); gap: 8px; pointer-events: none;}
         .pr-g-name-wrap { display: flex; align-items: center; gap: 6px; overflow: hidden; }
         .pr-g-name { color: #a4b09c; font-size: 16px; font-weight: bold; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1; }
         .pr-g-tix { color: #8bb377; font-weight: bold; font-size: 16px; text-shadow: 1px 1px 2px #000; line-height: 1; flex-shrink: 0; background: rgba(139, 179, 119, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(139, 179, 119, 0.2); }
 
-        .pr-g-bottom { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; min-height: 20px; }
+        .pr-g-bottom { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; min-height: 20px; pointer-events: none;}
         .badges-mini-container { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 
         .badge { padding: 2px 5px; font-size: 12px; font-weight: bold; font-family: sans-serif; text-transform: uppercase; background: rgba(5,5,5,0.9); border: 1px solid; border-radius: 3px; box-shadow: inset 0 0 3px rgba(0,0,0,0.9); line-height: 1; display: flex; align-items: center; gap: 2px; }
@@ -156,7 +168,7 @@
         .log-entry .icon { font-size: 18px; }
         @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* 🔥 ОБНОВЛЕННЫЙ ПРОФИЛЬ (РАСТЯГИВАЕТСЯ ПО ВЫСОТЕ) 🔥 */
+        /* 🔥 ОБНОВЛЕННЫЙ ПРОФИЛЬ С ИНВЕНТАРЕМ 🔥 */
         .profile-placeholder { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px; color: #a4b09c; }
         
         .prof-header { background: #121612; border: 1px solid #283325; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; width: 100%; box-sizing: border-box; }
@@ -164,6 +176,7 @@
         .logout-btn { margin-left: auto; background: #c45c5c; color: #1e1e2e; border: none; padding: 6px 10px; font-size: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s;}
         .logout-btn:hover { background: #e06c6c; }
 
+        /* Горизонтальные плашки баланса */
         .prof-balances { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; width: 100%; box-sizing: border-box; }
         .bal-card { background: rgba(138, 191, 134, 0.1); border: 1px solid #4a5c41; padding: 6px 10px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .bal-card.gold { background: rgba(184, 168, 123, 0.1); border: 1px solid #8c7b52; }
@@ -172,6 +185,15 @@
         .prof-limits { background: #121612; border: 1px dashed #283325; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; width: 100%; box-sizing: border-box; }
         .limit-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 2px; color: #c4d1b8; }
         .limit-val { font-weight: bold; color: #a6e3a1; }
+        
+        /* ИНВЕНТАРЬ */
+        .inv-section { margin-bottom: 8px; border: 1px dashed #4a5c41; border-radius: 8px; padding: 8px; background: rgba(138, 191, 134, 0.05); }
+        .inv-header { color: #a4b09c; font-size: 13px; text-transform: uppercase; font-weight: bold; margin-bottom: 6px; display: flex; justify-content: space-between;}
+        .inv-spell { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #161a15; padding: 6px 10px; border-radius: 6px; border: 1px solid #283325; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.5);}
+        .inv-spell:hover { border-color: #a6e3a1; background: #1e261d; transform: translateY(-2px);}
+        .inv-spell.active { border-color: #a6e3a1; background: rgba(166, 227, 161, 0.15); box-shadow: 0 0 10px rgba(166, 227, 161, 0.4);}
+        .inv-icon-name { display: flex; align-items: center; gap: 8px; color: #c4d1b8; font-size: 18px; font-weight: bold;}
+        .inv-hint { font-size: 12px; color: #a6e3a1; animation: throb 1.5s infinite;}
 
         /* СЕТКА ДЛЯ КНОПОК */
         .spin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: auto; width: 100%; box-sizing: border-box; }
@@ -246,6 +268,9 @@
     </style>
 </head>
 <body>
+
+    <!-- ТОСТЫ УВЕДОМЛЕНИЙ -->
+    <div id="toast-container"></div>
 
     <!-- ВСПЛЫВАЮЩАЯ РУЛЕТКА -->
     <div class="wheel-overlay" id="wheel-modal">
@@ -381,6 +406,12 @@
                                         </div>
                                     </div>
 
+                                    <!-- ИНВЕНТАРЬ -->
+                                    <div id="inv-container" class="inv-section">
+                                        <div class="inv-header"><span>🎒 Инвентарь</span> <span style="color: #6c7086;" id="inv-count">0 / 1</span></div>
+                                        <div id="inv-content" style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>
+                                    </div>
+
                                     <div class="prof-limits">
                                         <div style="color: #8abf86; font-weight: bold; margin-bottom: 3px; border-bottom: 1px solid #283325; padding-bottom: 4px;">Лимиты на стрим:</div>
                                         <div class="limit-row"><span>Куплено билетов:</span> <span class="limit-val" id="lim-tix">0 / 0</span></div>
@@ -390,9 +421,9 @@
                                     </div>
 
                                     <div class="spin-actions">
-                                        <button class="spin-btn free" onclick="alert('Скоро подключим!')">⚪ КРУТИТЬ БЕСПЛАТНОЕ</button>
-                                        <button class="spin-btn buff" onclick="alert('Скоро подключим!')">🟢 КРУТИТЬ БАФФ</button>
-                                        <button class="spin-btn debuff" onclick="alert('Скоро подключим!')">🔴 КРУТИТЬ ДЕБАФФ</button>
+                                        <button class="spin-btn free" onclick="sendTwitchCommand('!колесо фри')">⚪ КРУТИТЬ БЕСПЛАТНОЕ</button>
+                                        <button class="spin-btn buff" onclick="sendTwitchCommand('!колесо бафф')">🟢 КРУТИТЬ БАФФ</button>
+                                        <button class="spin-btn debuff" onclick="sendTwitchCommand('!колесо дебафф')">🔴 КРУТИТЬ ДЕБАФФ</button>
                                     </div>
                                 </div>
                             </div>
@@ -428,7 +459,7 @@
                                 <button class="tab-btn active" onclick="switchTab('altar', this)">🩸 Алтарь</button>
                                 <button class="tab-btn" onclick="switchTab('log', this)">📜 Журнал</button>
                             </div>
-                            <div class="widget-controls" style="margin-right: 8px; margin-top: 4px; margin-bottom: 4px; flex-shrink: 0;">
+                            <div class="widget-controls" style="margin-left: 8px; flex-shrink: 0;">
                                 <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)" title="Уменьшить"><svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg></button>
                                 <span class="zoom-level">100%</span>
                                 <button class="ctrl-btn" onclick="changeWidgetZoom(this, 0.1)" title="Увеличить"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>
@@ -457,7 +488,17 @@
     </div>
 
     <script>
-        // ЛОГИКА ВКЛАДОК
+        // СИСТЕМА УВЕДОМЛЕНИЙ
+        function showToast(msg, isError = false) {
+            const c = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            el.className = `toast ${isError ? 'error' : ''}`;
+            el.innerText = msg;
+            c.appendChild(el);
+            setTimeout(() => { if(c.contains(el)) c.removeChild(el); }, 3000);
+        }
+
+        // ЛОГИКА ВКЛАДОК И ЗУМА
         function switchTab(tabId, btnElement) {
             const widget = btnElement.closest('.widget-base');
             widget.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -466,7 +507,6 @@
             btnElement.classList.add('active');
         }
 
-        // ЛОГИКА МАСШТАБА ВИДЖЕТОВ И СВОРАЧИВАНИЯ
         function changeWidgetZoom(btn, delta) {
             const widget = btn.closest('.widget-base');
             const target = widget.querySelector('.zoom-target');
@@ -476,51 +516,30 @@
             if (currentZoom < 0.4) currentZoom = 0.4;
             if (currentZoom > 1.5) currentZoom = 1.5;
             widget.setAttribute('data-zoom', currentZoom.toFixed(1));
-            
             if (zoomLabel) zoomLabel.innerText = Math.round(currentZoom * 100) + '%';
-            
             if (widget.id === 'widget-chat' || widget.id === 'widget-profile') {
-                target.style.transform = 'none'; 
-                target.style.width = '100%'; 
-                target.style.height = widget.id === 'widget-chat' ? '100%' : 'auto'; 
-                target.style.zoom = currentZoom;
+                target.style.transform = 'none'; target.style.width = '100%'; target.style.height = widget.id === 'widget-chat' ? '100%' : 'auto'; target.style.zoom = currentZoom;
             } else {
-                target.style.transform = `scale(${currentZoom})`; 
-                target.style.width = `${100 / currentZoom}%`; 
-                target.style.height = `${100 / currentZoom}%`;
+                target.style.transform = `scale(${currentZoom})`; target.style.width = `${100 / currentZoom}%`; target.style.height = `${100 / currentZoom}%`;
             }
         }
         
-        document.querySelectorAll('.collapse-btn').forEach(btn => { 
-            btn.addEventListener('click', (e) => { 
-                const widget = e.target.closest('.widget-base'); 
-                widget.classList.toggle('collapsed'); 
-            }); 
-        });
+        document.querySelectorAll('.collapse-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.target.closest('.widget-base').classList.toggle('collapsed'); }); });
 
         // ЛОГИКА ПРАВИЛ И СЛОВАРЕЙ
         function openModalTab(tabId) {
             document.getElementById('rules-modal').classList.add('show');
-            renderDictionaryUI();
-            renderRulesUI(); 
+            renderDictionaryUI(); renderRulesUI(); 
             document.querySelectorAll('.modal-nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.modal-view').forEach(v => v.classList.remove('active'));
-            if (tabId === 'rules') {
-                document.querySelector('.modal-nav-btn:nth-child(1)').classList.add('active');
-                document.getElementById('modal-view-rules').classList.add('active');
-            } else {
-                document.querySelector('.modal-nav-btn:nth-child(2)').classList.add('active');
-                document.getElementById('modal-view-effects').classList.add('active');
-            }
+            if (tabId === 'rules') { document.querySelector('.modal-nav-btn:nth-child(1)').classList.add('active'); document.getElementById('modal-view-rules').classList.add('active'); } 
+            else { document.querySelector('.modal-nav-btn:nth-child(2)').classList.add('active'); document.getElementById('modal-view-effects').classList.add('active'); }
         }
-        
         function switchModalView(viewId, btn) {
             document.querySelectorAll('.modal-nav-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.modal-view').forEach(v => v.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('modal-view-' + viewId).classList.add('active');
+            btn.classList.add('active'); document.getElementById('modal-view-' + viewId).classList.add('active');
         }
-        
         function closeRulesModal() { document.getElementById('rules-modal').classList.remove('show'); }
         document.getElementById('rules-modal').addEventListener('click', function(e) { if (e.target === this) closeRulesModal(); });
 
@@ -542,18 +561,14 @@
 
         function renderRulesUI() {
             if(!currentConfig) return;
-            const gl = currentConfig.global_limits || {};
-            const lim = currentConfig.limits || {};
-
-            const maxGamesEl = document.getElementById('rule-max-games');
-            if(maxGamesEl) maxGamesEl.innerText = gl.max_games_per_user || 3;
-
+            const gl = currentConfig.global_limits || {}; const lim = currentConfig.limits || {};
+            const maxGamesEl = document.getElementById('rule-max-games'); if(maxGamesEl) maxGamesEl.innerText = gl.max_games_per_user || 3;
             const limitsList = document.getElementById('dynamic-limits-list');
             if(limitsList) {
                 limitsList.innerHTML = `
-                    <li><span class="eff-badge" style="background:#222b20; border-color:#32422f;">F</span> <b>ФОЛЛОВЕР:</b> Максимум <b>${gl.follower || 0}</b> билетов за баллы. Колеса: <b>${lim.f_free || 0}</b> беспл, <b>${lim.f_buffs || 0}</b> бафф, <b>${lim.f_debuffs || 0}</b> дебафф.</li>
-                    <li><span class="eff-badge vip-badge">VIP</span> <b>VIP:</b> Максимум <b>${gl.vip || 0}</b> билетов за баллы. Колеса: <b>${lim.vip_free || 0}</b> беспл, <b>${lim.vip_buffs || 0}</b> бафф, <b>${lim.vip_debuffs || 0}</b> дебафф.</li>
-                    <li><span class="eff-badge sub-badge">SUB</span> <b>SUB:</b> Максимум <b>${gl.sub || 0}</b> билетов за баллы. Колеса: <b>${lim.sub_free || 0}</b> беспл, <b>${lim.sub_buffs || 0}</b> бафф, <b>${lim.sub_debuffs || 0}</b> дебафф.</li>
+                    <li><span class="eff-badge" style="background:#222b20; border-color:#32422f;">F</span> <b>ФОЛЛОВЕР:</b> Макс <b>${gl.follower || 0}</b> билетов за баллы. Колеса: <b>${lim.f_free || 0}</b> беспл, <b>${lim.f_buffs || 0}</b> бафф, <b>${lim.f_debuffs || 0}</b> дебафф.</li>
+                    <li><span class="eff-badge vip-badge">VIP</span> <b>VIP:</b> Макс <b>${gl.vip || 0}</b> билетов за баллы. Колеса: <b>${lim.vip_free || 0}</b> беспл, <b>${lim.vip_buffs || 0}</b> бафф, <b>${lim.vip_debuffs || 0}</b> дебафф.</li>
+                    <li><span class="eff-badge sub-badge">SUB</span> <b>SUB:</b> Макс <b>${gl.sub || 0}</b> билетов за баллы. Колеса: <b>${lim.sub_free || 0}</b> беспл, <b>${lim.sub_buffs || 0}</b> бафф, <b>${lim.sub_debuffs || 0}</b> дебафф.</li>
                 `;
             }
         }
@@ -562,44 +577,104 @@
             if(!currentConfig || !currentConfig.dictionary) return;
             const baseUrl = "https://skinnystreams04-ai.github.io/auction-table/icons/";
             const renderGrid = (arr, containerId, cssClass) => {
-                const container = document.getElementById(containerId);
-                let html = "";
+                const container = document.getElementById(containerId); let html = "";
                 if(!arr || arr.length === 0) { container.innerHTML = "<p>Пусто</p>"; return; }
                 arr.forEach(eff => {
                     let desc = mechDescriptions[eff.mech] || "Уникальная магия Скинволкера.";
-                    let targetTxt = eff.target === 'self' ? 'На свой лот' : (eff.target === 'enemy' ? 'На лот врага' : 'Глобально');
                     let imgTag = `<img src="${baseUrl}${eff.id}.png" class="custom-icon" style="width:36px; height:36px; vertical-align:middle;" onerror="this.outerHTML='${eff.icon}'">`;
-                    html += `<div class="dict-item ${cssClass}"><div class="dict-icon">${imgTag}</div><div class="dict-info"><h4>${eff.name}</h4><p>${desc}</p><span class="target-lbl">Цель: ${targetTxt}</span></div></div>`;
+                    html += `<div class="dict-item ${cssClass}"><div class="dict-icon">${imgTag}</div><div class="dict-info"><h4>${eff.name}</h4><p>${desc}</p></div></div>`;
                 });
                 container.innerHTML = html;
             };
-            renderGrid(currentConfig.dictionary.buffs, 'dict-render-buffs', 'buff');
-            renderGrid(currentConfig.dictionary.debuffs, 'dict-render-debuffs', 'debuff');
+            renderGrid(currentConfig.dictionary.buffs, 'dict-render-buffs', 'buff'); renderGrid(currentConfig.dictionary.debuffs, 'dict-render-debuffs', 'debuff');
         }
 
-        // 🔥 TWITCH АВТОРИЗАЦИЯ 🔥
+        // 🔥 TWITCH АВТОРИЗАЦИЯ & ИНТЕРАКТИВ 🔥
         const TWITCH_CLIENT_ID = 'gko3y2nhxg0ocvte0ru970pbau3eiq';
         const REDIRECT_URI = 'https://skinnystreams04-ai.github.io/auction-table/';
         const STREAMER_LOGIN = 'skinwalker_nozxc'; 
-        let currentUserLogin = null;
+        
+        window.currentUserLogin = null;
+        window.currentUserId = null;
+        window.broadcasterId = null;
         let detectedRole = "F"; 
 
+        // ДОБАВЛЕН СКОУП user:write:chat
         function loginTwitch() {
-            const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=user:read:subscriptions&force_verify=true`;
+            const authUrl = `https://id.twitch.tv/oauth2/authorize?client_id=${TWITCH_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=user:read:subscriptions+user:write:chat&force_verify=true`;
             window.location.href = authUrl;
         }
 
         function logoutTwitch() {
             localStorage.removeItem('tw_token');
-            currentUserLogin = null;
+            window.currentUserLogin = null; window.currentUserId = null; window.broadcasterId = null;
             document.getElementById('profile-auth').style.display = 'none';
             document.getElementById('profile-unauth').style.display = 'flex';
+        }
+
+        // ОТПРАВКА КОМАНД ОТ ИМЕНИ ПОЛЬЗОВАТЕЛЯ
+        async function sendTwitchCommand(cmd) {
+            let token = localStorage.getItem('tw_token');
+            if(!token || !window.currentUserId || !window.broadcasterId) { showToast('Сначала войди через Twitch!', true); return; }
+            try {
+                showToast(`Отправляю: ${cmd}...`);
+                await fetch('https://api.twitch.tv/helix/chat/messages', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ broadcaster_id: window.broadcasterId, sender_id: window.currentUserId, message: cmd })
+                });
+            } catch(e) { console.error(e); showToast('Ошибка отправки!', true); }
+        }
+
+        // СИСТЕМА ТАРГЕТИНГА КАСТОВ
+        let targetingMode = false;
+        let loadedSpell = null;
+
+        function toggleTargeting() {
+            if (!loadedSpell) return;
+            targetingMode = !targetingMode;
+            const invEl = document.getElementById('inv-spell-content');
+            if (targetingMode) {
+                document.body.classList.add('targeting-active');
+                invEl.classList.add('active');
+                showToast('РЕЖИМ МАГИИ: Выбери лот в таблице слева!');
+            } else {
+                document.body.classList.remove('targeting-active');
+                invEl.classList.remove('active');
+            }
+        }
+
+        function handleGameClick(ownerLogin, slotIndex) {
+            if (!targetingMode || !loadedSpell) return;
+            
+            let cmd = "";
+            let targetType = loadedSpell.target || 'self';
+
+            if (targetType === 'enemy' || targetType === 'any') {
+                if (loadedSpell.mech === 'steal' || loadedSpell.mech === 'swap') {
+                    let mySlot = prompt("Укажи номер ТВОЕГО лота для обмена/воровства (цифра 1, 2 или 3):");
+                    if (!mySlot) return;
+                    cmd = `!каст ${mySlot} @${ownerLogin} ${slotIndex}`;
+                } else {
+                    cmd = `!каст ${slotIndex} @${ownerLogin}`;
+                }
+            } else {
+                // Если магия только на себя
+                if (ownerLogin.toLowerCase() !== window.currentUserLogin.toLowerCase()) {
+                    showToast("Эту магию можно применить только на СВОЙ лот!", true); return;
+                }
+                cmd = `!каст ${slotIndex}`;
+            }
+            
+            sendTwitchCommand(cmd);
+            targetingMode = false;
+            document.body.classList.remove('targeting-active');
+            document.getElementById('inv-spell-content').classList.remove('active');
         }
 
         async function checkTwitchAuth() {
             let token = localStorage.getItem('tw_token');
             const hash = window.location.hash;
-            
             if (hash && hash.includes('access_token=')) {
                 const params = new URLSearchParams(hash.substring(1));
                 token = params.get('access_token');
@@ -609,39 +684,28 @@
 
             if (token) {
                 try {
-                    const res = await fetch('https://api.twitch.tv/helix/users', {
-                        headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID }
-                    });
+                    const res = await fetch('https://api.twitch.tv/helix/users', { headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID } });
                     if (res.ok) {
                         const json = await res.json();
-                        currentUserLogin = json.data[0].login;
-                        const currentUserId = json.data[0].id;
+                        window.currentUserLogin = json.data[0].login;
+                        window.currentUserId = json.data[0].id;
                         document.getElementById('tw-username').innerText = json.data[0].display_name;
                         document.getElementById('tw-avatar').src = json.data[0].profile_image_url || 'https://static-cdn.jtvnw.net/user-default-pictures-uv/aecdef652747d66f-profile_image-300x300.png';
                         
                         try {
-                            const colorRes = await fetch(`https://api.twitch.tv/helix/chat/color?user_id=${currentUserId}`, {
-                                headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID }
-                            });
+                            const colorRes = await fetch(`https://api.twitch.tv/helix/chat/color?user_id=${window.currentUserId}`, { headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID } });
                             const colorJson = await colorRes.json();
                             if (colorJson.data && colorJson.data.length > 0 && colorJson.data[0].color) {
                                 document.getElementById('tw-username').style.color = colorJson.data[0].color;
-                            } else {
-                                document.getElementById('tw-username').style.color = '#cba6f7'; 
-                            }
+                            } else { document.getElementById('tw-username').style.color = '#cba6f7'; }
                         } catch(e) { document.getElementById('tw-username').style.color = '#cba6f7'; }
 
                         try {
-                            const bRes = await fetch(`https://api.twitch.tv/helix/users?login=${STREAMER_LOGIN}`, {
-                                headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID }
-                            });
+                            const bRes = await fetch(`https://api.twitch.tv/helix/users?login=${STREAMER_LOGIN}`, { headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID } });
                             const bJson = await bRes.json();
-                            const broadcasterId = bJson.data[0].id;
+                            window.broadcasterId = bJson.data[0].id;
 
-                            const subRes = await fetch(`https://api.twitch.tv/helix/subscriptions/user?broadcaster_id=${broadcasterId}&user_id=${currentUserId}`, {
-                                headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID }
-                            });
-                            
+                            const subRes = await fetch(`https://api.twitch.tv/helix/subscriptions/user?broadcaster_id=${window.broadcasterId}&user_id=${window.currentUserId}`, { headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID } });
                             if (subRes.status === 200) { detectedRole = "SUB"; } else { detectedRole = "F"; }
                         } catch(e) { detectedRole = "F"; }
 
@@ -649,45 +713,54 @@
                         document.getElementById('profile-auth').style.display = 'flex';
                         
                         if (window.latestAuctionData) renderWallet(window.latestAuctionData);
-                        
-                    } else {
-                        logoutTwitch();
-                    }
+                    } else { logoutTwitch(); }
                 } catch (e) { console.error('Twitch Auth Error:', e); }
             }
         }
 
-        // 🔥 РАСЧЕТ БАЛАНСОВ И ЛИМИТОВ 🔥
+        // 🔥 РАСЧЕТ БАЛАНСОВ, ЛИМИТОВ И ИНВЕНТАРЯ 🔥
         function renderWallet(data) {
-            if (!currentUserLogin || !data) return;
+            if (!window.currentUserLogin || !data) return;
             
             let wGold = 0; let wTickets = 0; let role = detectedRole;
-            let ticketsBought = 0;
-            let buffsUsed = 0;
-            let debuffsUsed = 0;
-            let freeUsed = 0;
+            let ticketsBought = 0; let buffsUsed = 0; let debuffsUsed = 0; let freeUsed = 0;
 
             const players = data.players || [];
-            const player = players.find(p => p.user && p.user.toLowerCase() === currentUserLogin.toLowerCase());
+            const player = players.find(p => p.user && p.user.toLowerCase() === window.currentUserLogin.toLowerCase());
             
             if (player) {
-                wGold = player.wallet_gold || 0;
-                wTickets = player.wallet_tickets || 0;
+                wGold = player.wallet_gold || 0; wTickets = player.wallet_tickets || 0;
                 
-                if (player.role && (player.role.toLowerCase() === 'vip' || player.is_vip)) {
-                    role = "VIP";
-                } else if (player.role && (player.role.toLowerCase() === 'sub' || player.is_sub)) {
-                    role = "SUB";
-                }
+                if (player.role && (player.role.toLowerCase() === 'vip' || player.is_vip)) { role = "VIP"; } 
+                else if (player.role && (player.role.toLowerCase() === 'sub' || player.is_sub)) { role = "SUB"; }
 
                 if (player.games) {
                     let gArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     gArr.forEach(g => { ticketsBought += parseInt(g.tickets) || 0; });
                 }
 
-                buffsUsed = player.buffs_used || 0;
-                debuffsUsed = player.debuffs_used || 0;
-                freeUsed = player.free_used || 0;
+                buffsUsed = player.buffs_used || 0; debuffsUsed = player.debuffs_used || 0; freeUsed = player.free_used || 0;
+
+                // ОБНОВЛЕНИЕ ИНВЕНТАРЯ
+                const invCount = document.getElementById('inv-count');
+                const invContent = document.getElementById('inv-content');
+                if (player.active_mech) {
+                    loadedSpell = {
+                        mech: player.active_mech,
+                        name: player.active_name || 'Магия',
+                        icon: player.active_icon || '✨',
+                        target: player.active_target || 'self'
+                    };
+                    invCount.innerText = "1 / 1";
+                    invContent.innerHTML = `<div id="inv-spell-content" class="inv-spell ${targetingMode ? 'active' : ''}" onclick="toggleTargeting()">
+                                                <div class="inv-icon-name">${loadedSpell.icon} ${loadedSpell.name}</div>
+                                                <div class="inv-hint">Нажми сюда, затем на лот слева!</div>
+                                            </div>`;
+                } else {
+                    loadedSpell = null; targetingMode = false; document.body.classList.remove('targeting-active');
+                    invCount.innerText = "0 / 1";
+                    invContent.innerHTML = `<div style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>`;
+                }
             }
             
             document.getElementById('tw-gold').innerText = wGold;
@@ -698,41 +771,18 @@
             roleBadge.className = `role-badge ${role.toLowerCase()}`;
 
             if (currentConfig) {
-                const gl = currentConfig.global_limits || {};
-                const lim = currentConfig.limits || {};
+                const gl = currentConfig.global_limits || {}; const lim = currentConfig.limits || {};
+                let maxTickets = gl.follower || 10; let maxBuffs = lim.f_buffs || 1; let maxDebuffs = lim.f_debuffs || 0; let maxFree = lim.f_free || 0;
 
-                let maxTickets = gl.follower || 10;
-                let maxBuffs = lim.f_buffs || 1;
-                let maxDebuffs = lim.f_debuffs || 0;
-                let maxFree = lim.f_free || 0;
-
-                if (role === 'VIP') {
-                    maxTickets = gl.vip || 25;
-                    maxBuffs = lim.vip_buffs || 2;
-                    maxDebuffs = lim.vip_debuffs || 1;
-                    maxFree = lim.vip_free || 0;
-                } else if (role === 'SUB') {
-                    maxTickets = gl.sub || 50;
-                    maxBuffs = lim.sub_buffs || 3;
-                    maxDebuffs = lim.sub_debuffs || 2;
-                    maxFree = lim.sub_free || 0;
-                }
-
-                const availBuffs = Math.max(0, maxBuffs - buffsUsed);
-                const availDebuffs = Math.max(0, maxDebuffs - debuffsUsed);
-                const availFree = Math.max(0, maxFree - freeUsed);
+                if (role === 'VIP') { maxTickets = gl.vip || 25; maxBuffs = lim.vip_buffs || 2; maxDebuffs = lim.vip_debuffs || 1; maxFree = lim.vip_free || 0; } 
+                else if (role === 'SUB') { maxTickets = gl.sub || 50; maxBuffs = lim.sub_buffs || 3; maxDebuffs = lim.sub_debuffs || 2; maxFree = lim.sub_free || 0; }
 
                 document.getElementById('lim-tix').innerText = `${ticketsBought} / ${maxTickets}`;
-                document.getElementById('lim-free').innerText = availFree;
-                document.getElementById('lim-buff').innerText = availBuffs;
-                document.getElementById('lim-debuff').innerText = availDebuffs;
+                document.getElementById('lim-free').innerText = Math.max(0, maxFree - freeUsed);
+                document.getElementById('lim-buff').innerText = Math.max(0, maxBuffs - buffsUsed);
+                document.getElementById('lim-debuff').innerText = Math.max(0, maxDebuffs - debuffsUsed);
             }
         }
-
-        function copyText(element, text) {
-            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text); const oldColor = element.style.color; element.style.color = "#ffffff"; setTimeout(() => { element.style.color = oldColor; }, 300); }
-        }
-        function copyNick(element, nick) { const textToCopy = '@' + nick; if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(textToCopy); } }
 
         // БАЗОВАЯ ЛОГИКА АУКЦИОНА И FIREBASE
         const playersGrid = document.getElementById("players-grid");
@@ -751,24 +801,13 @@
             try {
                 const [dataRes, confRes] = await Promise.all([ fetch(firebaseUrl + "?nocache=" + new Date().getTime()), fetch(configUrl + "?nocache=" + new Date().getTime()) ]);
                 const data = await dataRes.json(); currentConfig = await confRes.json();
-                
-                window.latestAuctionData = data; 
-                renderWallet(data); 
+                window.latestAuctionData = data; renderWallet(data); 
 
                 if (data && data.current_phase) {
                     const phaseInd = document.getElementById('phase-indicator');
-                    if (data.current_phase === 1) { 
-                        phaseInd.className = 'phase-indicator p2'; 
-                        phaseInd.innerHTML = '🟡 ФАЗА 1: ЯСНЫЙ ДЕНЬ'; 
-                    } 
-                    else if (data.current_phase === 2) { 
-                        phaseInd.className = 'phase-indicator p3'; 
-                        phaseInd.innerHTML = '🌑 ФАЗА 2: ЗАТМЕНИЕ'; 
-                    } 
-                    else { 
-                        phaseInd.className = 'phase-indicator'; 
-                        phaseInd.innerHTML = 'ОЖИДАНИЕ СТАРТА'; 
-                    }
+                    if (data.current_phase === 1) { phaseInd.className = 'phase-indicator p2'; phaseInd.innerHTML = '🟡 ФАЗА 1: ЯСНЫЙ ДЕНЬ'; } 
+                    else if (data.current_phase === 2) { phaseInd.className = 'phase-indicator p3'; phaseInd.innerHTML = '🌑 ФАЗА 2: ЗАТМЕНИЕ'; } 
+                    else { phaseInd.className = 'phase-indicator'; phaseInd.innerHTML = 'ОЖИДАНИЕ СТАРТА'; }
                 }
 
                 if (currentConfig && currentConfig.dictionary) {
@@ -782,34 +821,21 @@
 
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
                     const spinData = data.last_spin;
-                    if (isFirstLoad) {
-                        lastProcessedSpinTime = spinData.timestamp;
-                        isFirstLoad = false;
-                    } else if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) { 
-                        lastProcessedSpinTime = spinData.timestamp; 
-                        startWheelAnimation(spinData); 
-                    }
-                } else {
-                    isFirstLoad = false;
-                }
+                    if (isFirstLoad) { lastProcessedSpinTime = spinData.timestamp; isFirstLoad = false; } 
+                    else if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) { lastProcessedSpinTime = spinData.timestamp; startWheelAnimation(spinData); }
+                } else { isFirstLoad = false; }
             } catch (error) {}
         }
         
-        async function fetchLoop() {
-            await fetchFromCloud();
-            setTimeout(fetchLoop, 1000);
-        }
-        
-        checkTwitchAuth();
-        fetchLoop();
+        async function fetchLoop() { await fetchFromCloud(); setTimeout(fetchLoop, 1000); }
+        checkTwitchAuth(); fetchLoop();
 
         let lastLogDataString = "";
         function drawLog(logArray) {
             const currentLogString = JSON.stringify(logArray);
             if (lastLogDataString === currentLogString) return; 
             lastLogDataString = currentLogString;
-            const logList = document.getElementById('action-log-list');
-            let html = '';
+            const logList = document.getElementById('action-log-list'); let html = '';
             logArray.forEach(entry => { html += `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`; });
             logList.innerHTML = html;
         }
@@ -825,18 +851,13 @@
                     localGameCount = gamesArr.length;
                     gamesArr.forEach(game => {
                         let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); 
-                        let t = parseInt(game.tickets) || 0;
-                        let g = parseInt(game.gold) || 0;
-                        
+                        let t = parseInt(game.tickets) || 0; let g = parseInt(game.gold) || 0;
                         if (!globalCauldron[upperName]) globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: safeName, badges: [] };
-                        globalCauldron[upperName].tickets += t; 
-                        globalCauldron[upperName].gold += g; 
-                        
+                        globalCauldron[upperName].tickets += t; globalCauldron[upperName].gold += g; 
                         if(game.badges) {
                             let bArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges);
                             globalCauldron[upperName].badges.push(...bArr);
                         }
-
                         playerTotalTickets += (t + g); 
                     });
                 }
@@ -852,10 +873,11 @@
             if(typeof window.failedImages === 'undefined') window.failedImages = {};
 
             playersData.forEach(player => {
-                let gamesHtml = "";
+                let gamesHtml = ""; let slotIndex = 0;
                 if (player.games) {
                     let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     gamesArr.forEach(game => {
+                        slotIndex++;
                         let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let globalGold = globalCauldron[upperName].gold;
                         let itemClass = ""; let globalBadge = "";
 
@@ -874,24 +896,18 @@
                                 else if(type === 'poison') iconText = "☠️"; else if(type === 'acid') iconText = "🧪";
                                 else { iconText = `✨`; titleText = type; }
                             }
-                            
-                            let imgUrl = `${baseUrl}${type}.png`;
-                            let imgTag = "";
-                            if(window.failedImages[imgUrl]) { imgTag = iconText; } 
-                            else { imgTag = `<img src="${imgUrl}" class="custom-icon" onerror="window.failedImages['${imgUrl}']=true; this.outerHTML='${iconText}'">`; }
-
-                            let displayContent = count > 1 ? `${imgTag}&nbsp;x${count}` : imgTag; 
-                            return `<div class="badge ${type}" title="${titleText}">${displayContent}</div>`;
+                            let imgUrl = `${baseUrl}${type}.png`; let imgTag = "";
+                            if(window.failedImages[imgUrl]) { imgTag = iconText; } else { imgTag = `<img src="${imgUrl}" class="custom-icon" onerror="window.failedImages['${imgUrl}']=true; this.outerHTML='${iconText}'">`; }
+                            return `<div class="badge ${type}" title="${titleText}">${count > 1 ? `${imgTag}&nbsp;x${count}` : imgTag}</div>`;
                         }).join("");
-                        
-                        let allBadges = globalBadge + localBadges;
                         
                         let goldHtmlPill = game.gold > 0 ? `<span class="pr-g-tix" style="color: #b8a87b; background: rgba(184, 168, 123, 0.1); border-color: rgba(184, 168, 123, 0.2); margin-right: 5px;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon"> ${game.gold}</span>` : '';
                         
-                        gamesHtml += `<div class="pr-game-pill ${itemClass}"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${allBadges}</div></div></div>`;
+                        // 🔥 ВШИТЫЙ ONCLICK ДЛЯ ТАРГЕТИНГА 🔥
+                        gamesHtml += `<div class="pr-game-pill ${itemClass}" onclick="handleGameClick('${player.user}', ${slotIndex})"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${globalBadge + localBadges}</div></div></div>`;
                     });
                 }
-                playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name" onclick="copyNick(this, '${player.user || "Зритель"}')">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
+                playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
             });
 
             const sortedGames = Object.values(globalCauldron).sort((a, b) => (b.tickets + b.gold) - (a.tickets + a.gold)); 
@@ -901,14 +917,12 @@
                 if (game.gold >= 100) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
                 else if (game.gold >= 50) { itemClass = "immortal"; statusBadge = `<div class="status-badge immortal">💀 БЕССМЕРТИЕ</div>`; }
                 let safeNameEscaped = game.rawName.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                
                 let goldTickets = game.gold > 0 ? `<span style="color: #b8a87b; margin-right: 12px; display:flex; align-items:center;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon" style="margin-right: 4px;"> ${game.gold}</span>` : '';
-                
                 let bottomRow = statusBadge ? `<div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 5px;">${statusBadge}</div>` : '';
 
                 html += `<div class="cauldron-item ${itemClass}">
                             <div class="c-top-row">
-                                <div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div>
+                                <div class="c-game-name">${game.rawName}</div>
                                 <div class="c-tickets" style="display:flex; align-items:center;">
                                     ${goldTickets}
                                     <span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span>
@@ -922,14 +936,9 @@
 
         function startWheelAnimation(spinData) {
             isSpinning = true; 
-            const overlay = document.getElementById('wheel-modal'); 
-            const canvas = document.getElementById('wheel-canvas'); 
-            const ctx = canvas.getContext('2d'); 
-            const resultBox = document.getElementById('wheel-result'); 
+            const overlay = document.getElementById('wheel-modal'); const canvas = document.getElementById('wheel-canvas'); const ctx = canvas.getContext('2d'); const resultBox = document.getElementById('wheel-result'); 
             
-            resultBox.classList.remove('show'); 
-            overlay.className = 'wheel-overlay active';
-            canvas.style.transform = `scale(1) rotate(0rad)`;
+            resultBox.classList.remove('show'); overlay.className = 'wheel-overlay active'; canvas.style.transform = `scale(1) rotate(0rad)`;
             
             let itemsRaw = []; let neonColor = "#8abf86"; 
             if (spinData.action === "SPIN_BUFF_SUB") { itemsRaw = currentConfig.wheels.premium.buffs; overlay.classList.add('buff'); neonColor = "#a6e3a1"; } 
@@ -959,16 +968,9 @@
                 if (!startTime) startTime = timestamp; const progress = Math.min((timestamp - startTime) / duration, 1);
                 canvas.style.transform = `scale(1) rotate(${absoluteFinalAngle * easeOut(progress)}rad)`;
                 if (progress < 1) { requestAnimationFrame(animateWheel); } else {
-                    document.getElementById('res-user').innerText = `КРУТИТ: ${spinData.user}`; 
-                    document.getElementById('res-text').innerText = `${targetItem.name}`; 
-                    document.getElementById('res-text').style.color = neonColor;
+                    document.getElementById('res-user').innerText = `КРУТИТ: ${spinData.user}`; document.getElementById('res-text').innerText = `${targetItem.name}`; document.getElementById('res-text').style.color = neonColor;
                     resultBox.classList.add('show');
-                    
-                    clearTimeout(wheelTimeout); 
-                    wheelTimeout = setTimeout(() => { 
-                        overlay.classList.remove('active'); 
-                        setTimeout(() => { isSpinning = false; }, 500); 
-                    }, 4000); 
+                    clearTimeout(wheelTimeout); wheelTimeout = setTimeout(() => { overlay.classList.remove('active'); setTimeout(() => { isSpinning = false; }, 500); }, 4000); 
                 }
             }
             requestAnimationFrame(animateWheel);

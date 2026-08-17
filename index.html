@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V46.0 (Smart Targeting & Role Fix)</title>
+    <title>Аукцион - Оверлей V46.2 (Strict DB Limits)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -272,10 +272,8 @@
 </head>
 <body>
 
-    <!-- ТОСТЫ УВЕДОМЛЕНИЙ -->
     <div id="toast-container"></div>
 
-    <!-- ВСПЛЫВАЮЩАЯ РУЛЕТКА -->
     <div class="wheel-overlay" id="wheel-modal">
         <div class="wheel-scale-box">
             <canvas id="wheel-canvas" width="800" height="800"></canvas>
@@ -287,7 +285,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ПРАВИЛ И ЭФФЕКТОВ -->
     <div class="rules-modal" id="rules-modal">
         <div class="rules-content">
             <button class="rules-close-btn" onclick="closeRulesModal()">✖</button>
@@ -341,7 +338,6 @@
     <div id="app-wrapper" class="app-wrapper">
         <div class="layout">
             
-            <!-- ЛЕВАЯ ЧАСТЬ -->
             <div class="left-container">
                 <div class="phase-bar">
                     <button class="top-nav-btn left-btn" onclick="openModalTab('rules')" style="color: #b8a87b; border-color: #8c7b52; display: flex; align-items: center; gap: 5px; justify-content: center;">
@@ -353,13 +349,10 @@
                 <div class="left-panel" id="players-grid"></div>
             </div>
             
-            <!-- ПРАВАЯ ЧАСТЬ (ЖЕСТКАЯ СЕТКА) -->
             <div class="right-interactive">
                 
-                <!-- КОЛОНКА 1: ПРОФИЛЬ и ЧАТ -->
                 <div class="col-main">
                     
-                    <!-- ПРОФИЛЬ -->
                     <div class="widget-base static-widget" id="widget-profile" style="flex: 0 0 auto;" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title">👤 Профиль</div>
@@ -373,14 +366,12 @@
                         </div>
                         <div class="widget-content" style="overflow-y: visible;">
                             <div class="zoom-target" style="padding: 12px; position: relative !important; height: auto !important; width: 100% !important; transform: none !important; box-sizing: border-box;">
-                                <!-- НЕ АВТОРИЗОВАН -->
                                 <div class="profile-placeholder" id="profile-unauth">
                                     <h3>Твой Кошелек</h3>
                                     <p>Войди через Twitch, чтобы увидеть баланс, лимиты и крутить колесо.</p>
                                     <button onclick="loginTwitch()" style="background: #6441a5; color: #fff; border: 2px solid #4a307a; padding: 10px 20px; font-size: 18px; font-family: 'Neucha', cursive; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: bold;">💜 Войти через Twitch</button>
                                 </div>
                                 
-                                <!-- АВТОРИЗОВАН -->
                                 <div class="profile-placeholder" id="profile-auth" style="display: none; align-items: stretch; justify-content: flex-start; padding: 0;">
                                     <div class="prof-header">
                                         <img id="tw-avatar" class="prof-avatar" src="" alt="Avatar">
@@ -391,7 +382,6 @@
                                         <button class="logout-btn" onclick="logoutTwitch()">Выйти</button>
                                     </div>
 
-                                    <!-- ГОРИЗОНТАЛЬНЫЕ БАЛАНСЫ -->
                                     <div class="prof-balances">
                                         <div class="bal-card">
                                             <div style="width: 100%; font-size: 13px; color: #a4b09c; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Обычные</div>
@@ -409,7 +399,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- ИНВЕНТАРЬ -->
                                     <div id="inv-container" class="inv-section">
                                         <div class="inv-header"><span>🎒 Инвентарь</span> <span style="color: #6c7086;" id="inv-count">0 / 1</span></div>
                                         <div id="inv-content" style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>
@@ -433,7 +422,6 @@
                         </div>
                     </div>
 
-                    <!-- ЧАТ -->
                     <div class="widget-base static-widget" id="widget-chat" style="flex: 1; min-height: 0;" data-zoom="1">
                         <div class="widget-header">
                             <div class="widget-title">💬 Чат Твича</div>
@@ -454,7 +442,6 @@
 
                 </div>
 
-                <!-- КОЛОНКА 2: АЛТАРЬ / ЖУРНАЛ -->
                 <div class="col-side">
                     <div class="widget-base static-widget" id="widget-altar-log" style="height: 100%; flex: 1;" data-zoom="1">
                         <div class="widget-header multi-widget-header">
@@ -472,12 +459,10 @@
                         </div>
                         <div class="widget-content">
                             <div class="zoom-target">
-                                <!-- ВКЛАДКА АЛТАРЯ -->
                                 <div id="tab-altar" class="tab-pane active">
                                     <div id="cauldron-list"></div>
                                 </div>
                                 
-                                <!-- ВКЛАДКА ЖУРНАЛА -->
                                 <div id="tab-log" class="tab-pane">
                                     <div id="action-log-list"></div>
                                 </div>
@@ -491,17 +476,26 @@
     </div>
 
     <script>
-        // СИСТЕМА УВЕДОМЛЕНИЙ
-        function showToast(msg, isError = false) {
-            const c = document.getElementById('toast-container');
-            const el = document.createElement('div');
-            el.className = `toast ${isError ? 'error' : ''}`;
-            el.innerText = msg;
-            c.appendChild(el);
-            setTimeout(() => { if(c.contains(el)) c.removeChild(el); }, 4000);
+        // ЛОГИКА ГЛОБАЛЬНОГО МАСШТАБА СТРАНИЦЫ
+        let pageZoom = 1.0;
+        function autoZoomMobile() {
+            if (window.innerWidth > 0 && window.innerWidth < 1350) {
+                pageZoom = window.innerWidth / 1350;
+                document.body.style.zoom = pageZoom;
+                document.getElementById('global-zoom-label').innerText = Math.round(pageZoom * 100) + '%';
+            }
+        }
+        window.addEventListener('load', autoZoomMobile);
+
+        function changePageZoom(delta) {
+            pageZoom += delta;
+            if (pageZoom < 0.3) pageZoom = 0.3;
+            if (pageZoom > 2.0) pageZoom = 2.0;
+            document.body.style.zoom = pageZoom;
+            document.getElementById('global-zoom-label').innerText = Math.round(pageZoom * 100) + '%';
         }
 
-        // ЛОГИКА ВКЛАДОК И ЗУМА
+        // ЛОГИКА ВКЛАДОК
         function switchTab(tabId, btnElement) {
             const widget = btnElement.closest('.widget-base');
             widget.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -510,6 +504,7 @@
             btnElement.classList.add('active');
         }
 
+        // ЛОГИКА МАСШТАБА ВИДЖЕТОВ И СВОРАЧИВАНИЯ
         function changeWidgetZoom(btn, delta) {
             const widget = btn.closest('.widget-base');
             const target = widget.querySelector('.zoom-target');
@@ -667,7 +662,6 @@
                     hintEl.innerText = "Выбери СВОЙ лот";
                     showToast('МАГИЯ: Выбери свой лот для баффа!');
                 } else {
-                    // Дебаффы можно кидать на кого угодно (target: 'enemy' или 'any')
                     targetingState = 'single';
                     document.body.className = 'targeting-any';
                     hintEl.innerText = "Выбери ЛЮБОЙ лот (цель)";
@@ -706,7 +700,6 @@
 
             sendTwitchCommand(cmd);
             
-            // Сброс UI после отправки
             targetingMode = false;
             targetingState = 'none';
             document.body.className = '';
@@ -760,7 +753,7 @@
             }
         }
 
-        // 🔥 РАСЧЕТ БАЛАНСОВ, ЛИМИТОВ И ИНВЕНТАРЯ 🔥
+        // 🔥 РАСЧЕТ БАЛАНСОВ И ЛИМИТОВ 🔥
         function renderWallet(data) {
             if (!window.currentUserLogin || !data) return;
             
@@ -785,12 +778,11 @@
                 else if (player.is_vip && finalRole !== "SUB") finalRole = "VIP";
                 role = finalRole;
 
-                if (player.games) {
-                    let gArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
-                    gArr.forEach(g => { ticketsBought += parseInt(g.tickets) || 0; });
-                }
-
-                buffsUsed = player.buffs_used || 0; debuffsUsed = player.debuffs_used || 0; freeUsed = player.free_used || 0;
+                // БЕРЕМ ИНФОРМАЦИЮ СТРОГО ИЗ БАЗЫ
+                ticketsBought = parseInt(player.tickets_bought || 0);
+                buffsUsed = parseInt(player.buffs_used || player.used_buffs || 0); 
+                debuffsUsed = parseInt(player.debuffs_used || player.used_debuffs || 0); 
+                freeUsed = parseInt(player.free_used || player.used_free || player.free_spins || 0);
 
                 // ОБНОВЛЕНИЕ ИНВЕНТАРЯ
                 const invCount = document.getElementById('inv-count');
@@ -843,6 +835,11 @@
                 document.getElementById('lim-debuff').innerText = Math.max(0, maxDebuffs - debuffsUsed);
             }
         }
+
+        function copyText(element, text) {
+            if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text); const oldColor = element.style.color; element.style.color = "#ffffff"; setTimeout(() => { element.style.color = oldColor; }, 300); }
+        }
+        function copyNick(element, nick) { const textToCopy = '@' + nick; if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(textToCopy); } }
 
         // БАЗОВАЯ ЛОГИКА АУКЦИОНА И FIREBASE
         const playersGrid = document.getElementById("players-grid");
@@ -966,10 +963,11 @@
                         
                         let goldHtmlPill = game.gold > 0 ? `<span class="pr-g-tix" style="color: #b8a87b; background: rgba(184, 168, 123, 0.1); border-color: rgba(184, 168, 123, 0.2); margin-right: 5px;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon"> ${game.gold}</span>` : '';
                         
+                        // ВШИТЫЙ ONCLICK ДЛЯ ТАРГЕТИНГА
                         gamesHtml += `<div class="pr-game-pill ${itemClass} ${isMineClass}" onclick="handleGameClick('${player.user}', ${slotIndex})"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${globalBadge + localBadges}</div></div></div>`;
                     });
                 }
-                playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
+                playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name" onclick="copyNick(this, '${player.user || "Зритель"}')">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
             });
 
             const sortedGames = Object.values(globalCauldron).sort((a, b) => (b.tickets + b.gold) - (a.tickets + a.gold)); 
@@ -984,7 +982,7 @@
 
                 html += `<div class="cauldron-item ${itemClass}">
                             <div class="c-top-row">
-                                <div class="c-game-name">${game.rawName}</div>
+                                <div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div>
                                 <div class="c-tickets" style="display:flex; align-items:center;">
                                     ${goldTickets}
                                     <span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span>

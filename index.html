@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.2 (VIP Sync Button)</title>
+    <title>Аукцион - Оверлей V48.3 (Filtered Table)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -243,6 +243,7 @@
             .col-main, .col-side { width: 100%; height: auto; padding-right: 0;}
             .col-side { height: 500px; }
             #widget-profile { height: auto !important; flex: 0 0 auto; }
+            /* ЖЕСТКАЯ ФИКСАЦИЯ ВЫСОТЫ ЧАТА ДЛЯ ТЕЛЕФОНА */
             #widget-chat { height: 450px !important; min-height: 450px !important; flex: 0 0 auto !important; display: flex !important; }
             .wheel-scale-box { width: 320px; height: 320px; transform: scale(0.65); }
             #wheel-canvas { width: 300px; height: 300px; }
@@ -370,6 +371,7 @@
                                                 <div id="tw-tickets" class="bal-val" style="color: #8abf86;">0</div>
                                             </div>
                                         </div>
+                                        <!-- 🔥 КЛИКАБЕЛЬНОЕ ЗОЛОТО 🔥 -->
                                         <div class="bal-card gold clickable" onclick="activateGoldTargeting()" title="Нажми, чтобы закинуть золото в лот!">
                                             <div style="width: 100%; font-size: 13px; color: #b8a87b; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Золотые</div>
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
@@ -779,7 +781,7 @@
                     if (currentConfig.dictionary.debuffs) currentConfig.dictionary.debuffs.forEach(e => dictionaryMap[e.id] = e);
                 }
 
-                if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
+                if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%; margin-top: 30px;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
                 if (data && data.log) { drawLog(data.log); } else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
 
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
@@ -802,66 +804,75 @@
         }
 
         function drawSlots(playersData) {
-            const globalCauldron = {}; let globalMaxGames = 3; const baseUrl = "https://skinnystreams04-ai.github.io/auction-table/icons/";
-            playersData.forEach(player => {
+            const baseUrl = "https://skinnystreams04-ai.github.io/auction-table/icons/";
+            
+            // 🔥 ФИЛЬТР: Оставляем только тех, у кого реально добавлены игры 🔥
+            const activePlayers = playersData.filter(p => p.games && (Array.isArray(p.games) ? p.games.length > 0 : Object.keys(p.games).length > 0));
+
+            if (activePlayers.length === 0) {
+                playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%; margin-top: 20px;'>Алтарь пуст... Ждем жертв.</h2>";
+                cauldronList.innerHTML = "";
+                return;
+            }
+
+            const globalCauldron = {}; let globalMaxGames = 3; 
+
+            activePlayers.forEach(player => {
                 let playerTotalTickets = 0; let localGameCount = 0;
-                if (player.games) {
-                    let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games); localGameCount = gamesArr.length;
-                    gamesArr.forEach(game => {
-                        let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); 
-                        let t = parseInt(game.tickets) || 0; let g = parseInt(game.gold) || 0;
-                        if (!globalCauldron[upperName]) globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: safeName, badges: [] };
-                        globalCauldron[upperName].tickets += t; globalCauldron[upperName].gold += g; 
-                        if(game.badges) { let bArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges); globalCauldron[upperName].badges.push(...bArr); }
-                        playerTotalTickets += (t + g); 
-                    });
-                }
+                let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games); 
+                localGameCount = gamesArr.length;
+                gamesArr.forEach(game => {
+                    let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); 
+                    let t = parseInt(game.tickets) || 0; let g = parseInt(game.gold) || 0;
+                    if (!globalCauldron[upperName]) globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: safeName, badges: [] };
+                    globalCauldron[upperName].tickets += t; globalCauldron[upperName].gold += g; 
+                    if(game.badges) { let bArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges); globalCauldron[upperName].badges.push(...bArr); }
+                    playerTotalTickets += (t + g); 
+                });
                 player.totalTickets = playerTotalTickets; if (localGameCount > globalMaxGames) globalMaxGames = localGameCount; 
             });
             
-            playersData.sort((a, b) => b.totalTickets - a.totalTickets);
+            activePlayers.sort((a, b) => b.totalTickets - a.totalTickets);
             let headerHtml = `<div class="table-header"><div class="th-user">ЗРИТЕЛЬ</div><div class="th-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">`;
             for(let i = 1; i <= globalMaxGames; i++) { headerHtml += `<div class="th-game">ИГРА ${i}</div>`; }
             headerHtml += `</div></div>`; playersGrid.innerHTML = headerHtml;
 
             if(typeof window.failedImages === 'undefined') window.failedImages = {};
 
-            playersData.forEach(player => {
+            activePlayers.forEach(player => {
                 let gamesHtml = ""; let slotIndex = 0;
-                if (player.games) {
-                    let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
-                    gamesArr.forEach(game => {
-                        slotIndex++; let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let globalGold = globalCauldron[upperName].gold;
-                        let itemClass = ""; let globalBadge = "";
-                        let isMineClass = (player.user && window.currentUserLogin && player.user.toLowerCase() === window.currentUserLogin.toLowerCase()) ? 'is-mine' : '';
-                        if (globalGold >= 100) { itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute" title="Неуязвимость">🛡️</div>`; } 
-                        else if (globalGold >= 50) { itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal" title="Бессмертие">💀</div>`; }
+                let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
+                gamesArr.forEach(game => {
+                    slotIndex++; let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let globalGold = globalCauldron[upperName].gold;
+                    let itemClass = ""; let globalBadge = "";
+                    let isMineClass = (player.user && window.currentUserLogin && player.user.toLowerCase() === window.currentUserLogin.toLowerCase()) ? 'is-mine' : '';
+                    if (globalGold >= 100) { itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute" title="Неуязвимость">🛡️</div>`; } 
+                    else if (globalGold >= 50) { itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal" title="Бессмертие">💀</div>`; }
 
-                        let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges || {}); let badgeCounts = {};
-                        badgesArr.forEach(b => { if (!b || !b.type) return; badgeCounts[b.type] = (badgeCounts[b.type] || 0) + 1; });
-                        let localBadges = Object.keys(badgeCounts).map(type => {
-                            let count = badgeCounts[type]; let iconText = ""; let titleText = "";
-                            if (dictionaryMap[type]) { iconText = `${dictionaryMap[type].icon}`; titleText = dictionaryMap[type].name; } 
-                            else {
-                                if(type === 'shield') iconText = "🛡️"; else if(type === 'fire') iconText = "🔥";
-                                else if(type === 'freeze') iconText = "❄️"; else if(type === 'kill') iconText = "💀";
-                                else if(type === 'poison') iconText = "☠️"; else if(type === 'acid') iconText = "🧪";
-                                else { iconText = `✨`; titleText = type; }
-                            }
-                            let imgUrl = `${baseUrl}${type}.png`; let imgTag = "";
-                            if(window.failedImages[imgUrl]) { imgTag = iconText; } else { imgTag = `<img src="${imgUrl}" class="custom-icon" onerror="window.failedImages['${imgUrl}']=true; this.outerHTML='${iconText}'">`; }
-                            return `<div class="badge ${type}" title="${titleText}">${count > 1 ? `${imgTag}&nbsp;x${count}` : imgTag}</div>`;
-                        }).join("");
-                        
-                        let goldHtmlPill = game.gold > 0 ? `<span class="pr-g-tix" style="color: #b8a87b; background: rgba(184, 168, 123, 0.1); border-color: rgba(184, 168, 123, 0.2); margin-right: 5px;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon"> ${game.gold}</span>` : '';
-                        gamesHtml += `<div class="pr-game-pill ${itemClass} ${isMineClass}" onclick="handleGameClick('${player.user}', ${slotIndex})"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${globalBadge + localBadges}</div></div></div>`;
-                    });
-                }
+                    let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges || {}); let badgeCounts = {};
+                    badgesArr.forEach(b => { if (!b || !b.type) return; badgeCounts[b.type] = (badgeCounts[b.type] || 0) + 1; });
+                    let localBadges = Object.keys(badgeCounts).map(type => {
+                        let count = badgeCounts[type]; let iconText = ""; let titleText = "";
+                        if (dictionaryMap[type]) { iconText = `${dictionaryMap[type].icon}`; titleText = dictionaryMap[type].name; } 
+                        else {
+                            if(type === 'shield') iconText = "🛡️"; else if(type === 'fire') iconText = "🔥";
+                            else if(type === 'freeze') iconText = "❄️"; else if(type === 'kill') iconText = "💀";
+                            else if(type === 'poison') iconText = "☠️"; else if(type === 'acid') iconText = "🧪";
+                            else { iconText = `✨`; titleText = type; }
+                        }
+                        let imgUrl = `${baseUrl}${type}.png`; let imgTag = "";
+                        if(window.failedImages[imgUrl]) { imgTag = iconText; } else { imgTag = `<img src="${imgUrl}" class="custom-icon" onerror="window.failedImages['${imgUrl}']=true; this.outerHTML='${iconText}'">`; }
+                        return `<div class="badge ${type}" title="${titleText}">${count > 1 ? `${imgTag}&nbsp;x${count}` : imgTag}</div>`;
+                    }).join("");
+                    
+                    let goldHtmlPill = game.gold > 0 ? `<span class="pr-g-tix" style="color: #b8a87b; background: rgba(184, 168, 123, 0.1); border-color: rgba(184, 168, 123, 0.2); margin-right: 5px;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon"> ${game.gold}</span>` : '';
+                    gamesHtml += `<div class="pr-game-pill ${itemClass} ${isMineClass}" onclick="handleGameClick('${player.user}', ${slotIndex})"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${globalBadge + localBadges}</div></div></div>`;
+                });
                 playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
             });
 
             const sortedGames = Object.values(globalCauldron).sort((a, b) => (b.tickets + b.gold) - (a.tickets + a.gold)); 
-            const cauldronListEl = document.getElementById("cauldron-list"); let html = "";
+            let html = "";
             sortedGames.forEach(game => {
                 let statusBadge = ""; let itemClass = "";
                 if (game.gold >= 100) { itemClass = "absolute"; statusBadge = `<div class="status-badge absolute">🛡️ НЕУЯЗВИМОСТЬ</div>`; } 
@@ -872,7 +883,7 @@
 
                 html += `<div class="cauldron-item ${itemClass}"><div class="c-top-row"><div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div><div class="c-tickets" style="display:flex; align-items:center;">${goldTickets}<span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span></div></div>${bottomRow}</div>`;
             });
-            cauldronListEl.innerHTML = html;
+            cauldronList.innerHTML = html;
         }
 
         function startWheelAnimation(spinData) {

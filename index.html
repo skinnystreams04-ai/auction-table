@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.0 (Clean Code & Gold UX)</title>
+    <title>Аукцион - Оверлей V48.2 (VIP Sync Button)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -192,6 +192,10 @@
         .spin-btn.buff { background: #4a664d; color: #a6e3a1; border: 1px solid #8abf86; }
         .spin-btn.debuff { background: #663b3b; color: #eba0a0; border: 1px solid #c45c5c; }
         .spin-btn:hover { filter: brightness(1.2); }
+        
+        /* КНОПКА ПРОВЕРКИ РОЛИ */
+        #btn-sync-role { background: transparent; border: 1px solid #4a5c41; color: #a4b09c; font-family: 'Neucha', cursive; font-size: 11px; padding: 2px 6px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        #btn-sync-role:hover { background: rgba(138, 191, 134, 0.1); color: #c4d1b8; border-color: #8abf86; }
 
         /* ВСПЛЫВАЮЩЕЕ КОЛЕСО */
         .wheel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
@@ -239,7 +243,7 @@
             .col-main, .col-side { width: 100%; height: auto; padding-right: 0;}
             .col-side { height: 500px; }
             #widget-profile { height: auto !important; flex: 0 0 auto; }
-            #widget-chat { height: 450px !important; flex: none;}
+            #widget-chat { height: 450px !important; min-height: 450px !important; flex: 0 0 auto !important; display: flex !important; }
             .wheel-scale-box { width: 320px; height: 320px; transform: scale(0.65); }
             #wheel-canvas { width: 300px; height: 300px; }
             #wheel-frame { width: 320px; height: 320px; }
@@ -349,7 +353,11 @@
                                         <img id="tw-avatar" class="prof-avatar" src="" alt="Avatar">
                                         <div style="text-align: left; flex: 1;">
                                             <div id="tw-username" style="font-size: 20px; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; line-height: 1;">...</div>
-                                            <div id="tw-role" class="role-badge f">F</div>
+                                            <!-- 🔥 КНОПКА СИНХРОНИЗАЦИИ 🔥 -->
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <div id="tw-role" class="role-badge f">F</div>
+                                                <button id="btn-sync-role" onclick="requestRoleSync()" style="display: none;">🔄 ПРОВЕРИТЬ РОЛЬ</button>
+                                            </div>
                                         </div>
                                         <button class="logout-btn" onclick="logoutTwitch()">Выйти</button>
                                     </div>
@@ -362,7 +370,6 @@
                                                 <div id="tw-tickets" class="bal-val" style="color: #8abf86;">0</div>
                                             </div>
                                         </div>
-                                        <!-- 🔥 КЛИКАБЕЛЬНОЕ ЗОЛОТО 🔥 -->
                                         <div class="bal-card gold clickable" onclick="activateGoldTargeting()" title="Нажми, чтобы закинуть золото в лот!">
                                             <div style="width: 100%; font-size: 13px; color: #b8a87b; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Золотые</div>
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
@@ -506,13 +513,13 @@
         function renderRulesUI() {
             if(!currentConfig) return;
             const gl = currentConfig.global_limits || {}; const lim = currentConfig.limits || {};
-            const maxGamesEl = document.getElementById('rule-max-games'); if(maxGamesEl) maxGamesEl.innerText = gl.max_games_per_user || 3;
+            const maxGamesEl = document.getElementById('rule-max-games'); if(maxGamesEl) maxGamesEl.innerText = gl.max_games_per_user ?? 3;
             const limitsList = document.getElementById('dynamic-limits-list');
             if(limitsList) {
                 limitsList.innerHTML = `
-                    <li><span class="eff-badge" style="background:#222b20; border-color:#32422f;">F</span> <b>ФОЛЛОВЕР:</b> Макс <b>${gl.follower || 0}</b> билетов за баллы. Колеса: <b>${lim.f_free || 0}</b> беспл, <b>${lim.f_buffs || 0}</b> бафф, <b>${lim.f_debuffs || 0}</b> дебафф.</li>
-                    <li><span class="eff-badge vip-badge">VIP</span> <b>VIP:</b> Макс <b>${gl.vip || 0}</b> билетов за баллы. Колеса: <b>${lim.vip_free || 0}</b> беспл, <b>${lim.vip_buffs || 0}</b> бафф, <b>${lim.vip_debuffs || 0}</b> дебафф.</li>
-                    <li><span class="eff-badge sub-badge">SUB</span> <b>SUB:</b> Макс <b>${gl.sub || 0}</b> билетов за баллы. Колеса: <b>${lim.sub_free || 0}</b> беспл, <b>${lim.sub_buffs || 0}</b> бафф, <b>${lim.sub_debuffs || 0}</b> дебафф.</li>
+                    <li><span class="eff-badge" style="background:#222b20; border-color:#32422f;">F</span> <b>ФОЛЛОВЕР:</b> Макс <b>${gl.follower ?? 0}</b> билетов за баллы. Колеса: <b>${lim.f_free ?? 0}</b> беспл, <b>${lim.f_buffs ?? 0}</b> бафф, <b>${lim.f_debuffs ?? 0}</b> дебафф.</li>
+                    <li><span class="eff-badge vip-badge">VIP</span> <b>VIP:</b> Макс <b>${gl.vip ?? 0}</b> билетов за баллы. Колеса: <b>${lim.vip_free ?? 0}</b> беспл, <b>${lim.vip_buffs ?? 0}</b> бафф, <b>${lim.vip_debuffs ?? 0}</b> дебафф.</li>
+                    <li><span class="eff-badge sub-badge">SUB</span> <b>SUB:</b> Макс <b>${gl.sub ?? 0}</b> билетов за баллы. Колеса: <b>${lim.sub_free ?? 0}</b> беспл, <b>${lim.sub_buffs ?? 0}</b> бафф, <b>${lim.sub_debuffs ?? 0}</b> дебафф.</li>
                 `;
             }
         }
@@ -541,7 +548,7 @@
         window.currentUserLogin = null;
         window.currentUserId = null;
         window.broadcasterId = null;
-        window.currentGoldBalance = 0; // Сохраняем золото локально
+        window.currentGoldBalance = 0;
         let detectedRole = "F"; 
 
         function loginTwitch() {
@@ -560,115 +567,78 @@
             let token = localStorage.getItem('tw_token');
             if(!token || !window.currentUserId || !window.broadcasterId) { showToast('Сначала войди через Twitch!', true); return; }
             try {
-                showToast(`⏳ Отправляю: ${cmd}...`);
                 const response = await fetch('https://api.twitch.tv/helix/chat/messages', {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${token}`, 'Client-Id': TWITCH_CLIENT_ID, 'Content-Type': 'application/json' },
                     body: JSON.stringify({ broadcaster_id: window.broadcasterId, sender_id: window.currentUserId, message: cmd })
                 });
-                if (response.ok) { showToast(`✅ Отправлено!`); } 
-                else {
+                if (!response.ok) {
                     if (response.status === 401 || response.status === 403) { showToast('❌ Ошибка прав! Нажми "Выйти" в профиле и войди заново!', true); } 
-                    else { showToast(`❌ Ошибка Твича!`, true); }
+                    else { showToast(`❌ Ошибка отправки!`, true); }
                 }
             } catch(e) { showToast('❌ Ошибка сети!', true); }
         }
 
-        // 🔥 СИСТЕМА ТАРГЕТИНГА КАСТОВ И ЗОЛОТА 🔥
-        let targetingMode = false;
-        let targetingState = 'none'; // 'step1', 'step2', 'single', 'gold'
-        let firstTarget = null;
-        let loadedSpell = null;
+        function requestRoleSync() {
+            showToast('🔄 Отправляю запрос боту. Ожидайте обновления...');
+            sendTwitchCommand('!роль');
+            const btn = document.getElementById('btn-sync-role');
+            btn.innerText = '⏳';
+            btn.style.pointerEvents = 'none';
+            setTimeout(() => { btn.innerText = '🔄 ПРОВЕРИТЬ РОЛЬ'; btn.style.pointerEvents = 'auto'; }, 5000);
+        }
+
+        let targetingMode = false; let targetingState = 'none'; let firstTarget = null; let loadedSpell = null;
 
         function activateGoldTargeting() {
-            if (window.currentGoldBalance <= 0) {
-                showToast('❌ У тебя нет Золотых билетов!', true);
-                return;
-            }
-            // Сбрасываем магию, если была нажата
+            if (window.currentGoldBalance <= 0) { showToast('❌ У тебя нет Золотых билетов!', true); return; }
             if (targetingMode && targetingState !== 'gold') resetTargetingUI();
-            
-            targetingMode = true;
-            targetingState = 'gold';
-            document.body.className = 'targeting-any'; 
-            showToast('🟡 РЕЖИМ ЗОЛОТА: Выбери ЛОБОЙ лот на Алтаре!');
+            targetingMode = true; targetingState = 'gold'; document.body.className = 'targeting-any'; 
+            showToast('🟡 РЕЖИМ ЗОЛОТА: Выбери ЛЮБОЙ лот на Алтаре!');
         }
 
         function toggleTargeting() {
             if (!loadedSpell) return;
-            // Если до этого был выбран режим золота, отменяем его
             if (targetingState === 'gold') { resetTargetingUI(); }
-            
             targetingMode = !targetingMode;
-            const invEl = document.getElementById('inv-spell-content');
-            const hintEl = document.getElementById('inv-hint');
-            
+            const invEl = document.getElementById('inv-spell-content'); const hintEl = document.getElementById('inv-hint');
             if (targetingMode) {
                 invEl.classList.add('active');
                 if (loadedSpell.mech === 'steal' || loadedSpell.mech === 'swap') {
-                    targetingState = 'step1'; document.body.className = 'targeting-self';
-                    hintEl.innerText = "ШАГ 1: Выбери СВОЙ лот"; showToast('РЕЖИМ ОБМЕНА: Сначала выбери свой лот!');
+                    targetingState = 'step1'; document.body.className = 'targeting-self'; hintEl.innerText = "ШАГ 1: Выбери СВОЙ лот"; showToast('РЕЖИМ ОБМЕНА: Сначала выбери свой лот!');
                 } else if (loadedSpell.target === 'self') {
-                    targetingState = 'single'; document.body.className = 'targeting-self';
-                    hintEl.innerText = "Выбери СВОЙ лот"; showToast('МАГИЯ: Выбери свой лот для баффа!');
+                    targetingState = 'single'; document.body.className = 'targeting-self'; hintEl.innerText = "Выбери СВОЙ лот"; showToast('МАГИЯ: Выбери свой лот для баффа!');
                 } else {
-                    targetingState = 'single'; document.body.className = 'targeting-any';
-                    hintEl.innerText = "Выбери ЛЮБОЙ лот (цель)"; showToast('МАГИЯ: Выбери любой лот (даже свой)!');
+                    targetingState = 'single'; document.body.className = 'targeting-any'; hintEl.innerText = "Выбери ЛЮБОЙ лот (цель)"; showToast('МАГИЯ: Выбери любой лот (даже свой)!');
                 }
-            } else {
-                resetTargetingUI();
-            }
+            } else { resetTargetingUI(); }
         }
 
         function resetTargetingUI() {
-            targetingMode = false;
-            targetingState = 'none';
-            document.body.className = '';
-            const invEl = document.getElementById('inv-spell-content');
-            const hintEl = document.getElementById('inv-hint');
+            targetingMode = false; targetingState = 'none'; document.body.className = '';
+            const invEl = document.getElementById('inv-spell-content'); const hintEl = document.getElementById('inv-hint');
             if (invEl) invEl.classList.remove('active');
             if (hintEl) hintEl.innerText = loadedSpell ? "Нажми сюда, чтобы применить!" : "Пусто. Крути колесо!";
         }
 
         function handleGameClick(ownerLogin, slotIndex) {
             if (!targetingMode) return;
-
-            // Обработка Золотых Билетов
             if (targetingState === 'gold') {
                 let amount = prompt(`Сколько ЗОЛОТЫХ билетов закинуть?\nДоступно: ${window.currentGoldBalance}`);
                 if (!amount) { resetTargetingUI(); return; }
                 amount = parseInt(amount);
-                if (isNaN(amount) || amount <= 0 || amount > window.currentGoldBalance) {
-                    showToast('❌ Некорректная сумма!', true); resetTargetingUI(); return;
-                }
-                // Отправляем команду !золото (настрой ее в Streamer.bot, чтобы она списывала баланс и начисляла голду лоту)
-                sendTwitchCommand(`!золото ${amount} ${slotIndex} @${ownerLogin}`);
-                resetTargetingUI();
-                return;
+                if (isNaN(amount) || amount <= 0 || amount > window.currentGoldBalance) { showToast('❌ Некорректная сумма!', true); resetTargetingUI(); return; }
+                sendTwitchCommand(`!золото ${amount} ${slotIndex} @${ownerLogin}`); resetTargetingUI(); return;
             }
-
-            // Обработка Магии
             if (!loadedSpell) return;
-
             if (targetingState === 'step1') {
-                firstTarget = { slot: slotIndex };
-                targetingState = 'step2';
-                document.body.className = 'targeting-any';
-                document.getElementById('inv-hint').innerText = "ШАГ 2: Выбери лот ЦЕЛИ";
-                showToast('Отлично! Теперь выбери лот врага (цели).');
-                return;
+                firstTarget = { slot: slotIndex }; targetingState = 'step2'; document.body.className = 'targeting-any';
+                document.getElementById('inv-hint').innerText = "ШАГ 2: Выбери лот ЦЕЛИ"; showToast('Отлично! Теперь выбери лот врага (цели).'); return;
             }
-
             let cmd = "";
-            if (targetingState === 'step2') {
-                cmd = `!каст ${firstTarget.slot} @${ownerLogin} ${slotIndex}`;
-            } else {
-                if (loadedSpell.target === 'self') cmd = `!каст ${slotIndex}`;
-                else cmd = `!каст ${slotIndex} @${ownerLogin}`;
-            }
-
-            sendTwitchCommand(cmd);
-            resetTargetingUI();
+            if (targetingState === 'step2') { cmd = `!каст ${firstTarget.slot} @${ownerLogin} ${slotIndex}`; } 
+            else { if (loadedSpell.target === 'self') cmd = `!каст ${slotIndex}`; else cmd = `!каст ${slotIndex} @${ownerLogin}`; }
+            sendTwitchCommand(cmd); resetTargetingUI();
         }
 
         async function checkTwitchAuth() {
@@ -715,7 +685,7 @@
             }
         }
 
-        // 🔥 РАСЧЕТ БАЛАНСОВ И ЛИМИТОВ (ТОЛЬКО ИЗ БАЗЫ!) 🔥
+        // 🔥 РАСЧЕТ БАЛАНСОВ И ЛИМИТОВ 🔥
         function renderWallet(data) {
             if (!window.currentUserLogin || !data) return;
             
@@ -725,46 +695,44 @@
             const players = data.players || [];
             const player = players.find(p => p.user && p.user.toLowerCase() === window.currentUserLogin.toLowerCase());
             
+            let finalRole = detectedRole; 
             if (player) {
                 wGold = parseInt(player.wallet_gold || 0); wTickets = parseInt(player.wallet_tickets || 0);
-                window.currentGoldBalance = wGold; // Сохраняем для логики клика
+                window.currentGoldBalance = wGold;
 
                 let rolePriority = { 'SUB': 3, 'VIP': 2, 'F': 1 };
-                let finalRole = detectedRole; 
                 if (player.role) { let dbRole = player.role.toUpperCase(); if (rolePriority[dbRole] > rolePriority[finalRole]) finalRole = dbRole; }
                 if (player.is_sub) finalRole = "SUB"; else if (player.is_vip && finalRole !== "SUB") finalRole = "VIP";
-                role = finalRole;
-
-                // БЕРЕМ ИНФОРМАЦИЮ СТРОГО ИЗ БАЗЫ БЕЗ ВЫЧИСЛЕНИЙ ПО ЛОТАМ!
+                
                 ticketsBought = parseInt(player.tickets_bought || player.bought_tickets || 0);
                 buffsUsed = parseInt(player.spins_buffs_used || player.buffs_used || 0); 
                 debuffsUsed = parseInt(player.spins_debuffs_used || player.debuffs_used || 0); 
                 freeUsed = parseInt(player.spins_free_used || player.free_used || 0);
 
-                const invCount = document.getElementById('inv-count');
-                const invContent = document.getElementById('inv-content');
+                const invCount = document.getElementById('inv-count'); const invContent = document.getElementById('inv-content');
                 if (player.active_mech) {
                     loadedSpell = { mech: player.active_mech, name: player.active_name || 'Магия', icon: player.active_icon || '✨', target: player.active_target || 'self' };
                     let hintText = 'Нажми сюда, чтобы применить!';
                     if (targetingMode && targetingState !== 'gold') {
-                        if (targetingState === 'step2') hintText = 'ШАГ 2: Выбери лот ЦЕЛИ';
-                        else if (targetingState === 'step1') hintText = 'ШАГ 1: Выбери СВОЙ лот';
-                        else if (loadedSpell.target === 'self') hintText = 'Выбери СВОЙ лот';
-                        else hintText = 'Выбери ЛЮБОЙ лот (цель)';
+                        if (targetingState === 'step2') hintText = 'ШАГ 2: Выбери лот ЦЕЛИ'; else if (targetingState === 'step1') hintText = 'ШАГ 1: Выбери СВОЙ лот'; else if (loadedSpell.target === 'self') hintText = 'Выбери СВОЙ лот'; else hintText = 'Выбери ЛЮБОЙ лот (цель)';
                     }
                     invCount.innerText = "1 / 1";
-                    invContent.innerHTML = `<div id="inv-spell-content" class="inv-spell ${targetingMode && targetingState !== 'gold' ? 'active' : ''}" onclick="toggleTargeting()">
-                                                <div class="inv-icon-name">${loadedSpell.icon} ${loadedSpell.name}</div>
-                                                <div id="inv-hint" class="inv-hint">${hintText}</div>
-                                            </div>`;
+                    invContent.innerHTML = `<div id="inv-spell-content" class="inv-spell ${targetingMode && targetingState !== 'gold' ? 'active' : ''}" onclick="toggleTargeting()"><div class="inv-icon-name">${loadedSpell.icon} ${loadedSpell.name}</div><div id="inv-hint" class="inv-hint">${hintText}</div></div>`;
                 } else {
                     loadedSpell = null; 
                     if (targetingState !== 'gold') { targetingMode = false; document.body.className = ''; targetingState = 'none'; }
-                    invCount.innerText = "0 / 1";
-                    invContent.innerHTML = `<div style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>`;
+                    invCount.innerText = "0 / 1"; invContent.innerHTML = `<div style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>`;
                 }
             }
             
+            // Если роль не максимальная, показываем кнопку обновления
+            if (finalRole === 'SUB' || finalRole === 'VIP') {
+                document.getElementById('btn-sync-role').style.display = 'none';
+            } else {
+                document.getElementById('btn-sync-role').style.display = 'inline-block';
+            }
+            
+            role = finalRole;
             document.getElementById('tw-gold').innerText = wGold;
             document.getElementById('tw-tickets').innerText = wTickets;
             
@@ -773,10 +741,10 @@
 
             if (currentConfig) {
                 const gl = currentConfig.global_limits || {}; const lim = currentConfig.limits || {};
-                let maxTickets = gl.follower || 10; let maxBuffs = lim.f_buffs || 1; let maxDebuffs = lim.f_debuffs || 0; let maxFree = lim.f_free || 0;
+                let maxTickets = gl.follower ?? 10; let maxBuffs = lim.f_buffs ?? 0; let maxDebuffs = lim.f_debuffs ?? 0; let maxFree = lim.f_free ?? 0;
 
-                if (role === 'VIP') { maxTickets = gl.vip || 25; maxBuffs = lim.vip_buffs || 2; maxDebuffs = lim.vip_debuffs || 1; maxFree = lim.vip_free || 0; } 
-                else if (role === 'SUB') { maxTickets = gl.sub || 50; maxBuffs = lim.sub_buffs || 3; maxDebuffs = lim.sub_debuffs || 2; maxFree = lim.sub_free || 0; }
+                if (role === 'VIP') { maxTickets = gl.vip ?? 25; maxBuffs = lim.vip_buffs ?? 0; maxDebuffs = lim.vip_debuffs ?? 0; maxFree = lim.vip_free ?? 0; } 
+                else if (role === 'SUB') { maxTickets = gl.sub ?? 50; maxBuffs = lim.sub_buffs ?? 0; maxDebuffs = lim.sub_debuffs ?? 0; maxFree = lim.sub_free ?? 0; }
 
                 document.getElementById('lim-tix').innerText = `${ticketsBought} / ${maxTickets}`;
                 document.getElementById('lim-free').innerText = `${freeUsed} / ${maxFree}`;
@@ -785,18 +753,12 @@
             }
         }
 
-        // БАЗОВАЯ ЛОГИКА АУКЦИОНА И FIREBASE
         const playersGrid = document.getElementById("players-grid");
         const cauldronList = document.getElementById("cauldron-list");
         const firebaseUrl = "https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/auction_data.json";
         const configUrl = "https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/auction_config.json";
 
-        let dictionaryMap = {};
-        let lastProcessedSpinTime = 0;
-        let isSpinning = false;
-        let isFirstLoad = true;
-        let currentConfig = null;
-        let wheelTimeout = null;
+        let dictionaryMap = {}; let lastProcessedSpinTime = 0; let isSpinning = false; let isFirstLoad = true; let currentConfig = null; let wheelTimeout = null;
 
         async function fetchFromCloud() {
             try {
@@ -833,32 +795,24 @@
 
         let lastLogDataString = "";
         function drawLog(logArray) {
-            const currentLogString = JSON.stringify(logArray);
-            if (lastLogDataString === currentLogString) return; 
-            lastLogDataString = currentLogString;
+            const currentLogString = JSON.stringify(logArray); if (lastLogDataString === currentLogString) return; lastLogDataString = currentLogString;
             const logList = document.getElementById('action-log-list'); let html = '';
             logArray.forEach(entry => { html += `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`; });
             logList.innerHTML = html;
         }
 
         function drawSlots(playersData) {
-            const globalCauldron = {}; let globalMaxGames = 3; 
-            const baseUrl = "https://skinnystreams04-ai.github.io/auction-table/icons/";
-
+            const globalCauldron = {}; let globalMaxGames = 3; const baseUrl = "https://skinnystreams04-ai.github.io/auction-table/icons/";
             playersData.forEach(player => {
                 let playerTotalTickets = 0; let localGameCount = 0;
                 if (player.games) {
-                    let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
-                    localGameCount = gamesArr.length;
+                    let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games); localGameCount = gamesArr.length;
                     gamesArr.forEach(game => {
                         let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); 
                         let t = parseInt(game.tickets) || 0; let g = parseInt(game.gold) || 0;
                         if (!globalCauldron[upperName]) globalCauldron[upperName] = { tickets: 0, gold: 0, rawName: safeName, badges: [] };
                         globalCauldron[upperName].tickets += t; globalCauldron[upperName].gold += g; 
-                        if(game.badges) {
-                            let bArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges);
-                            globalCauldron[upperName].badges.push(...bArr);
-                        }
+                        if(game.badges) { let bArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges); globalCauldron[upperName].badges.push(...bArr); }
                         playerTotalTickets += (t + g); 
                     });
                 }
@@ -866,7 +820,6 @@
             });
             
             playersData.sort((a, b) => b.totalTickets - a.totalTickets);
-            
             let headerHtml = `<div class="table-header"><div class="th-user">ЗРИТЕЛЬ</div><div class="th-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">`;
             for(let i = 1; i <= globalMaxGames; i++) { headerHtml += `<div class="th-game">ИГРА ${i}</div>`; }
             headerHtml += `</div></div>`; playersGrid.innerHTML = headerHtml;
@@ -878,18 +831,14 @@
                 if (player.games) {
                     let gamesArr = Array.isArray(player.games) ? player.games : Object.values(player.games);
                     gamesArr.forEach(game => {
-                        slotIndex++;
-                        let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let globalGold = globalCauldron[upperName].gold;
+                        slotIndex++; let safeName = game.name != null ? String(game.name) : "Без названия"; let upperName = safeName.toUpperCase(); let globalGold = globalCauldron[upperName].gold;
                         let itemClass = ""; let globalBadge = "";
-
                         let isMineClass = (player.user && window.currentUserLogin && player.user.toLowerCase() === window.currentUserLogin.toLowerCase()) ? 'is-mine' : '';
-
                         if (globalGold >= 100) { itemClass = "absolute-slot"; globalBadge = `<div class="badge absolute" title="Неуязвимость">🛡️</div>`; } 
                         else if (globalGold >= 50) { itemClass = "immortal-slot"; globalBadge = `<div class="badge immortal" title="Бессмертие">💀</div>`; }
 
                         let badgesArr = Array.isArray(game.badges) ? game.badges : Object.values(game.badges || {}); let badgeCounts = {};
                         badgesArr.forEach(b => { if (!b || !b.type) return; badgeCounts[b.type] = (badgeCounts[b.type] || 0) + 1; });
-
                         let localBadges = Object.keys(badgeCounts).map(type => {
                             let count = badgeCounts[type]; let iconText = ""; let titleText = "";
                             if (dictionaryMap[type]) { iconText = `${dictionaryMap[type].icon}`; titleText = dictionaryMap[type].name; } 
@@ -905,7 +854,6 @@
                         }).join("");
                         
                         let goldHtmlPill = game.gold > 0 ? `<span class="pr-g-tix" style="color: #b8a87b; background: rgba(184, 168, 123, 0.1); border-color: rgba(184, 168, 123, 0.2); margin-right: 5px;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon"> ${game.gold}</span>` : '';
-                        
                         gamesHtml += `<div class="pr-game-pill ${itemClass} ${isMineClass}" onclick="handleGameClick('${player.user}', ${slotIndex})"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${globalBadge + localBadges}</div></div></div>`;
                     });
                 }
@@ -922,16 +870,7 @@
                 let goldTickets = game.gold > 0 ? `<span style="color: #b8a87b; margin-right: 12px; display:flex; align-items:center;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon" style="margin-right: 4px;"> ${game.gold}</span>` : '';
                 let bottomRow = statusBadge ? `<div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 5px;">${statusBadge}</div>` : '';
 
-                html += `<div class="cauldron-item ${itemClass}">
-                            <div class="c-top-row">
-                                <div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div>
-                                <div class="c-tickets" style="display:flex; align-items:center;">
-                                    ${goldTickets}
-                                    <span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span>
-                                </div>
-                            </div>
-                            ${bottomRow}
-                         </div>`;
+                html += `<div class="cauldron-item ${itemClass}"><div class="c-top-row"><div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div><div class="c-tickets" style="display:flex; align-items:center;">${goldTickets}<span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span></div></div>${bottomRow}</div>`;
             });
             cauldronListEl.innerHTML = html;
         }

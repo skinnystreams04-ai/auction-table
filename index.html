@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.4 (Tickets & Cancel UX)</title>
+    <title>Аукцион - Оверлей V48.5 (Self-Target Tickets)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -368,7 +368,7 @@
                                     </div>
 
                                     <div class="prof-balances">
-                                        <!-- 🔥 ОБЫЧНЫЕ БИЛЕТЫ (ТЕПЕРЬ КЛИКАБЕЛЬНЫЕ) 🔥 -->
+                                        <!-- 🔥 ОБЫЧНЫЕ БИЛЕТЫ (КЛИКАБЕЛЬНЫЕ) 🔥 -->
                                         <div class="bal-card tickets clickable" onclick="activateTicketTargeting()" title="Нажми, чтобы закинуть обычные билеты в лот!">
                                             <div style="width: 100%; font-size: 13px; color: #a4b09c; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Обычные</div>
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
@@ -614,9 +614,11 @@
         function activateTicketTargeting() {
             if (window.currentTicketBalance <= 0) { showToast('❌ У тебя нет Обычных билетов!', true); return; }
             if (targetingMode && targetingState !== 'ticket') resetTargetingUI();
-            targetingMode = true; targetingState = 'ticket'; document.body.className = 'targeting-any'; 
+            targetingMode = true; targetingState = 'ticket'; 
+            // ИЗМЕНЕНИЕ ДЛЯ БИЛЕТОВ: Только свои лоты
+            document.body.className = 'targeting-self'; 
             document.getElementById('cancel-banner').style.display = 'block';
-            showToast('🎟️ РЕЖИМ БИЛЕТОВ: Выбери ЛЮБОЙ лот на Алтаре!');
+            showToast('🎟️ РЕЖИМ БИЛЕТОВ: Выбери СВОЙ лот на Алтаре!');
         }
 
         function toggleTargeting() {
@@ -657,13 +659,14 @@
                 sendTwitchCommand(`!золото ${amount} ${slotIndex} @${ownerLogin}`); resetTargetingUI(); return;
             }
 
-            // ОБРАБОТКА ОБЫЧНЫХ БИЛЕТОВ
+            // ОБРАБОТКА ОБЫЧНЫХ БИЛЕТОВ (Только свои лоты)
             if (targetingState === 'ticket') {
-                let amount = prompt(`Сколько ОБЫЧНЫХ билетов закинуть?\nДоступно: ${window.currentTicketBalance}`);
+                let amount = prompt(`Сколько ОБЫЧНЫХ билетов закинуть в СВОЙ лот?\nДоступно: ${window.currentTicketBalance}`);
                 if (!amount) { resetTargetingUI(); return; }
                 amount = parseInt(amount);
                 if (isNaN(amount) || amount <= 0 || amount > window.currentTicketBalance) { showToast('❌ Некорректная сумма!', true); resetTargetingUI(); return; }
-                sendTwitchCommand(`!билет ${amount} ${slotIndex} @${ownerLogin}`); resetTargetingUI(); return;
+                // Отправляем короткую команду
+                sendTwitchCommand(`!билет ${amount} ${slotIndex}`); resetTargetingUI(); return;
             }
 
             // ОБРАБОТКА МАГИИ ИЗ РУЛЕТКИ

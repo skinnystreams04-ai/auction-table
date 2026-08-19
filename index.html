@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.5 (Self-Target Tickets)</title>
+    <title>Аукцион - Оверлей V48.6 (Clean Rules & Copy UX)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -96,7 +96,8 @@
         .player-row { display: flex; align-items: stretch; background: linear-gradient(90deg, #121612 0%, #0a0d0a 100%); border: 1px solid #283325; border-left: 4px solid #4a5c41; border-radius: 6px; box-shadow: 2px 2px 8px rgba(0,0,0,0.6); flex-shrink: 0; }
         .pr-user-info { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 8px 12px; background: rgba(0,0,0,0.3); border-right: 1px solid #283325; width: 250px; flex-shrink: 0; box-sizing: border-box; border-radius: 6px 0 0 6px; }
         .pr-role-name { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; width: 100%; }
-        .pr-name { font-size: 18px; font-weight: bold; color: #c4d1b8; text-transform: uppercase; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; cursor: pointer; pointer-events: auto; }
+        .pr-name { font-size: 18px; font-weight: bold; color: #c4d1b8; text-transform: uppercase; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; cursor: pointer; pointer-events: auto; transition: color 0.2s; }
+        .pr-name:hover { color: #a6e3a1; }
         .pr-total { font-size: 14px; color: #7c966a; font-weight: bold; background: rgba(124, 150, 106, 0.1); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(124, 150, 106, 0.2); margin-top: 4px; }
         .pr-games { display: grid; gap: 10px; padding: 10px; flex: 1; align-content: start; }
         .pr-game-pill { display: flex; flex-direction: column; background: #161a15; border: 1px solid #2b3628; border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); overflow: hidden; transition: 0.2s ease;}
@@ -217,7 +218,8 @@
         #cauldron-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; box-sizing: border-box; flex: 1; width: 100%; }
         .cauldron-item { background: rgba(14, 17, 13, 0.8); border: 1px solid #21291f; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden; flex-shrink: 0; }
         .c-top-row { display: flex; justify-content: space-between; align-items: center; }
-        .c-game-name { font-size: 18px; font-weight: bold; color: #b5c4ab; text-transform: uppercase; width: 65%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .c-game-name { font-size: 18px; font-weight: bold; color: #b5c4ab; text-transform: uppercase; width: 65%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: color 0.2s;}
+        .c-game-name:hover { color: #c4d1b8; }
         .c-tickets { font-size: 22px; font-weight: 900; color: #7fa86b;}
         .c-gold { display: flex; align-items: center; gap: 5px; font-size: 14px; color: #b8a87b; font-weight: bold; background: rgba(140, 123, 82, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(140, 123, 82, 0.3); }
         .status-badge { font-size: 13px; font-family: sans-serif; font-weight: 900; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; }
@@ -277,16 +279,16 @@
                 <div class="rules-text">
                     <div class="rules-section-title">🎬 ДВЕ ФАЗЫ АУКЦИОНА</div>
                     <ul>
-                        <li><b>🟡 ФАЗА 1 «Ясный день»:</b> Время Зарождения. Открыто добавление новых игр и <i>Колеса Баффов</i>. Время закидывать свои лоты, баффать их и копить силы.</li>
-                        <li><b>🌑 ФАЗА 2 «Солнечное затмение»:</b> Судная Ночь. <b>ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫТО.</b> Открывается <i>Колесо Дебаффов</i>. Начинается жесткая война: воровство, яды, налоги и убийства. Выживает сильнейший!</li>
+                        <li><b>🟡 ФАЗА 1 «Ясный день»:</b> Открыто добавление новых игр и <i>Колесо Баффов</i>. Можно добавлять лоты и увеличивать количество билетов.</li>
+                        <li><b>🌑 ФАЗА 2 «Солнечное затмение»:</b> <b>ДОБАВЛЕНИЕ НОВЫХ ИГР ЗАКРЫТО.</b> Открывается <i>Колесо Дебаффов</i>. Разрешено атаковать чужие лоты (воровство, налоги, яды).</li>
                     </ul>
 
                     <div class="rules-section-title">🎮 КАК УЧАСТВОВАТЬ</div>
                     <ul>
-                        <li><b>Добавление лотов:</b> В наградах канала можно добавить до <span id="rule-max-games" class="eff-badge">3</span> игр (укажи их через запятую в одном сообщении).</li>
-                        <li><b>Бесплатные билеты:</b> Покупай за баллы канала (1 билет = 100 баллов). Не дает магических эффектов, но имеет жесткие лимиты по ролям (смотри ниже).</li>
-                        <li><b>Платный заказ (Донат):</b> <b>ЛИМИТОВ НЕТ!</b> 2 грн = 1 Золотой билет. Чем больше донат, тем мощнее эффекты (уточняй расценки на стриме).</li>
-                        <li><b>Магия и защита:</b> Все касты работают ТОЛЬКО ПО ЦИФРАМ лотов (например: <code>!каст 1</code>). Ни один дебафф (кроме Смерти) не опускает билеты ниже 1. В магазине за баллы можно купить <span class="eff-badge shield">🛡️ Щит</span> или 🧴 Очищение от яда.</li>
+                        <li><b>Добавление лотов:</b> В наградах канала можно добавить до <span id="rule-max-games" class="eff-badge">3</span> игр (указываются через запятую в одном сообщении).</li>
+                        <li><b>Бесплатные билеты:</b> Покупаются за баллы канала (1 билет = 100 баллов). Лимитированы в зависимости от роли (см. ниже).</li>
+                        <li><b>Платный заказ (Донат):</b> <b>ЛИМИТОВ НЕТ!</b> 2 грн = 1 Золотой билет. Крупные суммы дают иммунитет к негативным эффектам.</li>
+                        <li><b>Магия и защита:</b> Эффекты применяются по номеру лота (например: <code>!каст 1</code>). Дебаффы (кроме Смерти) не опускают билеты ниже 1. В магазине за баллы доступны <span class="eff-badge shield">🛡️ Щит</span> и 🧴 Очищение.</li>
                     </ul>
 
                     <div class="rules-section-title">👑 ПРИВИЛЕГИИ И ЛИМИТЫ</div>
@@ -468,6 +470,16 @@
             setTimeout(() => { if(c.contains(el)) c.removeChild(el); }, 5000);
         }
 
+        // 🔥 ФУНКЦИЯ КОПИРОВАНИЯ ТЕКСТА ПО КЛИКУ 🔥
+        function copyText(el, text) {
+            if (targetingMode) return; // Не даем копировать, когда пытаемся закинуть каст/билеты
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`📋 Скопировано: ${text}`);
+            }).catch(err => {
+                showToast(`❌ Ошибка копирования`, true);
+            });
+        }
+
         function switchTab(tabId, btnElement) {
             const widget = btnElement.closest('.widget-base');
             widget.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
@@ -615,7 +627,6 @@
             if (window.currentTicketBalance <= 0) { showToast('❌ У тебя нет Обычных билетов!', true); return; }
             if (targetingMode && targetingState !== 'ticket') resetTargetingUI();
             targetingMode = true; targetingState = 'ticket'; 
-            // ИЗМЕНЕНИЕ ДЛЯ БИЛЕТОВ: Только свои лоты
             document.body.className = 'targeting-self'; 
             document.getElementById('cancel-banner').style.display = 'block';
             showToast('🎟️ РЕЖИМ БИЛЕТОВ: Выбери СВОЙ лот на Алтаре!');
@@ -665,7 +676,6 @@
                 if (!amount) { resetTargetingUI(); return; }
                 amount = parseInt(amount);
                 if (isNaN(amount) || amount <= 0 || amount > window.currentTicketBalance) { showToast('❌ Некорректная сумма!', true); resetTargetingUI(); return; }
-                // Отправляем короткую команду
                 sendTwitchCommand(`!билет ${amount} ${slotIndex}`); resetTargetingUI(); return;
             }
 
@@ -766,7 +776,6 @@
                 }
             }
             
-            // Если роль не максимальная, показываем кнопку обновления
             if (finalRole === 'SUB' || finalRole === 'VIP') { document.getElementById('btn-sync-role').style.display = 'none'; } 
             else { document.getElementById('btn-sync-role').style.display = 'inline-block'; }
             
@@ -844,7 +853,6 @@
             logArray.forEach(entry => { 
                 let el = `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`;
                 htmlAll += el;
-                // ФИЛЬТРУЕМ ЖУРНАЛ ДЛЯ ВКЛАДКИ ЗОЛОТА
                 if (entry.text.includes('ЗОЛОТ') || entry.text.includes('Золотых')) { htmlFinance += el; }
             });
             
@@ -855,7 +863,6 @@
         function drawSlots(playersData) {
             const baseUrl = "https://skinnystreams04-ai.github.io/auction-table/icons/";
             
-            // 🔥 ФИЛЬТР: Оставляем только тех, у кого реально добавлены игры 🔥
             const activePlayers = playersData.filter(p => p.games && (Array.isArray(p.games) ? p.games.length > 0 : Object.keys(p.games).length > 0));
 
             if (activePlayers.length === 0) {
@@ -917,7 +924,9 @@
                     let goldHtmlPill = game.gold > 0 ? `<span class="pr-g-tix" style="color: #b8a87b; background: rgba(184, 168, 123, 0.1); border-color: rgba(184, 168, 123, 0.2); margin-right: 5px;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon"> ${game.gold}</span>` : '';
                     gamesHtml += `<div class="pr-game-pill ${itemClass} ${isMineClass}" onclick="handleGameClick('${player.user}', ${slotIndex})"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${globalBadge + localBadges}</div></div></div>`;
                 });
-                playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
+                
+                // 🔥 ТУТ ДОБАВЛЕНО КОПИРОВАНИЕ НИКА 🔥
+                playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name" onclick="copyText(this, '${player.user}')" title="Скопировать никнейм">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
             });
 
             const sortedGames = Object.values(globalCauldron).sort((a, b) => (b.tickets + b.gold) - (a.tickets + a.gold)); 
@@ -930,7 +939,8 @@
                 let goldTickets = game.gold > 0 ? `<span style="color: #b8a87b; margin-right: 12px; display:flex; align-items:center;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon" style="margin-right: 4px;"> ${game.gold}</span>` : '';
                 let bottomRow = statusBadge ? `<div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 5px;">${statusBadge}</div>` : '';
 
-                html += `<div class="cauldron-item ${itemClass}"><div class="c-top-row"><div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название">${game.rawName}</div><div class="c-tickets" style="display:flex; align-items:center;">${goldTickets}<span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span></div></div>${bottomRow}</div>`;
+                // 🔥 ТУТ ДОБАВЛЕНО КОПИРОВАНИЕ НАЗВАНИЯ ИГРЫ В АЛТАРЕ 🔥
+                html += `<div class="cauldron-item ${itemClass}"><div class="c-top-row"><div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название игры">${game.rawName}</div><div class="c-tickets" style="display:flex; align-items:center;">${goldTickets}<span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span></div></div>${bottomRow}</div>`;
             });
             cauldronList.innerHTML = html;
         }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.3 (Filtered Table)</title>
+    <title>Аукцион - Оверлей V48.4 (Tickets & Cancel UX)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -21,9 +21,11 @@
         body.targeting-self .pr-game-pill.is-mine { opacity: 1; pointer-events: auto; filter: none; border: 2px dashed #a6e3a1; cursor: crosshair; box-shadow: 0 0 10px rgba(166, 227, 161, 0.2); }
         body.targeting-self .pr-game-pill.is-mine:hover { border-color: #c4d1b8; box-shadow: 0 0 20px rgba(166, 227, 161, 0.6); transform: scale(1.02); z-index: 10; background: #1a2618; }
         
-        /* КЛИКАБЕЛЬНЫЙ БАЛАНС ЗОЛОТА */
+        /* КЛИКАБЕЛЬНЫЕ БАЛАНСЫ */
         .bal-card.gold.clickable { cursor: pointer; transition: 0.2s ease; }
         .bal-card.gold.clickable:hover { background: rgba(184, 168, 123, 0.15); box-shadow: 0 0 15px rgba(184, 168, 123, 0.4); border-color: #b8a87b; transform: translateY(-2px); }
+        .bal-card.tickets.clickable { cursor: pointer; transition: 0.2s ease; }
+        .bal-card.tickets.clickable:hover { background: rgba(138, 191, 134, 0.15); box-shadow: 0 0 15px rgba(138, 191, 134, 0.4); border-color: #8abf86; transform: translateY(-2px); }
         
         .app-wrapper { width: 100%; height: 100vh; box-sizing: border-box; padding: 15px 20px; display: flex; flex-direction: column; overflow: hidden; }
         .layout { display: flex; gap: 20px; align-items: flex-start; width: 100%; height: calc(100vh - 60px); justify-content: space-between; margin-top: 15px;}
@@ -147,7 +149,7 @@
         .widget-base.collapsed { height: auto !important; flex: 0 0 auto; resize: none; }
         .widget-base.collapsed .widget-content { display: none; }
 
-        /* ТАБЫ (АЛТАРЬ / ЖУРНАЛ) */
+        /* ТАБЫ (АЛТАРЬ / ЖУРНАЛ / ЗОЛОТО) */
         .multi-widget-header { padding: 0 8px 0 0 !important; }
         .tabs-header { display: flex; align-items: stretch; height: 100%; flex: 1; min-width: 0; }
         .tab-btn { background: transparent; border: none; color: #4a5c41; font-family: 'Neucha', cursive; font-size: 14px; font-weight: bold; padding: 5px 6px; cursor: pointer; text-transform: uppercase; transition: 0.2s; border-bottom: 2px solid transparent; border-right: 1px solid #283325; display: flex; flex: 1; justify-content: center;}
@@ -156,7 +158,7 @@
         .tab-pane { display: none; height: 100%; width: 100%; flex-direction: column; box-sizing: border-box; overflow-y: auto; }
         .tab-pane.active { display: flex; }
         
-        #action-log-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        #action-log-list, #action-finance-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
         .log-entry { background: rgba(14, 17, 13, 0.8); border: 1px solid #283325; border-radius: 4px; padding: 8px 10px; font-size: 16px; color: #c4d1b8; border-left: 3px solid #4a5c41; }
         .log-entry .time { color: #6c7086; font-size: 14px; margin-right: 5px; }
 
@@ -243,7 +245,6 @@
             .col-main, .col-side { width: 100%; height: auto; padding-right: 0;}
             .col-side { height: 500px; }
             #widget-profile { height: auto !important; flex: 0 0 auto; }
-            /* ЖЕСТКАЯ ФИКСАЦИЯ ВЫСОТЫ ЧАТА ДЛЯ ТЕЛЕФОНА */
             #widget-chat { height: 450px !important; min-height: 450px !important; flex: 0 0 auto !important; display: flex !important; }
             .wheel-scale-box { width: 320px; height: 320px; transform: scale(0.65); }
             #wheel-canvas { width: 300px; height: 300px; }
@@ -253,6 +254,9 @@
     </style>
 </head>
 <body>
+
+    <!-- 🔥 КНОПКА ОТМЕНЫ ПРИЦЕЛА 🔥 -->
+    <div id="cancel-banner" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:10000; background:#1a1212; color:#eba0a0; padding:10px 30px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:20px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); border: 2px solid #c45c5c;" onclick="resetTargetingUI()">✖ ОТМЕНИТЬ ПРИЦЕЛИВАНИЕ (ESC)</div>
 
     <div id="toast-container"></div>
 
@@ -364,14 +368,15 @@
                                     </div>
 
                                     <div class="prof-balances">
-                                        <div class="bal-card">
+                                        <!-- 🔥 ОБЫЧНЫЕ БИЛЕТЫ (ТЕПЕРЬ КЛИКАБЕЛЬНЫЕ) 🔥 -->
+                                        <div class="bal-card tickets clickable" onclick="activateTicketTargeting()" title="Нажми, чтобы закинуть обычные билеты в лот!">
                                             <div style="width: 100%; font-size: 13px; color: #a4b09c; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Обычные</div>
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
                                                 <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET.png" style="width: 32px; filter: drop-shadow(0 0 10px rgba(138,191,134,0.5));">
                                                 <div id="tw-tickets" class="bal-val" style="color: #8abf86;">0</div>
                                             </div>
                                         </div>
-                                        <!-- 🔥 КЛИКАБЕЛЬНОЕ ЗОЛОТО 🔥 -->
+                                        <!-- 🔥 ЗОЛОТО 🔥 -->
                                         <div class="bal-card gold clickable" onclick="activateGoldTargeting()" title="Нажми, чтобы закинуть золото в лот!">
                                             <div style="width: 100%; font-size: 13px; color: #b8a87b; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Золотые</div>
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
@@ -388,7 +393,7 @@
 
                                     <div class="prof-limits">
                                         <div style="color: #8abf86; font-weight: bold; margin-bottom: 3px; border-bottom: 1px solid #283325; padding-bottom: 4px;">Лимиты на стрим:</div>
-                                        <div class="limit-row"><span>Использовано билетов:</span> <span class="limit-val" id="lim-tix">0 / 0</span></div>
+                                        <div class="limit-row"><span>Куплено билетов:</span> <span class="limit-val" id="lim-tix">0 / 0</span></div>
                                         <div class="limit-row"><span>Использовано беспл. колес:</span> <span class="limit-val" style="color: #b0b8a8;" id="lim-free">0 / 0</span></div>
                                         <div class="limit-row"><span>Использовано баффов:</span> <span class="limit-val" id="lim-buff">0 / 0</span></div>
                                         <div class="limit-row"><span>Использовано дебаффов:</span> <span class="limit-val" style="color: #c45c5c;" id="lim-debuff">0 / 0</span></div>
@@ -426,12 +431,13 @@
                 </div>
 
                 <div class="col-side">
-                    <!-- АЛТАРЬ / ЖУРНАЛ -->
+                    <!-- АЛТАРЬ / ЖУРНАЛ / ФИНАНСЫ -->
                     <div class="widget-base static-widget" id="widget-altar-log" style="height: 100%; flex: 1;" data-zoom="1">
                         <div class="widget-header multi-widget-header">
                             <div class="tabs-header">
                                 <button class="tab-btn active" onclick="switchTab('altar', this)">🩸 Алтарь</button>
                                 <button class="tab-btn" onclick="switchTab('log', this)">📜 Журнал</button>
+                                <button class="tab-btn" style="color: #b8a87b;" onclick="switchTab('finance', this)">💰 Золото</button>
                             </div>
                             <div class="widget-controls" style="margin-left: 8px; flex-shrink: 0;">
                                 <button class="ctrl-btn" onclick="changeWidgetZoom(this, -0.1)"><svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg></button>
@@ -445,6 +451,7 @@
                             <div class="zoom-target">
                                 <div id="tab-altar" class="tab-pane active"><div id="cauldron-list"></div></div>
                                 <div id="tab-log" class="tab-pane"><div id="action-log-list"></div></div>
+                                <div id="tab-finance" class="tab-pane"><div id="action-finance-list"></div></div>
                             </div>
                         </div>
                     </div>
@@ -551,6 +558,7 @@
         window.currentUserId = null;
         window.broadcasterId = null;
         window.currentGoldBalance = 0;
+        window.currentTicketBalance = 0;
         let detectedRole = "F"; 
 
         function loginTwitch() {
@@ -560,7 +568,7 @@
 
         function logoutTwitch() {
             localStorage.removeItem('tw_token');
-            window.currentUserLogin = null; window.currentUserId = null; window.broadcasterId = null; window.currentGoldBalance = 0;
+            window.currentUserLogin = null; window.currentUserId = null; window.broadcasterId = null; window.currentGoldBalance = 0; window.currentTicketBalance = 0;
             document.getElementById('profile-auth').style.display = 'none';
             document.getElementById('profile-unauth').style.display = 'flex';
         }
@@ -585,27 +593,40 @@
             showToast('🔄 Отправляю запрос боту. Ожидайте обновления...');
             sendTwitchCommand('!роль');
             const btn = document.getElementById('btn-sync-role');
-            btn.innerText = '⏳';
-            btn.style.pointerEvents = 'none';
+            btn.innerText = '⏳'; btn.style.pointerEvents = 'none';
             setTimeout(() => { btn.innerText = '🔄 ПРОВЕРИТЬ РОЛЬ'; btn.style.pointerEvents = 'auto'; }, 5000);
         }
 
+        // 🔥 СИСТЕМА ТАРГЕТИНГА КАСТОВ И БАЛАНСА 🔥
         let targetingMode = false; let targetingState = 'none'; let firstTarget = null; let loadedSpell = null;
+
+        // Обработка клавиши ESC
+        document.addEventListener('keydown', (e) => { if(e.key === 'Escape') resetTargetingUI(); });
 
         function activateGoldTargeting() {
             if (window.currentGoldBalance <= 0) { showToast('❌ У тебя нет Золотых билетов!', true); return; }
             if (targetingMode && targetingState !== 'gold') resetTargetingUI();
             targetingMode = true; targetingState = 'gold'; document.body.className = 'targeting-any'; 
+            document.getElementById('cancel-banner').style.display = 'block';
             showToast('🟡 РЕЖИМ ЗОЛОТА: Выбери ЛЮБОЙ лот на Алтаре!');
+        }
+
+        function activateTicketTargeting() {
+            if (window.currentTicketBalance <= 0) { showToast('❌ У тебя нет Обычных билетов!', true); return; }
+            if (targetingMode && targetingState !== 'ticket') resetTargetingUI();
+            targetingMode = true; targetingState = 'ticket'; document.body.className = 'targeting-any'; 
+            document.getElementById('cancel-banner').style.display = 'block';
+            showToast('🎟️ РЕЖИМ БИЛЕТОВ: Выбери ЛЮБОЙ лот на Алтаре!');
         }
 
         function toggleTargeting() {
             if (!loadedSpell) return;
-            if (targetingState === 'gold') { resetTargetingUI(); }
+            if (targetingState === 'gold' || targetingState === 'ticket') { resetTargetingUI(); }
             targetingMode = !targetingMode;
             const invEl = document.getElementById('inv-spell-content'); const hintEl = document.getElementById('inv-hint');
             if (targetingMode) {
                 invEl.classList.add('active');
+                document.getElementById('cancel-banner').style.display = 'block';
                 if (loadedSpell.mech === 'steal' || loadedSpell.mech === 'swap') {
                     targetingState = 'step1'; document.body.className = 'targeting-self'; hintEl.innerText = "ШАГ 1: Выбери СВОЙ лот"; showToast('РЕЖИМ ОБМЕНА: Сначала выбери свой лот!');
                 } else if (loadedSpell.target === 'self') {
@@ -618,6 +639,7 @@
 
         function resetTargetingUI() {
             targetingMode = false; targetingState = 'none'; document.body.className = '';
+            document.getElementById('cancel-banner').style.display = 'none';
             const invEl = document.getElementById('inv-spell-content'); const hintEl = document.getElementById('inv-hint');
             if (invEl) invEl.classList.remove('active');
             if (hintEl) hintEl.innerText = loadedSpell ? "Нажми сюда, чтобы применить!" : "Пусто. Крути колесо!";
@@ -625,6 +647,8 @@
 
         function handleGameClick(ownerLogin, slotIndex) {
             if (!targetingMode) return;
+
+            // ОБРАБОТКА ЗОЛОТА
             if (targetingState === 'gold') {
                 let amount = prompt(`Сколько ЗОЛОТЫХ билетов закинуть?\nДоступно: ${window.currentGoldBalance}`);
                 if (!amount) { resetTargetingUI(); return; }
@@ -632,6 +656,17 @@
                 if (isNaN(amount) || amount <= 0 || amount > window.currentGoldBalance) { showToast('❌ Некорректная сумма!', true); resetTargetingUI(); return; }
                 sendTwitchCommand(`!золото ${amount} ${slotIndex} @${ownerLogin}`); resetTargetingUI(); return;
             }
+
+            // ОБРАБОТКА ОБЫЧНЫХ БИЛЕТОВ
+            if (targetingState === 'ticket') {
+                let amount = prompt(`Сколько ОБЫЧНЫХ билетов закинуть?\nДоступно: ${window.currentTicketBalance}`);
+                if (!amount) { resetTargetingUI(); return; }
+                amount = parseInt(amount);
+                if (isNaN(amount) || amount <= 0 || amount > window.currentTicketBalance) { showToast('❌ Некорректная сумма!', true); resetTargetingUI(); return; }
+                sendTwitchCommand(`!билет ${amount} ${slotIndex} @${ownerLogin}`); resetTargetingUI(); return;
+            }
+
+            // ОБРАБОТКА МАГИИ ИЗ РУЛЕТКИ
             if (!loadedSpell) return;
             if (targetingState === 'step1') {
                 firstTarget = { slot: slotIndex }; targetingState = 'step2'; document.body.className = 'targeting-any';
@@ -701,6 +736,7 @@
             if (player) {
                 wGold = parseInt(player.wallet_gold || 0); wTickets = parseInt(player.wallet_tickets || 0);
                 window.currentGoldBalance = wGold;
+                window.currentTicketBalance = wTickets;
 
                 let rolePriority = { 'SUB': 3, 'VIP': 2, 'F': 1 };
                 if (player.role) { let dbRole = player.role.toUpperCase(); if (rolePriority[dbRole] > rolePriority[finalRole]) finalRole = dbRole; }
@@ -715,24 +751,21 @@
                 if (player.active_mech) {
                     loadedSpell = { mech: player.active_mech, name: player.active_name || 'Магия', icon: player.active_icon || '✨', target: player.active_target || 'self' };
                     let hintText = 'Нажми сюда, чтобы применить!';
-                    if (targetingMode && targetingState !== 'gold') {
+                    if (targetingMode && targetingState !== 'gold' && targetingState !== 'ticket') {
                         if (targetingState === 'step2') hintText = 'ШАГ 2: Выбери лот ЦЕЛИ'; else if (targetingState === 'step1') hintText = 'ШАГ 1: Выбери СВОЙ лот'; else if (loadedSpell.target === 'self') hintText = 'Выбери СВОЙ лот'; else hintText = 'Выбери ЛЮБОЙ лот (цель)';
                     }
                     invCount.innerText = "1 / 1";
-                    invContent.innerHTML = `<div id="inv-spell-content" class="inv-spell ${targetingMode && targetingState !== 'gold' ? 'active' : ''}" onclick="toggleTargeting()"><div class="inv-icon-name">${loadedSpell.icon} ${loadedSpell.name}</div><div id="inv-hint" class="inv-hint">${hintText}</div></div>`;
+                    invContent.innerHTML = `<div id="inv-spell-content" class="inv-spell ${targetingMode && targetingState !== 'gold' && targetingState !== 'ticket' ? 'active' : ''}" onclick="toggleTargeting()"><div class="inv-icon-name">${loadedSpell.icon} ${loadedSpell.name}</div><div id="inv-hint" class="inv-hint">${hintText}</div></div>`;
                 } else {
                     loadedSpell = null; 
-                    if (targetingState !== 'gold') { targetingMode = false; document.body.className = ''; targetingState = 'none'; }
+                    if (targetingState !== 'gold' && targetingState !== 'ticket') { targetingMode = false; document.body.className = ''; targetingState = 'none'; }
                     invCount.innerText = "0 / 1"; invContent.innerHTML = `<div style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>`;
                 }
             }
             
             // Если роль не максимальная, показываем кнопку обновления
-            if (finalRole === 'SUB' || finalRole === 'VIP') {
-                document.getElementById('btn-sync-role').style.display = 'none';
-            } else {
-                document.getElementById('btn-sync-role').style.display = 'inline-block';
-            }
+            if (finalRole === 'SUB' || finalRole === 'VIP') { document.getElementById('btn-sync-role').style.display = 'none'; } 
+            else { document.getElementById('btn-sync-role').style.display = 'inline-block'; }
             
             role = finalRole;
             document.getElementById('tw-gold').innerText = wGold;
@@ -782,7 +815,10 @@
                 }
 
                 if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%; margin-top: 30px;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
-                if (data && data.log) { drawLog(data.log); } else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
+                if (data && data.log) { drawLog(data.log); } else { 
+                    document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; 
+                    document.getElementById('action-finance-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #b8a87b; font-style: italic;">История золота пуста...</div>';
+                }
 
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
                     const spinData = data.last_spin;
@@ -798,9 +834,19 @@
         let lastLogDataString = "";
         function drawLog(logArray) {
             const currentLogString = JSON.stringify(logArray); if (lastLogDataString === currentLogString) return; lastLogDataString = currentLogString;
-            const logList = document.getElementById('action-log-list'); let html = '';
-            logArray.forEach(entry => { html += `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`; });
-            logList.innerHTML = html;
+            const logList = document.getElementById('action-log-list');
+            const financeList = document.getElementById('action-finance-list');
+            let htmlAll = ''; let htmlFinance = '';
+            
+            logArray.forEach(entry => { 
+                let el = `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`;
+                htmlAll += el;
+                // ФИЛЬТРУЕМ ЖУРНАЛ ДЛЯ ВКЛАДКИ ЗОЛОТА
+                if (entry.text.includes('ЗОЛОТ') || entry.text.includes('Золотых')) { htmlFinance += el; }
+            });
+            
+            logList.innerHTML = htmlAll || '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>';
+            financeList.innerHTML = htmlFinance || '<div style="text-align: center; padding: 20px; color: #b8a87b; font-style: italic;">История золота пуста...</div>';
         }
 
         function drawSlots(playersData) {

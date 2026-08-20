@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.6 (Clean Rules & Copy UX)</title>
+    <title>Аукцион - Оверлей V48.7 (Dynamic Rarity)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -212,7 +212,7 @@
         .wheel-result { text-align: center; margin-top: 30px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; }
         .wheel-result.show { opacity: 1; transform: translateY(0); }
         .res-user { color: #b8a87b; font-size: 28px; margin-bottom: 5px; text-transform: uppercase; }
-        .res-text { font-size: 42px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; }
+        .res-text { font-size: 42px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px currentColor; }
 
         /* АЛТАРЬ */
         #cauldron-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; box-sizing: border-box; flex: 1; width: 100%; }
@@ -925,7 +925,6 @@
                     gamesHtml += `<div class="pr-game-pill ${itemClass} ${isMineClass}" onclick="handleGameClick('${player.user}', ${slotIndex})"><div class="pr-g-top"><div class="pr-g-name-wrap"><span class="pr-g-name">${safeName}</span></div><div style="display:flex; align-items:center;">${goldHtmlPill}<span class="pr-g-tix"><img src="${baseUrl}BILET.png" class="custom-icon"> ${game.tickets || 0}</span></div></div><div class="pr-g-bottom"><div class="badges-mini-container">${globalBadge + localBadges}</div></div></div>`;
                 });
                 
-                // 🔥 ТУТ ДОБАВЛЕНО КОПИРОВАНИЕ НИКА 🔥
                 playersGrid.innerHTML += `<div class="player-row"><div class="pr-user-info"><div class="pr-role-name"><span class="role-badge ${player.role ? player.role.toLowerCase() : 'f'}">${player.role || 'F'}</span><span class="pr-name" onclick="copyText(this, '${player.user}')" title="Скопировать никнейм">${player.user || "Зритель"}</span></div><div class="pr-total">Σ ${player.totalTickets} билетов</div></div><div class="pr-games" style="grid-template-columns: repeat(${globalMaxGames}, 1fr);">${gamesHtml}</div></div>`;
             });
 
@@ -939,12 +938,12 @@
                 let goldTickets = game.gold > 0 ? `<span style="color: #b8a87b; margin-right: 12px; display:flex; align-items:center;"><img src="${baseUrl}BILET_GOLD.png" class="custom-icon" style="margin-right: 4px;"> ${game.gold}</span>` : '';
                 let bottomRow = statusBadge ? `<div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 5px;">${statusBadge}</div>` : '';
 
-                // 🔥 ТУТ ДОБАВЛЕНО КОПИРОВАНИЕ НАЗВАНИЯ ИГРЫ В АЛТАРЕ 🔥
                 html += `<div class="cauldron-item ${itemClass}"><div class="c-top-row"><div class="c-game-name" onclick="copyText(this, '${safeNameEscaped}')" title="Скопировать название игры">${game.rawName}</div><div class="c-tickets" style="display:flex; align-items:center;">${goldTickets}<span style="display:flex; align-items:center;"><img src="${baseUrl}BILET.png" class="custom-icon" style="margin-right: 4px;"> ${game.tickets}</span></div></div>${bottomRow}</div>`;
             });
             cauldronList.innerHTML = html;
         }
 
+        // 🔥 ФУНКЦИЯ КОЛЕСА С ДИНАМИЧЕСКОЙ РЕДКОСТЬЮ 🔥
         function startWheelAnimation(spinData) {
             isSpinning = true; 
             const overlay = document.getElementById('wheel-modal'); const canvas = document.getElementById('wheel-canvas'); const ctx = canvas.getContext('2d'); const resultBox = document.getElementById('wheel-result'); 
@@ -963,12 +962,36 @@
             const cx = 400, cy = 400; const sliceAngle = (Math.PI * 2) / activeItems.length;
             ctx.clearRect(0, 0, 800, 800); const lineRadius = 400; const textRadius = 265; 
             
+            // СЧИТАЕМ ОБЩИЙ ВЕС ДЛЯ ВЫЧИСЛЕНИЯ ПРОЦЕНТОВ
+            let totalActiveWeight = 0;
+            activeItems.forEach(item => { totalActiveWeight += Number(item.weight) || 1; });
+
             for (let i = 0; i < activeItems.length; i++) {
                 const startA = i * sliceAngle; const endA = startA + sliceAngle;
-                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, lineRadius, startA, endA); ctx.closePath(); ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, lineRadius, startA, endA); ctx.closePath(); 
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; ctx.lineWidth = 4; ctx.stroke();
+                
                 ctx.save(); ctx.translate(cx, cy); ctx.rotate(startA + sliceAngle / 2); ctx.textAlign = "right"; ctx.textBaseline = "middle";
                 let text = activeItems[i].name; if(text.length > 18) text = text.substring(0, 16) + "...";
-                ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; ctx.lineWidth = 6; ctx.strokeStyle = "black"; ctx.strokeText(text, textRadius, 0); ctx.fillStyle = neonColor; ctx.fillText(text, textRadius, 0); ctx.restore();
+                ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; ctx.lineWidth = 6; ctx.strokeStyle = "black"; 
+                ctx.strokeText(text, textRadius, 0); 
+                
+                // 🔥 ВЫСЧИТЫВАЕМ РЕДКОСТЬ ДЛЯ КАЖДОГО ПРЕДМЕТА 🔥
+                const itemWeight = Number(activeItems[i].weight) || 1;
+                const probability = (itemWeight / totalActiveWeight) * 100;
+                let itemColor = neonColor; 
+                
+                if (probability <= 5) {
+                    itemColor = "#f9e2af"; // Легендарный (Золотой)
+                } else if (probability <= 15) {
+                    itemColor = "#cba6f7"; // Эпический (Фиолетовый)
+                } else if (probability <= 30) {
+                    itemColor = "#89b4fa"; // Редкий (Синий)
+                }
+
+                ctx.fillStyle = itemColor; 
+                ctx.fillText(text, textRadius, 0); 
+                ctx.restore();
             }
             
             const spins = 5; const targetCenterAngle = targetIndex * sliceAngle + (sliceAngle / 2); const finalAngle = (spins * Math.PI * 2) - (Math.PI / 2) - targetCenterAngle; const randomOffset = (Math.random() - 0.5) * (sliceAngle * 0.7); const absoluteFinalAngle = finalAngle + randomOffset;
@@ -979,7 +1002,19 @@
                 if (!startTime) startTime = timestamp; const progress = Math.min((timestamp - startTime) / duration, 1);
                 canvas.style.transform = `scale(1) rotate(${absoluteFinalAngle * easeOut(progress)}rad)`;
                 if (progress < 1) { requestAnimationFrame(animateWheel); } else {
-                    document.getElementById('res-user').innerText = `КРУТИТ: ${spinData.user}`; document.getElementById('res-text').innerText = `${targetItem.name}`; document.getElementById('res-text').style.color = neonColor;
+                    document.getElementById('res-user').innerText = `КРУТИТ: ${spinData.user}`; 
+                    document.getElementById('res-text').innerText = `${targetItem.name}`;
+                    
+                    // ЦВЕТ ФИНАЛЬНОЙ НАДПИСИ ТОЖЕ ЗАВИСИТ ОТ РЕДКОСТИ
+                    const targetWeight = Number(targetItem.weight) || 1;
+                    const targetProb = (targetWeight / totalActiveWeight) * 100;
+                    let resultColor = neonColor;
+                    if (targetProb <= 5) resultColor = "#f9e2af";
+                    else if (targetProb <= 15) resultColor = "#cba6f7";
+                    else if (targetProb <= 30) resultColor = "#89b4fa";
+                    
+                    document.getElementById('res-text').style.color = resultColor;
+
                     resultBox.classList.add('show');
                     clearTimeout(wheelTimeout); wheelTimeout = setTimeout(() => { overlay.classList.remove('active'); setTimeout(() => { isSpinning = false; }, 500); }, 4000); 
                 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.7 (Dynamic Rarity)</title>
+    <title>Аукцион - Оверлей V48.8 (Rarity & Dual Logs)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -827,10 +827,10 @@
                 }
 
                 if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%; margin-top: 30px;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
-                if (data && data.log) { drawLog(data.log); } else { 
-                    document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; 
-                    document.getElementById('action-finance-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #b8a87b; font-style: italic;">История золота пуста...</div>';
-                }
+                
+                // 🔥 РАЗДЕЛЕНИЕ ЖУРНАЛОВ 🔥
+                if (data && data.log) { drawLog(data.log); } else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
+                if (data && data.finance_log) { drawFinanceLog(data.finance_log); } else { document.getElementById('action-finance-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #b8a87b; font-style: italic;">История золота пуста...</div>'; }
 
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
                     const spinData = data.last_spin;
@@ -847,17 +847,18 @@
         function drawLog(logArray) {
             const currentLogString = JSON.stringify(logArray); if (lastLogDataString === currentLogString) return; lastLogDataString = currentLogString;
             const logList = document.getElementById('action-log-list');
-            const financeList = document.getElementById('action-finance-list');
-            let htmlAll = ''; let htmlFinance = '';
-            
-            logArray.forEach(entry => { 
-                let el = `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`;
-                htmlAll += el;
-                if (entry.text.includes('ЗОЛОТ') || entry.text.includes('Золотых')) { htmlFinance += el; }
-            });
-            
+            let htmlAll = '';
+            logArray.forEach(entry => { htmlAll += `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`; });
             logList.innerHTML = htmlAll || '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>';
-            financeList.innerHTML = htmlFinance || '<div style="text-align: center; padding: 20px; color: #b8a87b; font-style: italic;">История золота пуста...</div>';
+        }
+
+        let lastFinanceLogString = "";
+        function drawFinanceLog(logArray) {
+            const currentString = JSON.stringify(logArray); if (lastFinanceLogString === currentString) return; lastFinanceLogString = currentString;
+            const list = document.getElementById('action-finance-list');
+            let html = '';
+            logArray.forEach(entry => { html += `<div class="log-entry"><span class="time">[${entry.time}]</span> ${entry.text}</div>`; });
+            list.innerHTML = html || '<div style="text-align: center; padding: 20px; color: #b8a87b; font-style: italic;">История золота пуста...</div>';
         }
 
         function drawSlots(playersData) {
@@ -962,9 +963,10 @@
             const cx = 400, cy = 400; const sliceAngle = (Math.PI * 2) / activeItems.length;
             ctx.clearRect(0, 0, 800, 800); const lineRadius = 400; const textRadius = 265; 
             
-            // СЧИТАЕМ ОБЩИЙ ВЕС ДЛЯ ВЫЧИСЛЕНИЯ ПРОЦЕНТОВ
+            // СЧИТАЕМ ОБЩИЙ ВЕС И ПОДГРУЖАЕМ НАСТРОЙКИ РЕДКОСТИ
             let totalActiveWeight = 0;
             activeItems.forEach(item => { totalActiveWeight += Number(item.weight) || 1; });
+            const rarity = currentConfig.wheels.rarity || { legendary: 5, epic: 15, rare: 30 };
 
             for (let i = 0; i < activeItems.length; i++) {
                 const startA = i * sliceAngle; const endA = startA + sliceAngle;
@@ -976,18 +978,14 @@
                 ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; ctx.lineWidth = 6; ctx.strokeStyle = "black"; 
                 ctx.strokeText(text, textRadius, 0); 
                 
-                // 🔥 ВЫСЧИТЫВАЕМ РЕДКОСТЬ ДЛЯ КАЖДОГО ПРЕДМЕТА 🔥
+                // 🔥 ВЫСЧИТЫВАЕМ И КРАСИМ РЕДКОСТЬ 🔥
                 const itemWeight = Number(activeItems[i].weight) || 1;
                 const probability = (itemWeight / totalActiveWeight) * 100;
                 let itemColor = neonColor; 
                 
-                if (probability <= 5) {
-                    itemColor = "#f9e2af"; // Легендарный (Золотой)
-                } else if (probability <= 15) {
-                    itemColor = "#cba6f7"; // Эпический (Фиолетовый)
-                } else if (probability <= 30) {
-                    itemColor = "#89b4fa"; // Редкий (Синий)
-                }
+                if (probability <= rarity.legendary) itemColor = "#f9e2af"; // Легендарный (Золотой)
+                else if (probability <= rarity.epic) itemColor = "#cba6f7"; // Эпический (Фиолетовый)
+                else if (probability <= rarity.rare) itemColor = "#89b4fa"; // Редкий (Синий)
 
                 ctx.fillStyle = itemColor; 
                 ctx.fillText(text, textRadius, 0); 
@@ -1009,9 +1007,10 @@
                     const targetWeight = Number(targetItem.weight) || 1;
                     const targetProb = (targetWeight / totalActiveWeight) * 100;
                     let resultColor = neonColor;
-                    if (targetProb <= 5) resultColor = "#f9e2af";
-                    else if (targetProb <= 15) resultColor = "#cba6f7";
-                    else if (targetProb <= 30) resultColor = "#89b4fa";
+                    
+                    if (targetProb <= rarity.legendary) resultColor = "#f9e2af";
+                    else if (targetProb <= rarity.epic) resultColor = "#cba6f7";
+                    else if (targetProb <= rarity.rare) resultColor = "#89b4fa";
                     
                     document.getElementById('res-text').style.color = resultColor;
 

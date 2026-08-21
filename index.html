@@ -844,6 +844,8 @@
                         }
                     }
                 } else { isFirstLoad = false; }
+            } catch (error) { console.error(error); }
+        }
         
         async function fetchLoop() { await fetchFromCloud(); setTimeout(fetchLoop, 1000); }
         checkTwitchAuth(); fetchLoop();
@@ -973,7 +975,12 @@
             activeItems.forEach(item => { totalActiveWeight += Number(item.weight) || 1; });
             const rarity = currentConfig.wheels.rarity || { legendary: 5, epic: 15, rare: 30 };
 
-            ctx.save(); ctx.translate(cx, cy); ctx.rotate(startA + sliceAngle / 2); ctx.textAlign = "right"; ctx.textBaseline = "middle";
+            for (let i = 0; i < activeItems.length; i++) {
+                const startA = i * sliceAngle; const endA = startA + sliceAngle;
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, lineRadius, startA, endA); ctx.closePath(); 
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; ctx.lineWidth = 4; ctx.stroke();
+                
+                ctx.save(); ctx.translate(cx, cy); ctx.rotate(startA + sliceAngle / 2); ctx.textAlign = "right"; ctx.textBaseline = "middle";
                 
                 // Считаем вероятность
                 const itemWeight = Number(activeItems[i].weight) || 1;

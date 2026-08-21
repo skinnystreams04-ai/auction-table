@@ -200,19 +200,19 @@
         #btn-sync-role { background: transparent; border: 1px solid #4a5c41; color: #a4b09c; font-family: 'Neucha', cursive; font-size: 11px; padding: 2px 6px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
         #btn-sync-role:hover { background: rgba(138, 191, 134, 0.1); color: #c4d1b8; border-color: #8abf86; }
 
-        /* ВСПЛЫВАЮЩЕЕ КОЛЕСО */
-        .wheel-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
-        .wheel-overlay.active { opacity: 1; pointer-events: auto; }
-        .wheel-scale-box { position: relative; width: 500px; height: 500px; transform: scale(0.8); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .wheel-overlay.active .wheel-scale-box { transform: scale(1); }
+        /* ВСПЛЫВАЮЩЕЕ КОЛЕСО (ВЫЕЗЖАЕТ СВЕРХУ) */
+        .wheel-overlay { position: fixed; top: 0; left: 50%; transform: translate(-50%, -100%); background: rgba(11, 13, 10, 0.95); border: 2px solid #4a5c41; border-top: none; border-radius: 0 0 20px 20px; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 40px 10px 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease; }
+        .wheel-overlay.active { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+        .wheel-scale-box { position: relative; width: 500px; height: 500px; transform: scale(0.6); margin: -90px 0; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .wheel-overlay.active .wheel-scale-box { transform: scale(0.7); }
         #wheel-canvas { position: absolute; width: 475px; height: 475px; top: 12.5px; left: 12.5px; border-radius: 50%; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1; }
         #wheel-frame { position: absolute; width: 500px; height: 500px; top: 0; left: 0; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 5; pointer-events: none; }
         .wheel-overlay.buff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Buff.png'); }
         .wheel-overlay.debuff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Debuff.png'); }
-        .wheel-result { text-align: center; margin-top: 30px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; }
+        .wheel-result { text-align: center; margin-top: 10px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; }
         .wheel-result.show { opacity: 1; transform: translateY(0); }
-        .res-user { color: #b8a87b; font-size: 28px; margin-bottom: 5px; text-transform: uppercase; }
-        .res-text { font-size: 42px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 15px currentColor; }
+        .res-user { color: #b8a87b; font-size: 20px; margin-bottom: 2px; text-transform: uppercase; }
+        .res-text { font-size: 32px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px currentColor; }
 
         /* АЛТАРЬ */
         #cauldron-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; box-sizing: border-box; flex: 1; width: 100%; }
@@ -835,10 +835,15 @@
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
                     const spinData = data.last_spin;
                     if (isFirstLoad) { lastProcessedSpinTime = spinData.timestamp; isFirstLoad = false; } 
-                    else if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) { lastProcessedSpinTime = spinData.timestamp; startWheelAnimation(spinData); }
+                    else if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) { 
+                        lastProcessedSpinTime = spinData.timestamp; 
+                        
+                        // 🔥 ПРИВАТНОСТЬ: Крутим на сайте ТОЛЬКО если это ты! 🔥
+                        if (window.currentUserLogin && spinData.user.toLowerCase() === window.currentUserLogin.toLowerCase()) {
+                            startWheelAnimation(spinData); 
+                        }
+                    }
                 } else { isFirstLoad = false; }
-            } catch (error) {}
-        }
         
         async function fetchLoop() { await fetchFromCloud(); setTimeout(fetchLoop, 1000); }
         checkTwitchAuth(); fetchLoop();
@@ -968,24 +973,25 @@
             activeItems.forEach(item => { totalActiveWeight += Number(item.weight) || 1; });
             const rarity = currentConfig.wheels.rarity || { legendary: 5, epic: 15, rare: 30 };
 
-            for (let i = 0; i < activeItems.length; i++) {
-                const startA = i * sliceAngle; const endA = startA + sliceAngle;
-                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, lineRadius, startA, endA); ctx.closePath(); 
-                ctx.strokeStyle = "rgba(0, 0, 0, 0.8)"; ctx.lineWidth = 4; ctx.stroke();
+            ctx.save(); ctx.translate(cx, cy); ctx.rotate(startA + sliceAngle / 2); ctx.textAlign = "right"; ctx.textBaseline = "middle";
                 
-                ctx.save(); ctx.translate(cx, cy); ctx.rotate(startA + sliceAngle / 2); ctx.textAlign = "right"; ctx.textBaseline = "middle";
-                let text = activeItems[i].name; if(text.length > 18) text = text.substring(0, 16) + "...";
-                ctx.font = "bold 32px 'Neucha', cursive, sans-serif"; ctx.lineWidth = 6; ctx.strokeStyle = "black"; 
+                // Считаем вероятность
+                const itemWeight = Number(activeItems[i].weight) || 1;
+                const probability = (itemWeight / totalActiveWeight) * 100;
+                
+                let text = activeItems[i].name; 
+                if(text.length > 10) text = text.substring(0, 8) + "...";
+                text += ` (${probability.toFixed(1)}%)`; // ДОБАВЛЯЕМ ПРОЦЕНТЫ!
+
+                ctx.font = "bold 24px 'Neucha', cursive, sans-serif"; // Чуть уменьшили шрифт, чтоб влезло
+                ctx.lineWidth = 5; ctx.strokeStyle = "black"; 
                 ctx.strokeText(text, textRadius, 0); 
                 
                 // 🔥 ВЫСЧИТЫВАЕМ И КРАСИМ РЕДКОСТЬ 🔥
-                const itemWeight = Number(activeItems[i].weight) || 1;
-                const probability = (itemWeight / totalActiveWeight) * 100;
                 let itemColor = neonColor; 
-                
-                if (probability <= rarity.legendary) itemColor = "#f9e2af"; // Легендарный (Золотой)
-                else if (probability <= rarity.epic) itemColor = "#cba6f7"; // Эпический (Фиолетовый)
-                else if (probability <= rarity.rare) itemColor = "#89b4fa"; // Редкий (Синий)
+                if (probability <= rarity.legendary) itemColor = "#f9e2af"; // Лега
+                else if (probability <= rarity.epic) itemColor = "#cba6f7"; // Эпик
+                else if (probability <= rarity.rare) itemColor = "#89b4fa"; // Рарочка
 
                 ctx.fillStyle = itemColor; 
                 ctx.fillText(text, textRadius, 0); 

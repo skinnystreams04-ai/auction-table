@@ -200,19 +200,22 @@
         #btn-sync-role { background: transparent; border: 1px solid #4a5c41; color: #a4b09c; font-family: 'Neucha', cursive; font-size: 11px; padding: 2px 6px; border-radius: 4px; cursor: pointer; transition: 0.2s; }
         #btn-sync-role:hover { background: rgba(138, 191, 134, 0.1); color: #c4d1b8; border-color: #8abf86; }
 
-        /* ВСПЛЫВАЮЩЕЕ КОЛЕСО (ВЫЕЗЖАЕТ СВЕРХУ) */
-        .wheel-overlay { position: fixed; top: 0; left: 50%; transform: translate(-50%, -100%); background: rgba(11, 13, 10, 0.95); border: 2px solid #4a5c41; border-top: none; border-radius: 0 0 20px 20px; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px 40px 10px 40px; box-shadow: 0 15px 40px rgba(0,0,0,0.9); opacity: 0; pointer-events: none; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease; }
-        .wheel-overlay.active { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
-        .wheel-scale-box { position: relative; width: 500px; height: 500px; transform: scale(0.6); margin: -90px 0; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .wheel-overlay.active .wheel-scale-box { transform: scale(0.7); }
+        /* ВСПЛЫВАЮЩЕЕ КОЛЕСО (ПОВЕРХ ТАБЛИЦЫ, ВЫЕЗЖАЕТ СВЕРХУ) */
+        .wheel-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; border-radius: 8px; overflow: hidden; }
+        .wheel-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .wheel-scale-box { position: relative; width: 500px; height: 500px; transform: translateY(-150%) scale(0.5); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .wheel-overlay.active .wheel-scale-box { transform: translateY(-10%) scale(1.15); }
+        
         #wheel-canvas { position: absolute; width: 475px; height: 475px; top: 12.5px; left: 12.5px; border-radius: 50%; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1; }
         #wheel-frame { position: absolute; width: 500px; height: 500px; top: 0; left: 0; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 5; pointer-events: none; }
         .wheel-overlay.buff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Buff.png'); }
         .wheel-overlay.debuff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Debuff.png'); }
-        .wheel-result { text-align: center; margin-top: 10px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; }
+        
+        .wheel-result { position: absolute; bottom: 8%; text-align: center; width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; z-index: 10; }
         .wheel-result.show { opacity: 1; transform: translateY(0); }
-        .res-user { color: #b8a87b; font-size: 20px; margin-bottom: 2px; text-transform: uppercase; }
-        .res-text { font-size: 32px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px currentColor; }
+        .res-user { color: #b8a87b; font-size: 24px; margin-bottom: 5px; text-transform: uppercase; text-shadow: 0 2px 4px #000; }
+        .res-text { font-size: 44px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 15px currentColor, 0 4px 10px #000; }
 
         /* АЛТАРЬ */
         #cauldron-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; box-sizing: border-box; flex: 1; width: 100%; }
@@ -248,10 +251,10 @@
             .col-side { height: 500px; }
             #widget-profile { height: auto !important; flex: 0 0 auto; }
             #widget-chat { height: 450px !important; min-height: 450px !important; flex: 0 0 auto !important; display: flex !important; }
-            .wheel-scale-box { width: 320px; height: 320px; transform: scale(0.65); }
+            .wheel-scale-box { width: 320px; height: 320px; transform: scale(0.65) translateY(-100%) !important; }
+            .wheel-overlay.active .wheel-scale-box { transform: scale(0.85) translateY(0) !important; }
             #wheel-canvas { width: 300px; height: 300px; }
             #wheel-frame { width: 320px; height: 320px; }
-            .wheel-overlay.active .wheel-scale-box { transform: scale(0.85); }
         }
     </style>
 </head>
@@ -261,11 +264,6 @@
     <div id="cancel-banner" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:10000; background:#1a1212; color:#eba0a0; padding:10px 30px; border-radius:8px; font-weight:bold; cursor:pointer; font-size:20px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); border: 2px solid #c45c5c;" onclick="resetTargetingUI()">✖ ОТМЕНИТЬ ПРИЦЕЛИВАНИЕ (ESC)</div>
 
     <div id="toast-container"></div>
-
-    <div class="wheel-overlay" id="wheel-modal">
-        <div class="wheel-scale-box"><canvas id="wheel-canvas" width="800" height="800"></canvas><div id="wheel-frame"></div></div>
-        <div class="wheel-result" id="wheel-result"><div class="res-user" id="res-user">КРУТИТ: ЗРИТЕЛЬ</div><div class="res-text" id="res-text">Награда!</div></div>
-    </div>
 
     <!-- МОДАЛЬНОЕ ОКНО ПРАВИЛ -->
     <div class="rules-modal" id="rules-modal">
@@ -321,6 +319,13 @@
             
             <!-- ЛЕВАЯ ЧАСТЬ -->
             <div class="left-container">
+                
+                <!-- 🔥 ВСПЛЫВАЮЩЕЕ КОЛЕСО (ПОВЕРХ ТАБЛИЦЫ) 🔥 -->
+                <div class="wheel-overlay" id="wheel-modal">
+                    <div class="wheel-scale-box"><canvas id="wheel-canvas" width="800" height="800"></canvas><div id="wheel-frame"></div></div>
+                    <div class="wheel-result" id="wheel-result"><div class="res-user" id="res-user">КРУТИТ: ЗРИТЕЛЬ</div><div class="res-text" id="res-text">Награда!</div></div>
+                </div>
+
                 <div class="phase-bar">
                     <button class="top-nav-btn left-btn" onclick="openModalTab('rules')" style="color: #b8a87b; border-color: #8c7b52; display: flex; align-items: center; gap: 5px; justify-content: center;">
                         <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET_GOLD.png" class="custom-icon" style="width: 18px; height: 18px;"> Правила / Эффекты
@@ -968,7 +973,7 @@
             
             const targetIndex = spinData.index; const targetItem = activeItems[targetIndex];
             const cx = 400, cy = 400; const sliceAngle = (Math.PI * 2) / activeItems.length;
-            ctx.clearRect(0, 0, 800, 800); const lineRadius = 400; const textRadius = 265; 
+            ctx.clearRect(0, 0, 800, 800); const lineRadius = 400; const textRadius = 250; 
             
             // СЧИТАЕМ ОБЩИЙ ВЕС И ПОДГРУЖАЕМ НАСТРОЙКИ РЕДКОСТИ
             let totalActiveWeight = 0;
@@ -990,8 +995,8 @@
                 if(text.length > 10) text = text.substring(0, 8) + "...";
                 text += ` (${probability.toFixed(1)}%)`; // ДОБАВЛЯЕМ ПРОЦЕНТЫ!
 
-                ctx.font = "bold 24px 'Neucha', cursive, sans-serif"; // Чуть уменьшили шрифт, чтоб влезло
-                ctx.lineWidth = 5; ctx.strokeStyle = "black"; 
+                ctx.font = "bold 26px 'Neucha', cursive, sans-serif"; 
+                ctx.lineWidth = 6; ctx.strokeStyle = "black"; 
                 ctx.strokeText(text, textRadius, 0); 
                 
                 // 🔥 ВЫСЧИТЫВАЕМ И КРАСИМ РЕДКОСТЬ 🔥

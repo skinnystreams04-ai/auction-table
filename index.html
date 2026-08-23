@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Аукцион - Оверлей V48.9 (Updated Rules)</title>
-    <link rel="icon" type="image/png" href="https://skinnystreams04-ai.github.io/auction-table/icons/BILET_GOLD.png">
+    <link rel="icon" type="image/png" href="https://skinnystreams04-ai.github.io/Auction/icons/BILET_GOLD.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 
@@ -208,10 +208,10 @@
         .wheel-scale-box { position: relative; width: 500px; height: 500px; transform: translateY(-150%) scale(0.5); transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .wheel-overlay.active .wheel-scale-box { transform: translateY(-10%) scale(1.15); }
         
-        #wheel-canvas { position: absolute; width: 475px; height: 475px; top: 12.5px; left: 12.5px; border-radius: 50%; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Wheel_Base.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1; }
-        #wheel-frame { position: absolute; width: 500px; height: 500px; top: 0; left: 0; background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Free.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 5; pointer-events: none; }
-        .wheel-overlay.buff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Buff.png'); }
-        .wheel-overlay.debuff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/auction-table/wheel/Frame_Debuff.png'); }
+        #wheel-canvas { position: absolute; width: 475px; height: 475px; top: 12.5px; left: 12.5px; border-radius: 50%; background-image: url('https://skinnystreams04-ai.github.io/Auction/wheel/Wheel_Base.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 1; }
+        #wheel-frame { position: absolute; width: 500px; height: 500px; top: 0; left: 0; background-image: url('https://skinnystreams04-ai.github.io/Auction/wheel/Frame_Free.png'); background-size: cover; background-position: center; background-repeat: no-repeat; z-index: 5; pointer-events: none; }
+        .wheel-overlay.buff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/Auction/wheel/Frame_Buff.png'); }
+        .wheel-overlay.debuff #wheel-frame { background-image: url('https://skinnystreams04-ai.github.io/Auction/wheel/Frame_Debuff.png'); }
         
         .wheel-result { position: absolute; bottom: 8%; text-align: center; width: 100%; opacity: 0; transform: translateY(20px); transition: all 0.4s ease; z-index: 10; }
         .wheel-result.show { opacity: 1; transform: translateY(0); }
@@ -293,7 +293,7 @@
                     <div class="rules-section-title">👑 ПРИВИЛЕГИИ И ЛИМИТЫ</div>
                     <ul id="dynamic-limits-list"><li>Загрузка актуальных лимитов из базы...</li></ul>
 
-                    <div class="rules-section-title"><img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET_GOLD.png" class="custom-icon" style="width:28px; height:28px; vertical-align: bottom;"> ЗОЛОТЫЕ БИЛЕТЫ (ЗА ДОНАТ И САБКИ)</div>
+                    <div class="rules-section-title"><img src="https://skinnystreams04-ai.github.io/Auction/icons/BILET_GOLD.png" class="custom-icon" style="width:28px; height:28px; vertical-align: bottom;"> ЗОЛОТЫЕ БИЛЕТЫ (ЗА ДОНАТ И САБКИ)</div>
                     <ul>
                         <li>Золотые билеты — это премиум валюта. Курс: <b>2 гривны = 1 Золотой билет</b>.</li>
                         <li><b>Twitch Сабки:</b> Учитываются по курсу: 1 сабка = 43 грн = <b>22 Золотых билета</b>.</li>
@@ -329,7 +329,7 @@
 
                 <div class="phase-bar">
                     <button class="top-nav-btn left-btn" onclick="openModalTab('rules')" style="color: #b8a87b; border-color: #8c7b52; display: flex; align-items: center; gap: 5px; justify-content: center;">
-                        <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET_GOLD.png" class="custom-icon" style="width: 18px; height: 18px;"> Правила / Эффекты
+                        <img src="https://skinnystreams04-ai.github.io/Auction/icons/BILET_GOLD.png" class="custom-icon" style="width: 18px; height: 18px;"> Правила / Эффекты
                     </button>
                     <div id="phase-indicator" class="phase-indicator p2">🟡 ФАЗА 1: ЯСНЫЙ ДЕНЬ</div>
                 </div>
@@ -380,7 +380,7 @@
                                         <div class="bal-card tickets clickable" onclick="activateTicketTargeting()" title="Нажми, чтобы закинуть обычные билеты в лот!">
                                             <div style="width: 100%; font-size: 13px; color: #a4b09c; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Обычные</div>
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
-                                                <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET.png" style="width: 32px; filter: drop-shadow(0 0 10px rgba(138,191,134,0.5));">
+                                                <img src="https://skinnystreams04-ai.github.io/Auction/icons/BILET.png" style="width: 32px; filter: drop-shadow(0 0 10px rgba(138,191,134,0.5));">
                                                 <div id="tw-tickets" class="bal-val" style="color: #8abf86;">0</div>
                                             </div>
                                         </div>
@@ -388,7 +388,7 @@
                                         <div class="bal-card gold clickable" onclick="activateGoldTargeting()" title="Нажми, чтобы закинуть золото в лот!">
                                             <div style="width: 100%; font-size: 13px; color: #b8a87b; text-transform: uppercase; text-align: center; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;">Золотые</div>
                                             <div style="display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%;">
-                                                <img src="https://skinnystreams04-ai.github.io/auction-table/icons/BILET_GOLD.png" style="width: 32px; filter: drop-shadow(0 0 10px rgba(184,168,123,0.5));">
+                                                <img src="https://skinnystreams04-ai.github.io/Auction/icons/BILET_GOLD.png" style="width: 32px; filter: drop-shadow(0 0 10px rgba(184,168,123,0.5));">
                                                 <div id="tw-gold" class="bal-val" style="color: #b8a87b;">0</div>
                                             </div>
                                         </div>
@@ -553,7 +553,7 @@
 
         function renderDictionaryUI() {
             if(!currentConfig || !currentConfig.dictionary) return;
-            const baseUrl = "https://skinnystreams04-ai.github.io/auction-table/icons/";
+            const baseUrl = "https://skinnystreams04-ai.github.io/Auction/icons/";
             const renderGrid = (arr, containerId, cssClass) => {
                 const container = document.getElementById(containerId); let html = "";
                 if(!arr || arr.length === 0) { container.innerHTML = "<p>Пусто</p>"; return; }
@@ -569,7 +569,7 @@
 
         // 🔥 TWITCH АВТОРИЗАЦИЯ & ИНТЕРАКТИВ 🔥
         const TWITCH_CLIENT_ID = 'gko3y2nhxg0ocvte0ru970pbau3eiq';
-        const REDIRECT_URI = 'https://skinnystreams04-ai.github.io/auction-table/';
+        const REDIRECT_URI = 'https://skinnystreams04-ai.github.io/Auction/';
         const STREAMER_LOGIN = 'skinwalker_nozxc'; 
         
         window.currentUserLogin = null;
@@ -875,7 +875,7 @@
         }
 
         function drawSlots(playersData) {
-            const baseUrl = "https://skinnystreams04-ai.github.io/auction-table/icons/";
+            const baseUrl = "https://skinnystreams04-ai.github.io/Auction/icons/";
             
             const activePlayers = playersData.filter(p => p.games && (Array.isArray(p.games) ? p.games.length > 0 : Object.keys(p.games).length > 0));
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Аукцион - Оверлей V48.9 (Updated Rules)</title>
+    <title>Аукцион - Оверлей V49.0 (Global Bank)</title>
     <link rel="icon" type="image/png" href="https://skinnystreams04-ai.github.io/Auction/icons/BILET_GOLD.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
@@ -735,51 +735,77 @@
                         document.getElementById('profile-unauth').style.display = 'none';
                         document.getElementById('profile-auth').style.display = 'flex';
                         
-                        if (window.latestAuctionData) renderWallet(window.latestAuctionData);
+                        if (window.latestAuctionData) renderWallet(window.latestAuctionData, window.globalUsersData);
                     } else { logoutTwitch(); }
                 } catch (e) { console.error('Twitch Auth Error:', e); }
             }
         }
 
-        // 🔥 РАСЧЕТ БАЛАНСОВ И ЛИМИТОВ 🔥
-        function renderWallet(data) {
-            if (!window.currentUserLogin || !data) return;
+        const firebaseUrlGlobal = "https://skinwalkerauction-default-rtdb.europe-west1.firebasedatabase.app/global_users.json";
+
+        // 🔥 РАСЧЕТ БАЛАНСОВ И ЛИМИТОВ (Склейка двух баз) 🔥
+        function renderWallet(data, globalUsers) {
+            if (!window.currentUserLogin) return;
             
             let wGold = 0; let wTickets = 0; let role = detectedRole;
             let ticketsBought = 0; let buffsUsed = 0; let debuffsUsed = 0; let freeUsed = 0;
 
-            const players = data.players || [];
+            const players = data ? (data.players || []) : [];
             const player = players.find(p => p.user && p.user.toLowerCase() === window.currentUserLogin.toLowerCase());
             
+            // 🔥 БЕРЕМ БАЛАНС ИЗ ГЛОБАЛЬНОЙ БАЗЫ 🔥
+            const globalUser = globalUsers ? globalUsers[window.currentUserLogin.toLowerCase()] : null;
             let finalRole = detectedRole; 
-            if (player) {
-                wGold = parseInt(player.wallet_gold || 0); wTickets = parseInt(player.wallet_tickets || 0);
+            
+            if (globalUser) {
+                wGold = parseInt(globalUser.wallet_gold || 0); 
+                wTickets = parseInt(globalUser.wallet_tickets || 0);
                 window.currentGoldBalance = wGold;
                 window.currentTicketBalance = wTickets;
 
                 let rolePriority = { 'SUB': 3, 'VIP': 2, 'F': 1 };
-                if (player.role) { let dbRole = player.role.toUpperCase(); if (rolePriority[dbRole] > rolePriority[finalRole]) finalRole = dbRole; }
-                if (player.is_sub) finalRole = "SUB"; else if (player.is_vip && finalRole !== "SUB") finalRole = "VIP";
-                
+                if (globalUser.role) { 
+                    let dbRole = globalUser.role.toUpperCase(); 
+                    if (rolePriority[dbRole] > rolePriority[finalRole]) finalRole = dbRole; 
+                }
+
+                if (globalUser.color) {
+                    document.getElementById('tw-username').style.color = globalUser.color;
+                }
+            }
+
+            // 🔥 БЕРЕМ ИНВЕНТАРЬ И ЛИМИТЫ ИЗ АУКЦИОНА 🔥
+            const invCount = document.getElementById('inv-count'); 
+            const invContent = document.getElementById('inv-content');
+            
+            if (player) {
                 ticketsBought = parseInt(player.tickets_bought || player.bought_tickets || 0);
                 buffsUsed = parseInt(player.spins_buffs_used || player.buffs_used || 0); 
                 debuffsUsed = parseInt(player.spins_debuffs_used || player.debuffs_used || 0); 
                 freeUsed = parseInt(player.spins_free_used || player.free_used || 0);
 
-                const invCount = document.getElementById('inv-count'); const invContent = document.getElementById('inv-content');
                 if (player.active_mech) {
                     loadedSpell = { mech: player.active_mech, name: player.active_name || 'Магия', icon: player.active_icon || '✨', target: player.active_target || 'self' };
                     let hintText = 'Нажми сюда, чтобы применить!';
                     if (targetingMode && targetingState !== 'gold' && targetingState !== 'ticket') {
-                        if (targetingState === 'step2') hintText = 'ШАГ 2: Выбери лот ЦЕЛИ'; else if (targetingState === 'step1') hintText = 'ШАГ 1: Выбери СВОЙ лот'; else if (loadedSpell.target === 'self') hintText = 'Выбери СВОЙ лот'; else hintText = 'Выбери ЛЮБОЙ лот (цель)';
+                        if (targetingState === 'step2') hintText = 'ШАГ 2: Выбери лот ЦЕЛИ'; 
+                        else if (targetingState === 'step1') hintText = 'ШАГ 1: Выбери СВОЙ лот'; 
+                        else if (loadedSpell.target === 'self') hintText = 'Выбери СВОЙ лот'; 
+                        else hintText = 'Выбери ЛЮБОЙ лот (цель)';
                     }
                     invCount.innerText = "1 / 1";
                     invContent.innerHTML = `<div id="inv-spell-content" class="inv-spell ${targetingMode && targetingState !== 'gold' && targetingState !== 'ticket' ? 'active' : ''}" onclick="toggleTargeting()"><div class="inv-icon-name">${loadedSpell.icon} ${loadedSpell.name}</div><div id="inv-hint" class="inv-hint">${hintText}</div></div>`;
                 } else {
                     loadedSpell = null; 
                     if (targetingState !== 'gold' && targetingState !== 'ticket') { targetingMode = false; document.body.className = ''; targetingState = 'none'; }
-                    invCount.innerText = "0 / 1"; invContent.innerHTML = `<div style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>`;
+                    invCount.innerText = "0 / 1"; 
+                    invContent.innerHTML = `<div style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>`;
                 }
+            } else {
+                loadedSpell = null; 
+                if (targetingState !== 'gold' && targetingState !== 'ticket') { targetingMode = false; document.body.className = ''; targetingState = 'none'; }
+                invCount.innerText = "0 / 1"; 
+                invContent.innerHTML = `<div style="color: #6c7086; text-align: center; padding: 4px; font-size: 14px;">Пусто. Крути колесо!</div>`;
             }
             
             if (finalRole === 'SUB' || finalRole === 'VIP') { document.getElementById('btn-sync-role').style.display = 'none'; } 
@@ -790,7 +816,8 @@
             document.getElementById('tw-tickets').innerText = wTickets;
             
             const roleBadge = document.getElementById('tw-role');
-            roleBadge.innerText = role.toUpperCase(); roleBadge.className = `role-badge ${role.toLowerCase()}`;
+            roleBadge.innerText = role.toUpperCase(); 
+            roleBadge.className = `role-badge ${role.toLowerCase()}`;
 
             if (currentConfig) {
                 const gl = currentConfig.global_limits || {}; const lim = currentConfig.limits || {};
@@ -815,9 +842,32 @@
 
         async function fetchFromCloud() {
             try {
-                const [dataRes, confRes] = await Promise.all([ fetch(firebaseUrl + "?nocache=" + new Date().getTime()), fetch(configUrl + "?nocache=" + new Date().getTime()) ]);
-                const data = await dataRes.json(); currentConfig = await confRes.json();
-                window.latestAuctionData = data; renderWallet(data); 
+                // Скачиваем сразу три базы
+                const [dataRes, confRes, globalRes] = await Promise.all([ 
+                    fetch(firebaseUrl + "?nocache=" + new Date().getTime()), 
+                    fetch(configUrl + "?nocache=" + new Date().getTime()),
+                    fetch(firebaseUrlGlobal + "?nocache=" + new Date().getTime())
+                ]);
+                
+                const data = await dataRes.json(); 
+                currentConfig = await confRes.json();
+                const globalUsers = await globalRes.json() || {};
+
+                // 🔥 СКЛЕИВАЕМ БАЗЫ ДЛЯ ТАБЛИЦЫ ЛОТОВ (Раздаем роли) 🔥
+                if (data && data.players) {
+                    data.players.forEach(p => {
+                        if (p.user) {
+                            const gu = globalUsers[p.user.toLowerCase()];
+                            if (gu) {
+                                p.role = gu.role || 'F';
+                            }
+                        }
+                    });
+                }
+
+                window.latestAuctionData = data; 
+                window.globalUsersData = globalUsers;
+                renderWallet(data, globalUsers); 
 
                 if (data && data.current_phase) {
                     const phaseInd = document.getElementById('phase-indicator');
@@ -832,19 +882,20 @@
                     if (currentConfig.dictionary.debuffs) currentConfig.dictionary.debuffs.forEach(e => dictionaryMap[e.id] = e);
                 }
 
-                if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%; margin-top: 30px;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
+                if (data && data.players) { try { drawSlots(data.players); } catch (e) {} } 
+                else { playersGrid.innerHTML = "<h2 style='color: #4a5c41; text-align: center; width: 100%; margin-top: 30px;'>Алтарь пуст... Ждем жертв.</h2>"; cauldronList.innerHTML = ""; }
                 
-                // 🔥 РАЗДЕЛЕНИЕ ЖУРНАЛОВ 🔥
-                if (data && data.log) { drawLog(data.log); } else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
-                if (data && data.finance_log) { drawFinanceLog(data.finance_log); } else { document.getElementById('action-finance-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #b8a87b; font-style: italic;">История золота пуста...</div>'; }
+                if (data && data.log) { drawLog(data.log); } 
+                else { document.getElementById('action-log-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #6c7086; font-style: italic;">Аукцион запущен. Ждем первых действий...</div>'; }
+                
+                if (data && data.finance_log) { drawFinanceLog(data.finance_log); } 
+                else { document.getElementById('action-finance-list').innerHTML = '<div style="text-align: center; padding: 20px; color: #b8a87b; font-style: italic;">История золота пуста...</div>'; }
 
                 if (data && data.last_spin && currentConfig && currentConfig.wheels) {
                     const spinData = data.last_spin;
                     if (isFirstLoad) { lastProcessedSpinTime = spinData.timestamp; isFirstLoad = false; } 
                     else if (spinData.timestamp > lastProcessedSpinTime && !isSpinning) { 
                         lastProcessedSpinTime = spinData.timestamp; 
-                        
-                        // 🔥 ПРИВАТНОСТЬ: Крутим на сайте ТОЛЬКО если это ты! 🔥
                         if (window.currentUserLogin && spinData.user.toLowerCase() === window.currentUserLogin.toLowerCase()) {
                             startWheelAnimation(spinData); 
                         }
